@@ -3,8 +3,9 @@
 
 (def datomic-uri (env :wb-db-uri))
 
-(def elasticsearch-uri
-  (or (env :elasticsearch-uri) "http://localhost:9200"))
+(def es-base-url
+  (or (env :es-base-uri) "http://localhost:9200"))
 
 (def release-id
-  (re-find #"WS\d+" datomic-uri))
+  (->> (re-find #"WS\d+" datomic-uri)
+       (clojure.string/lower-case)))
