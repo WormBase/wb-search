@@ -4,7 +4,11 @@
             [wb-es.env :refer [es-base-url release-id]]))
 
 (defn search [q options]
-  (let [query {:query {:match {:label q}}}
+  (let [query {:query
+               {:bool
+                {:should [{:term {:wbid q}}
+                          {:match {:label q}}
+                          {:match {:_all q}}]}}}
 
         response
         (http/get (format "%s/%s/_search?size=%s&from=%s"
