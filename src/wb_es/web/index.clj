@@ -3,11 +3,12 @@
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.json :refer [wrap-json-response]]
-            [ring.util.response :refer [response not-found]]))
+            [ring.util.response :refer [response not-found]]
+            [wb-es.web.core :refer [search]]))
 
 (defroutes app
-  (GET "/search" [q species type paper_type]
-       (response {:species species}))
+  (GET "/search" [q & options]
+       (response (search q options)))
   (route/not-found (response {:message "endpoint not found"})))
 
 (defn handler [request]
