@@ -1,4 +1,4 @@
-(ns wb-es.web.core
+(ns wb-es.web.index
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
@@ -6,7 +6,7 @@
             [ring.util.response :refer [response not-found]]))
 
 (defroutes app
-  (GET "/search" [species type paper_type]
+  (GET "/search" [q species type paper_type]
        (response {:species species}))
   (route/not-found (response {:message "endpoint not found"})))
 

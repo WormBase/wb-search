@@ -20,7 +20,7 @@
   :plugins [[lein-environ "1.1.0"]
             [lein-pprint "1.1.1"]]
   :main ^:skip-aot wb-es.core
-  :ring {:handler wb-es.web.core/handler}
+  :ring {:handler wb-es.web.index/handler}
   :resource-paths ["resources"]
   :uberjar {:aot :all}
   :target-path "target/%s"
