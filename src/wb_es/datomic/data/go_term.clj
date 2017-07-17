@@ -7,7 +7,8 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:go-term/id entity)
-     :label (:go-term/definition entity)}))
+     :label (first (:go-term/name entity))
+     :description (first (:go-term/definition entity))}))
 
 
 
