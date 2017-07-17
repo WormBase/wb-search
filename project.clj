@@ -9,11 +9,18 @@
    [org.clojure/core.async "0.3.442"]
    [environ "1.1.0"]
    [mount "0.1.11"]
-   [org.clojure/clojure "1.8.0"]]
+   [org.clojure/clojure "1.8.0"]
+
+   ;; the following dependecies are only needed for web
+   [compojure "1.6.0"]
+   [ring/ring-defaults "0.3.0"]
+   [ring/ring-core "1.6.2"]
+   [ring/ring-json "0.4.0"]]
   :source-paths ["src"]
   :plugins [[lein-environ "1.1.0"]
             [lein-pprint "1.1.1"]]
   :main ^:skip-aot wb-es.core
+  :ring {:handler wb-es.web.core/handler}
   :resource-paths ["resources"]
   :uberjar {:aot :all}
   :target-path "target/%s"
@@ -54,6 +61,7 @@
            [lein-ancient "0.6.8"]
            [lein-bikeshed "0.3.0"]
            [lein-ns-dep-graph "0.1.0-SNAPSHOT"]
+           [lein-ring "0.12.0"]
            [venantius/yagni "0.1.4"]
            [com.jakemccrary/lein-test-refresh "0.17.0"]]}]
       :test
