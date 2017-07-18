@@ -4,12 +4,17 @@
             [wb-es.env :refer [es-base-url release-id]]))
 
 (defn get-filter [options]
-  )
+  (->> []
+       (cons (when-let [type-value (:type options)]
+               {:type {:value (clojure.string/replace type-value #"_" "-")}}))
+       (filter identity)
+       (assoc-in {} [:bool :must])))
 
 (defn search [q options]
   (let [query {:query
                {:bool
-                {:should [{:term {:wbid q}}
+                {:filter (get-filter options)
+                 :should [{:term {:wbid q}}
                           {:match {:label q}}
                           {:match {:_all q}}]}}}
 
