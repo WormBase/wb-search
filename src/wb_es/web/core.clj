@@ -27,7 +27,7 @@
 (defn autocomplete [q options]
   (let [query {:query
                {:bool
-                {:should [{:match {:label q}}]}}}
+                {:should [{:match {:label.autocomplete q}}]}}}
 
         response
         (http/get (format "%s/%s/_search"

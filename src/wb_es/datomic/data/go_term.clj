@@ -8,7 +8,6 @@
   (data [this]
     {:wbid (:go-term/id entity)
      :label (first (:go-term/name entity))
-     :label_raw (first (:go-term/name entity))
      :description (first (:go-term/definition entity))}))
 
 
