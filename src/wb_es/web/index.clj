@@ -18,6 +18,6 @@
 (defn handler [request]
   (let [enhanced-handler
         (-> app
-            (wrap-json-response)
+            (wrap-json-response {:pretty true})
             (wrap-defaults api-defaults))]
     (enhanced-handler request)))
