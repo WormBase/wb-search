@@ -7,15 +7,12 @@
     :label {:type "string"
             :analyzer "autocomplete"
             :search_analyzer "standard"
-            ;; not sure why fields (below) doesn't work
-            ;; :fields {:raw {:type "string"
-            ;;                :index "not_analyzed"}
-            ;;          :autocomplete {:type "string"
-            ;;                         :analyzer "autocomplete"
-            ;;                         :search_analyzer "standard"}}
-            }
-    :label_raw {:type "string"
-                :index "not_analyzed"}}})
+            :fields {:raw {:type "string"
+                           :index "not_analyzed"}
+                     :autocomplete {:type "string"
+                                    :analyzer "autocomplete"
+                                    :search_analyzer "standard"}}
+            }}})
 
 (def index-settings
   {:settings
@@ -26,4 +23,4 @@
                :analyzer {"autocomplete" {:type "custom"
                                           :tokenizer "standard"
                                           :filter ["autocomplete_filter"]}}}}
-   :mappings {:go_term go-term-mapping}})
+   :mappings {:go-term go-term-mapping}})
