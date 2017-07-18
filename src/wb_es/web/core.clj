@@ -19,3 +19,17 @@
                   {:content-type "application/json"
                    :body (json/generate-string query)})]
     (json/parse-string (:body response))))
+
+
+(defn autocomplete [q options]
+  (let [query {:query
+               {:bool
+                {:should [{:match {:label q}}]}}}
+
+        response
+        (http/get (format "%s/%s/_search"
+                          es-base-url
+                          release-id)
+                  {:content-type "application/json"
+                   :body (json/generate-string query)})]
+    (json/parse-string (:body response))))

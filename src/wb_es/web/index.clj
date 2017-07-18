@@ -4,11 +4,13 @@
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.json :refer [wrap-json-response]]
             [ring.util.response :refer [response not-found]]
-            [wb-es.web.core :refer [search]]))
+            [wb-es.web.core :as web-core]))
 
 (defroutes app
   (GET "/search" [q & options]
-       (response (search q options)))
+       (response (web-core/search q options)))
+  (GET "/autocomplete" [q & options]
+       (response (web-core/autocomplete q options)))
   (route/not-found (response {:message "endpoint not found"})))
 
 (defn handler [request]
