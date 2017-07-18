@@ -7,14 +7,13 @@
   (->> []
        (cons (when-let [type-value (:type options)]
                {:type {:value (clojure.string/replace type-value #"_" "-")}}))
-       (filter identity)
-       (assoc-in {} [:bool :filter])))
+       (filter identity)))
 
 
 (defn search [q options]
   (let [query {:query
                {:bool
-                {:must [(get-filter options)
+                {:must [{:bool {:filter (get-filter options)}}
                         {:bool {:should [{:term {:wbid q}}
                                          {:match {:label q}}
                                          {:match {:_all q}}]}}]}}}
@@ -33,7 +32,7 @@
 (defn autocomplete [q options]
   (let [query {:query
                {:bool
-                {:must [(get-filter options)
+                {:must [{:bool {:filter (get-filter options)}}
                         {:bool
                          {:should [{:match {:label.autocomplete q}}]}}]}}}
 
@@ -49,7 +48,7 @@
 (defn search-exact [q options]
   (let [query {:query
                {:bool
-                {:must [(get-filter options)
+                {:must [{:bool {:filter (get-filter options)}}
                         {:bool
                          {:should [{:term {:wbid q}}
                                    {:term {"label.raw" q}}]}}]}}}
