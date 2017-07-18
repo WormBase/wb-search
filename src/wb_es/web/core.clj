@@ -33,7 +33,9 @@
 (defn autocomplete [q options]
   (let [query {:query
                {:bool
-                {:should [{:match {:label.autocomplete q}}]}}}
+                {:must [(get-filter options)
+                        {:bool
+                         {:should [{:match {:label.autocomplete q}}]}}]}}}
 
         response
         (http/get (format "%s/%s/_search"
@@ -47,8 +49,10 @@
 (defn search-exact [q options]
   (let [query {:query
                {:bool
-                {:should [{:term {:wbid q}}
-                          {:term {"label.raw" q}}]}}}
+                {:must [(get-filter options)
+                        {:bool
+                         {:should [{:term {:wbid q}}
+                                   {:term {"label.raw" q}}]}}]}}}
 
         response
         (http/get (format "%s/%s/_search"
