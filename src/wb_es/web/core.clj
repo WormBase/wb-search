@@ -60,3 +60,20 @@
                   {:content-type "application/json"
                    :body (json/generate-string query)})]
     (json/parse-string (:body response))))
+
+
+(defn random [options]
+  (let [date-seed (.format (java.text.SimpleDateFormat. "MM/dd/yyyy") (new java.util.Date))
+        query {:query
+               {:function_score
+                {:filter {:bool {:filter (get-filter options)}}
+                 :functions [{:random_score {:seed date-seed}}]
+                 :score_mode "sum"}}}
+
+        response
+        (http/get (format "%s/%s/_search"
+                          es-base-url
+                          release-id)
+                  {:content-type "application/json"
+                   :body (json/generate-string query)})]
+    (json/parse-string (:body response))))
