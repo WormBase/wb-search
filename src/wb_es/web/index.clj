@@ -13,6 +13,8 @@
        (response (web-core/autocomplete q options)))
   (GET "/search-exact" [q & options]
        (response (web-core/search-exact q options)))
+  (GET "/count" [q & options]
+       (response (web-core/count q options)))
   (GET "/random" [q & options]
        (response (web-core/random options)))
   (route/not-found (response {:message "endpoint not found"})))

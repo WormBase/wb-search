@@ -77,3 +77,20 @@
                   {:content-type "application/json"
                    :body (json/generate-string query)})]
     (json/parse-string (:body response))))
+
+
+(defn count [q options]
+  (let [query {:query
+               {:bool
+                {:must [{:bool {:filter (get-filter options)}}
+                        {:bool {:should [{:term {:wbid q}}
+                                         {:match {:label q}}
+                                         {:match {:_all q}}]}}]}}}
+
+        response
+        (http/get (format "%s/%s/_count"
+                          es-base-url
+                          release-id)
+                  {:content-type "application/json"
+                   :body (json/generate-string query)})]
+    (json/parse-string (:body response))))
