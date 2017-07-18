@@ -82,12 +82,14 @@
 
 
 (defn count [q options]
-  (let [query {:query
-               {:bool
-                {:must [{:bool {:filter (get-filter options)}}
-                        {:bool {:should [{:term {:wbid q}}
-                                         {:match {:label q}}
-                                         {:match {:_all q}}]}}]}}}
+  (let [query (if (and q (not= (clojure.string/trim q) ""))
+                {:query
+                 {:bool
+                  {:must [{:bool {:filter (get-filter options)}}
+                          {:bool {:should [{:term {:wbid q}}
+                                           {:match {:label q}}
+                                           {:match {:_all q}}]}}]}}}
+                {:query {:bool {:filter (get-filter options)}}})
 
         response
         (http/get (format "%s/%s/_count"
