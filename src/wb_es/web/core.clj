@@ -33,3 +33,18 @@
                   {:content-type "application/json"
                    :body (json/generate-string query)})]
     (json/parse-string (:body response))))
+
+
+(defn search-exact [q options]
+  (let [query {:query
+               {:bool
+                {:should [{:term {:wbid q}}
+                          {:term {"label_raw" q}}]}}}
+
+        response
+        (http/get (format "%s/%s/_search"
+                          es-base-url
+                          release-id)
+                  {:content-type "application/json"
+                   :body (json/generate-string query)})]
+    (json/parse-string (:body response))))

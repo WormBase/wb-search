@@ -11,6 +11,8 @@
        (response (web-core/search q options)))
   (GET "/autocomplete" [q & options]
        (response (web-core/autocomplete q options)))
+  (GET "/search-exact" [q & options]
+       (response (web-core/search-exact q options)))
   (route/not-found (response {:message "endpoint not found"})))
 
 (defn handler [request]
