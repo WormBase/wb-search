@@ -8,15 +8,16 @@
        (cons (when-let [type-value (:type options)]
                {:type {:value (clojure.string/replace type-value #"_" "-")}}))
        (filter identity)
-       (assoc-in {} [:bool :must])))
+       (assoc-in {} [:bool :filter])))
+
 
 (defn search [q options]
   (let [query {:query
                {:bool
-                {:filter (get-filter options)
-                 :should [{:term {:wbid q}}
-                          {:match {:label q}}
-                          {:match {:_all q}}]}}}
+                {:must [(get-filter options)
+                        {:bool {:should [{:term {:wbid q}}
+                                         {:match {:label q}}
+                                         {:match {:_all q}}]}}]}}}
 
         response
         (http/get (format "%s/%s/_search?size=%s&from=%s"
