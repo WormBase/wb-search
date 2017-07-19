@@ -9,11 +9,3 @@
     {:wbid (:go-term/id entity)
      :label (first (:go-term/name entity))
      :description (first (:go-term/definition entity))}))
-
-
-
-(defn metadata [go-term-entity]
-  (let []
-    {:_index 1
-     :_type 1
-     :_id 1}))
