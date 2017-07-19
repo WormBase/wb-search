@@ -69,7 +69,20 @@
       (http/put index-url {:headers {:content-type "application/json"}
                            :body (json/generate-string index-settings)})
       (let [n-threads 4
-            scheduler (chan n-threads)]
+            scheduler (chan n-threads)
+            logger (chan n-threads)]
+
+        ;; logging
+        (go
+          (time
+           (loop []
+             (if-let [entry (<! logger)]
+               ;; normal batches won't be nil
+               ;; only get nil when channel is closed
+               (do
+                 (prn entry)
+                 (recur))))))
+
 
         ;; multiple independent workers to execute jobs
         (dotimes [i n-threads]
@@ -79,10 +92,10 @@
                 ;; normal batches won't be nil
                 ;; only get nil when channel is closed
                 (do
-                  (println (meta job))
+                  (>! logger (or (meta job) :no_metadata))
                   (run-index-batch db job)
                   (recur))
-                ))))
+                (close! logger)))))
 
         (do
           ;; add jobs to scheduler in sequence
@@ -102,5 +115,5 @@
   (do
     (println "Hello, Bulky World!")
     (mount/start)
-    (time (run))
+    (run)
     (mount/stop)))
