@@ -1,12 +1,12 @@
 (ns wb-es.mappings.core)
 
-(def go-term-mapping
+(def default-mapping
   {:properties
    {:wbid {:type "string"
            :index "not_analyzed"}
     :label {:type "string"
             :fields {:raw {:type "string"
-                           :index "not_analyzed"}
+                           :analyzer "keyword_ignore_case"}
                      :autocomplete {:type "string"
                                     :analyzer "autocomplete"
                                     :search_analyzer "standard"}}
@@ -20,5 +20,8 @@
                                                :max_gram 20}}
                :analyzer {"autocomplete" {:type "custom"
                                           :tokenizer "standard"
-                                          :filter ["lowercase" "autocomplete_filter"]}}}}
-   :mappings {:go-term go-term-mapping}})
+                                          :filter ["lowercase" "autocomplete_filter"]}
+                          "keyword_ignore_case" {:type "custom"
+                                                 :tokenizer "keyword"
+                                                 :filter ["lowercase"]}}}}
+   :mappings {:_default_ default-mapping}})
