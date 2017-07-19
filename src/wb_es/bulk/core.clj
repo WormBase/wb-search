@@ -1,6 +1,7 @@
 (ns wb-es.bulk.core
   (:gen-class)
   (:require [clj-http.client :as http]
+            [clojure.core.async :refer [>! <! >!! <!! go chan buffer close!]]
             [cheshire.core :as json]
             [datomic.api :as d]
             [mount.core :as mount]
@@ -48,10 +49,31 @@
       (http/put index-url {:headers {:content-type "application/json"}
                            :body (json/generate-string index-settings)})
       (let [eids (get-eids-by-type db :go-term/id)
-            step 100
-            batches (partition step step [] eids)]
-        (doseq [batch batches]
-          (run-index-batch db batch))))))
+            n-max (dec (count eids))
+            step 1000
+            batches (partition step step [] eids)
+            n-threads 4
+            scheduler (chan n-threads)]
+        (dotimes [i n-threads]
+          (go
+            (loop []
+              (if-let [job (<! scheduler)]
+                ;; normal batches won't be nil
+                ;; only get nil when channel is closed
+                (do
+                  (let [n-start (* (:index job) step)
+                        n-end (min n-max (+ n-start step))]
+                    (println
+                     (format "Processing %s - %s" n-start n-end)))
+                  (run-index-batch db (:data job))
+                  (recur))
+                ))))
+        (do
+          (doseq [[i batch] (keep-indexed (fn [i b] [i b]) batches)]
+            (let [job {:index i :data batch}]
+              (>!! scheduler job)))
+          (close! scheduler))
+        ))))
 
 (defn -main
   "I don't do a whole lot ... yet."
@@ -59,5 +81,5 @@
   (do
     (println "Hello, Bulky World!")
     (mount/start)
-    (run)
+    (time (run))
     (mount/stop)))
