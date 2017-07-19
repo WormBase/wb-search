@@ -30,13 +30,33 @@
              {:headers {:content-type "application/x-ndjson"}
               :body formatted-docs}))
 
-(defn get-eids-by-type [db ident-attr]
+(defn get-eids-by-type
+  "get all datomic entity ids of a given type
+  indicated by its unique attribute ident
+  such as :gene/id"
+  [db ident-attr]
   (d/q '[:find [?eid ...]
          :in $ ?ident-attr
          :where [?eid ?ident-attr]]
        db ident-attr))
 
-(defn run-index-batch [db batch]
+(defn make-batches
+  "turn a list datomic entity ids to batches of the given size.
+  attach some metadata for debugging"
+  ([eids] (make-batches 500 nil))
+  ([eids batch-size order-info]
+   (->> eids
+        (sort)
+        (partition batch-size batch-size [])
+        (map (fn [batch]
+               (with-meta batch {:order order-info
+                                 :size (count batch)
+                                 :start (first batch)
+                                 :end (last batch)}))))))
+
+(defn run-index-batch
+  "index data of a batch of datomic entity ids"
+  [db batch]
   (->> batch
        (map #(create-document (d/entity db %)))
        (format-bulk "index")
@@ -50,8 +70,8 @@
                            :body (json/generate-string index-settings)})
       (let [eids (get-eids-by-type db :go-term/id)
             n-max (dec (count eids))
-            step 1000
-            batches (partition step step [] eids)
+            batch-size 1000
+            jobs (make-batches eids batch-size nil)
             n-threads 4
             scheduler (chan n-threads)]
         (dotimes [i n-threads]
@@ -61,17 +81,13 @@
                 ;; normal batches won't be nil
                 ;; only get nil when channel is closed
                 (do
-                  (let [n-start (* (:index job) step)
-                        n-end (min n-max (+ n-start step))]
-                    (println
-                     (format "Processing %s - %s" n-start n-end)))
-                  (run-index-batch db (:data job))
+                  (println (meta job))
+                  (run-index-batch db job)
                   (recur))
                 ))))
         (do
-          (doseq [[i batch] (keep-indexed (fn [i b] [i b]) batches)]
-            (let [job {:index i :data batch}]
-              (>!! scheduler job)))
+          (doseq [job jobs]
+            (>!! scheduler job))
           (close! scheduler))
         ))))
 
