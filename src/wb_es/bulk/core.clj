@@ -44,7 +44,7 @@
   "turn a list datomic entity ids to batches of the given size.
   attach some metadata for debugging"
   ([eids] (make-batches 500 nil))
-  ([eids batch-size order-info]
+  ([batch-size order-info eids]
    (->> eids
         (sort)
         (partition batch-size batch-size [])
@@ -68,12 +68,10 @@
     (do
       (http/put index-url {:headers {:content-type "application/json"}
                            :body (json/generate-string index-settings)})
-      (let [eids (get-eids-by-type db :go-term/id)
-            n-max (dec (count eids))
-            batch-size 1000
-            jobs (make-batches eids batch-size nil)
-            n-threads 4
+      (let [n-threads 4
             scheduler (chan n-threads)]
+
+        ;; multiple independent workers to execute jobs
         (dotimes [i n-threads]
           (go
             (loop []
@@ -85,9 +83,16 @@
                   (run-index-batch db job)
                   (recur))
                 ))))
+
         (do
-          (doseq [job jobs]
-            (>!! scheduler job))
+          ;; add jobs to scheduler in sequence
+          (let [eids (get-eids-by-type db :go-term/id)
+                jobs (make-batches 1000 :go-term eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          ;; close the channel to indicate no more input
+          ;; existing jobs on the channel will remain available for consumers
+          ;; https://clojure.github.io/core.async/#clojure.core.async/close!
           (close! scheduler))
         ))))
 
