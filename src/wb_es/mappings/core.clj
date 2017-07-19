@@ -10,7 +10,9 @@
                      :autocomplete {:type "string"
                                     :analyzer "autocomplete"
                                     :search_analyzer "standard"}}
-            }}})
+            }
+    :paper_type {:type "string"
+                 :analyzer "keyword_ignore_case"}}})
 
 (def index-settings
   {:settings

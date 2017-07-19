@@ -28,3 +28,9 @@
        :_type type
        :_id (format "%s:%s" type (ident entity))}
       (throw (Exception. "cannot identify ident attribute of the entity")))))
+
+(defn format-enum
+  "format the datomic enum into a elasticsearch word"
+  [enum]
+  (-> (name enum)
+      (clojure.string/replace #"-" "_")))

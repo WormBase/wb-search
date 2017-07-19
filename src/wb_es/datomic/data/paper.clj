@@ -10,4 +10,8 @@
      :label (:paper/brief-citation entity)
      :description (->> (:paper/abstract entity)
                        (map :longtext/text)
-                       (clojure.string/join "\n"))}))
+                       (clojure.string/join "\n"))
+     :paper_type (->> entity
+                      (:paper/type)
+                      (map :paper.type/type)
+                      (map data-util/format-enum))}))
