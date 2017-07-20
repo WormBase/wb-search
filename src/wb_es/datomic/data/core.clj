@@ -1,5 +1,6 @@
 (ns wb-es.datomic.data.core
-  (:require [wb-es.datomic.data.gene :as gene]
+  (:require [wb-es.datomic.data.do-term :as do-term]
+            [wb-es.datomic.data.gene :as gene]
             [wb-es.datomic.data.go-term :as go-term]
             [wb-es.datomic.data.paper :as paper]
             [wb-es.datomic.data.variation :as variation]
@@ -10,6 +11,7 @@
   [entity]
   (let [constructor-function
         (case (data-util/get-ident-attr entity)
+          :do-term/id do-term/->Do-term
           :gene/id gene/->Gene
           :go-term/id go-term/->Go-term
           :paper/id paper/->Paper
