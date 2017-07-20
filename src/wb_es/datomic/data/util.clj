@@ -30,7 +30,15 @@
       (throw (Exception. "cannot identify ident attribute of the entity")))))
 
 (defn format-enum
-  "format the datomic enum into a elasticsearch word"
+  "format the datomic enum into a elasticsearch term"
   [enum]
   (-> (name enum)
       (clojure.string/replace #"-" "_")))
+
+(defn format-species-enum
+  "format a species entity as a elasticsearch term"
+  [species-entity]
+  (let [[genus-name species-name] (-> (:species/id species-entity)
+                                      (clojure.string/lower-case)
+                                      (clojure.string/split #"\s+"))]
+    (format "%s_%s" (str (first genus-name)) species-name)))

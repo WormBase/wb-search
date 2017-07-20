@@ -3,7 +3,7 @@
 (def default-mapping
   {:properties
    {:wbid {:type "string"
-           :index "not_analyzed"}
+           :analyzer "keyword_ignore_case"}
     :label {:type "string"
             :fields {:raw {:type "string"
                            :analyzer "keyword_ignore_case"}
@@ -12,7 +12,11 @@
                                     :search_analyzer "standard"}}
             }
     :paper_type {:type "string"
-                 :analyzer "keyword_ignore_case"}}})
+                 :analyzer "keyword_ignore_case"}
+    :species {:type "string"
+              :analyzer "keyword_ignore_case"}
+    :gene {:type "string"
+           :analyzer "keyword_ignore_case"}}})
 
 (def index-settings
   {:settings
