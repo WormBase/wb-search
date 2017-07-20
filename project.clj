@@ -63,4 +63,9 @@
            [com.jakemccrary/lein-test-refresh "0.17.0"]]}]
       :test
       {:resource-paths ["test/resources"]}}
-  :repl-options {:init (set! *print-length* 10)})
+  :repl-options {:init (do
+                         (set! *print-length* 10)
+                         (use 'wb-es.env)
+                         (use 'wb-es.datomic.db)
+                         (require '[datomic.api :as d])
+                         (mount.core/start))})
