@@ -11,6 +11,8 @@
                                     :analyzer "autocomplete"
                                     :search_analyzer "standard"}}
             }
+    :other_names {:type "string"
+                  :analyzer "keyword_ignore_case"}
     :paper_type {:type "string"
                  :analyzer "keyword_ignore_case"}
     :species {:type "string"
