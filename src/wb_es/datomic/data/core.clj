@@ -19,6 +19,10 @@
             [wb-es.datomic.data.laboratory :as laboratory]
             [wb-es.datomic.data.life-stage :as life-stage]
             [wb-es.datomic.data.molecule :as molecule]
+            [wb-es.datomic.data.microarray-results :as microarray-results]
+            [wb-es.datomic.data.motif :as motif]
+            [wb-es.datomic.data.operon :as operon]
+            [wb-es.datomic.data.position-matrix :as position-matrix]
             [wb-es.datomic.data.paper :as paper]
             [wb-es.datomic.data.phenotype :as phenotype]
             [wb-es.datomic.data.strain :as strain]
@@ -50,6 +54,10 @@
           :laboratory/id laboratory/->Laboratory
           :life-stage/id life-stage/->Life-stage
           :molecule/id molecule/->Molecule
+          :microarray-results/id microarray-results/->Microarray-results
+          :motif/id motif/->Motif
+          :operon/id operon/->Operon
+          :position-matrix/id position-matrix/->Position-matrix
           :paper/id paper/->Paper
           :phenotype/id phenotype/->Phenotype
           :strain/id strain/->Strain

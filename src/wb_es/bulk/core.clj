@@ -180,6 +180,22 @@
                 jobs (make-batches 1000 :molecule eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :microarray-results/id)
+                jobs (make-batches 1000 :microarray-results eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :motif/id)
+                jobs (make-batches 1000 :motif eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :operon/id)
+                jobs (make-batches 1000 :operon eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :position-matrix/id)
+                jobs (make-batches 1000 :position-matrix eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :paper/id)
                 jobs (make-batches 1000 :paper eids)]
             (doseq [job jobs]
