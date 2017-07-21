@@ -6,6 +6,7 @@
             [wb-es.datomic.data.interaction :as interaction]
             [wb-es.datomic.data.paper :as paper]
             [wb-es.datomic.data.phenotype :as phenotype]
+            [wb-es.datomic.data.strain :as strain]
             [wb-es.datomic.data.variation :as variation]
             [wb-es.datomic.data.util :as data-util]))
 
@@ -21,6 +22,7 @@
           :interaction/id interaction/->Interaction
           :paper/id paper/->Paper
           :phenotype/id phenotype/->Phenotype
+          :strain/id strain/->Strain
           :variation/id variation/->Variation
           (throw (Exception. "Not sure how to handle the data type. Throw an error to let you know")))]
     (constructor-function entity)))
