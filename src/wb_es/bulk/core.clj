@@ -99,6 +99,10 @@
 
         (do
           ;; add jobs to scheduler in sequence
+          (let [eids (get-eids-by-type db :analysis/id)
+                jobs (make-batches 1000 :analysis eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :do-term/id)
                 jobs (make-batches 1000 :do-term eids)]
             (doseq [job jobs]
