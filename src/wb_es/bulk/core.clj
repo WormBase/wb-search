@@ -99,6 +99,7 @@
 
         (do
           ;; add jobs to scheduler in sequence
+
           (let [eids (get-eids-by-type db :analysis/id)
                 jobs (make-batches 1000 :analysis eids)]
             (doseq [job jobs]
@@ -117,6 +118,22 @@
               (>!! scheduler job)))
           (let [eids (get-eids-by-type db :clone/id)
                 jobs (make-batches 1000 :clone eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :construct/id)
+                jobs (make-batches 1000 :construct eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :expression-cluster/id)
+                jobs (make-batches 1000 :expression-cluster eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :expr-pattern/id)
+                jobs (make-batches 1000 :expr-pattern eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :expr-profile/id)
+                jobs (make-batches 1000 :expr-profile eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
           (let [eids (get-eids-by-type db :do-term/id)
