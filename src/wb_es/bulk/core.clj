@@ -103,6 +103,10 @@
                 jobs (make-batches 1000 :analysis eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :anatomy-term/id)
+                jobs (make-batches 1000 :anatomy-term eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :do-term/id)
                 jobs (make-batches 1000 :do-term eids)]
             (doseq [job jobs]
