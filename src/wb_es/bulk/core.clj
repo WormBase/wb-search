@@ -111,6 +111,10 @@
                 jobs (make-batches 1000 :go-term eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :interaction/id)
+                jobs (make-batches 1000 :interaction eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :paper/id)
                 jobs (make-batches 1000 :paper eids)]
             (doseq [job jobs]
