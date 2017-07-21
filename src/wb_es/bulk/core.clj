@@ -119,6 +119,10 @@
                 jobs (make-batches 1000 :interaction eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :molecule/id)
+                jobs (make-batches 1000 :molecule eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :paper/id)
                 jobs (make-batches 1000 :paper eids)]
             (doseq [job jobs]
