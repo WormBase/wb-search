@@ -1,6 +1,7 @@
 (ns wb-es.datomic.data.core
   (:require [wb-es.datomic.data.analysis :as analysis]
             [wb-es.datomic.data.anatomy-term :as anatomy-term]
+            [wb-es.datomic.data.antibody :as antibody]
             [wb-es.datomic.data.do-term :as do-term]
             [wb-es.datomic.data.feature :as feature]
             [wb-es.datomic.data.gene :as gene]
@@ -21,6 +22,7 @@
         (case (data-util/get-ident-attr entity)
           :analysis/id analysis/->Analysis
           :anatomy-term/id anatomy-term/->Anatomy-term
+          :antibody/id antibody/->Antibody
           :do-term/id do-term/->Do-term
           :feature/id feature/->Feature
           :gene/id gene/->Gene
