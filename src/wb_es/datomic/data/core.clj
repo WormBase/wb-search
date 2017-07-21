@@ -25,6 +25,10 @@
             [wb-es.datomic.data.position-matrix :as position-matrix]
             [wb-es.datomic.data.paper :as paper]
             [wb-es.datomic.data.phenotype :as phenotype]
+            [wb-es.datomic.data.protein :as protein]
+            [wb-es.datomic.data.pseudogene :as pseudogene]
+            [wb-es.datomic.data.rearrangement :as rearrangement]
+            [wb-es.datomic.data.rnai :as rnai]
             [wb-es.datomic.data.strain :as strain]
             [wb-es.datomic.data.variation :as variation]
             [wb-es.datomic.data.util :as data-util]))
@@ -60,6 +64,10 @@
           :position-matrix/id position-matrix/->Position-matrix
           :paper/id paper/->Paper
           :phenotype/id phenotype/->Phenotype
+          :protein/id protein/->Protein
+          :pseudogene/id pseudogene/->Pseudogene
+          :rearrangement/id rearrangement/->Rearrangement
+          :rnai/id rnai/->Rnai
           :strain/id strain/->Strain
           :variation/id variation/->Variation
           (throw (Exception. "Not sure how to handle the data type. Throw an error to let you know")))]

@@ -204,6 +204,22 @@
                 jobs (make-batches 1000 :phenotype eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :protein/id)
+                jobs (make-batches 1000 :protein eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :pseudogene/id)
+                jobs (make-batches 1000 :pseudogene eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :rearrangement/id)
+                jobs (make-batches 1000 :rearrangement eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :rnai/id)
+                jobs (make-batches 1000 :rnai eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :strain/id)
                 jobs (make-batches 1000 :strain eids)]
             (doseq [job jobs]
