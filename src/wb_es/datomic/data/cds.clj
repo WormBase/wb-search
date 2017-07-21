@@ -1,0 +1,14 @@
+;;
+;; brief-identification? (very sparce)
+;; remark?
+;; corresponding protein?
+(ns wb-es.datomic.data.cds
+  (:require [datomic.api :as d]
+            [wb-es.datomic.data.util :as data-util]))
+
+(deftype Cds [entity]
+  data-util/Document
+  (metadata [this] (data-util/default-metadata entity))
+  (data [this]
+    {:wbid (:cds/id entity)
+     :species (data-util/format-species-enum (:cds/species entity))}))

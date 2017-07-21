@@ -111,6 +111,14 @@
                 jobs (make-batches 1000 :antibody eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :cds/id)
+                jobs (make-batches 1000 :cds eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :clone/id)
+                jobs (make-batches 1000 :clone eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :do-term/id)
                 jobs (make-batches 1000 :do-term eids)]
             (doseq [job jobs]

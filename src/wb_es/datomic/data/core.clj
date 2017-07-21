@@ -2,6 +2,8 @@
   (:require [wb-es.datomic.data.analysis :as analysis]
             [wb-es.datomic.data.anatomy-term :as anatomy-term]
             [wb-es.datomic.data.antibody :as antibody]
+            [wb-es.datomic.data.cds :as cds]
+            [wb-es.datomic.data.clone :as clone]
             [wb-es.datomic.data.do-term :as do-term]
             [wb-es.datomic.data.feature :as feature]
             [wb-es.datomic.data.gene :as gene]
@@ -23,6 +25,8 @@
           :analysis/id analysis/->Analysis
           :anatomy-term/id anatomy-term/->Anatomy-term
           :antibody/id antibody/->Antibody
+          :cds/id cds/->Cds
+          :clone/id clone/->Clone
           :do-term/id do-term/->Do-term
           :feature/id feature/->Feature
           :gene/id gene/->Gene
