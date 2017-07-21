@@ -119,6 +119,10 @@
                 jobs (make-batches 1000 :paper eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :phenotype/id)
+                jobs (make-batches 1000 :phenotype eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :variation/id)
                 jobs (make-batches 1000 :variation eids)]
             (doseq [job jobs]
