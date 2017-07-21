@@ -7,4 +7,5 @@
   data-util/Document
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
-    {:wbid (:laboratory/id entity)}))
+    {:wbid (:laboratory/id entity)
+     :wbid_as_label (:laboratory/id entity)}))

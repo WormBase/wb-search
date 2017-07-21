@@ -9,6 +9,6 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:strain/id entity)
-     :label (:strain/id entity)
+     :wbid_as_label (:strain/id entity)
      :description (:strain/genotype entity)
      :species (data-util/format-species-enum (:strain/species entity))}))

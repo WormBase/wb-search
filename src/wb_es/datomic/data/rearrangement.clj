@@ -10,4 +10,5 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:rearrangement/id entity)
+     :wbid_as_label (:rearrangement/id entity)
      :species (data-util/format-species-enum (:rearrangement/species entity))}))

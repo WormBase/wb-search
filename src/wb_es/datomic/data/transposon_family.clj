@@ -7,4 +7,5 @@
   data-util/Document
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
-    {:wbid (:transposon-family/id entity)}))
+    {:wbid (:transposon-family/id entity)
+     :wbid_as_label (:transposon-family/id entity)}))

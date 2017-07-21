@@ -15,7 +15,8 @@
                 {:query
                  {:bool
                   {:must [{:bool {:filter (get-filter options)}}
-                          {:bool {:should [{:term {:wbid q}}
+                          {:bool {:should [{:dis_max {:queries [{:term {:wbid q}}
+                                                                {:match {:wbid_as_label q}}]}}
                                            {:match {:label q}}
                                            {:match {:_all q}}]}}]}}}
                 {:query {:bool {:filter (get-filter options)}}})
@@ -36,7 +37,8 @@
                {:bool
                 {:must [{:bool {:filter (get-filter options)}}
                         {:bool
-                         {:should [{:match {:label.autocomplete q}}]}}]}}}
+                         {:should [{:match {:label.autocomplete q}}
+                                   {:match {:wbid_as_label q}}]}}]}}}
 
         response
         (http/get (format "%s/%s/_search"
@@ -86,7 +88,8 @@
                 {:query
                  {:bool
                   {:must [{:bool {:filter (get-filter options)}}
-                          {:bool {:should [{:term {:wbid q}}
+                          {:bool {:should [{:dis_max {:queries [{:term {:wbid q}}
+                                                                {:match {:wbid_as_label q}}]}}
                                            {:match {:label q}}
                                            {:match {:_all q}}]}}]}}}
                 {:query {:bool {:filter (get-filter options)}}})

@@ -10,4 +10,5 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:transcript/id entity)
+     :wbid_as_label (:transcript/id entity)
      :species (data-util/format-species-enum (:transcript/species entity))}))

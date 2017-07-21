@@ -252,12 +252,11 @@
                 jobs (make-batches 1000 :wbprocess eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
-
-
           (let [eids (get-eids-by-type db :variation/id)
                 jobs (make-batches 1000 :variation eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+
           ;; close the channel to indicate no more input
           ;; existing jobs on the channel will remain available for consumers
           ;; https://clojure.github.io/core.async/#clojure.core.async/close!

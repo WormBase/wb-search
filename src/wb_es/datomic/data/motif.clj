@@ -8,4 +8,6 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:motif/id entity)
-     :label (:motif/name entity)}))
+     :wbid_as_label (if-not (seq (:motif/title entity))
+                      (:motif/id entity))
+     :label (first (:motif/title entity) )}))

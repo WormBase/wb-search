@@ -9,4 +9,5 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:microarray-results/id entity)
+     :wbid_as_label (:microarray-results/id entity)
      :species (data-util/format-species-enum (:microarray-results/species entity))}))
