@@ -29,8 +29,15 @@
             [wb-es.datomic.data.pseudogene :as pseudogene]
             [wb-es.datomic.data.rearrangement :as rearrangement]
             [wb-es.datomic.data.rnai :as rnai]
+            [wb-es.datomic.data.sequence :as sequence]
             [wb-es.datomic.data.strain :as strain]
+            [wb-es.datomic.data.structure-data :as structure-data]
+            [wb-es.datomic.data.transcript :as transcript]
+            [wb-es.datomic.data.transgene :as transgene]
+            [wb-es.datomic.data.transposon :as transposon]
+            [wb-es.datomic.data.transposon-family :as transposon-family]
             [wb-es.datomic.data.variation :as variation]
+            [wb-es.datomic.data.wbprocess :as wbprocess]
             [wb-es.datomic.data.util :as data-util]))
 
 (defn create-document
@@ -68,7 +75,14 @@
           :pseudogene/id pseudogene/->Pseudogene
           :rearrangement/id rearrangement/->Rearrangement
           :rnai/id rnai/->Rnai
+          :sequence/id sequence/->Sequence
           :strain/id strain/->Strain
+          :structure-data/id structure-data/->Structure-data
+          :transcript/id transcript/->Transcript
+          :transgene/id transgene/->Transgene
+          :transposon/id transposon/->Transposon
+          :transposon-family/id transposon-family/->Transposon-family
           :variation/id variation/->Variation
+          :wbprocess/id wbprocess/->Wbprocess
           (throw (Exception. "Not sure how to handle the data type. Throw an error to let you know")))]
     (constructor-function entity)))

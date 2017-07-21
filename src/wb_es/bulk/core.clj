@@ -220,10 +220,40 @@
                 jobs (make-batches 1000 :rnai eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :sequence/id)
+                jobs (make-batches 1000 :sequence eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :strain/id)
                 jobs (make-batches 1000 :strain eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :structure-data/id)
+                jobs (make-batches 1000 :structure-data eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :transcript/id)
+                jobs (make-batches 1000 :transcript eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :transgene/id)
+                jobs (make-batches 1000 :transgene eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :transposon/id)
+                jobs (make-batches 1000 :transposon eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :transposon-family/id)
+                jobs (make-batches 1000 :transposon-family eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :wbprocess/id)
+                jobs (make-batches 1000 :wbprocess eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+
+
           (let [eids (get-eids-by-type db :variation/id)
                 jobs (make-batches 1000 :variation eids)]
             (doseq [job jobs]
