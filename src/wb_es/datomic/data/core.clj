@@ -2,6 +2,7 @@
   (:require [wb-es.datomic.data.do-term :as do-term]
             [wb-es.datomic.data.feature :as feature]
             [wb-es.datomic.data.gene :as gene]
+            [wb-es.datomic.data.gene-class :as gene-class]
             [wb-es.datomic.data.go-term :as go-term]
             [wb-es.datomic.data.interaction :as interaction]
             [wb-es.datomic.data.molecule :as molecule]
@@ -19,6 +20,7 @@
           :do-term/id do-term/->Do-term
           :feature/id feature/->Feature
           :gene/id gene/->Gene
+          :gene-class/id gene-class/->Gene-class
           :go-term/id go-term/->Go-term
           :interaction/id interaction/->Interaction
           :molecule/id molecule/->Molecule
