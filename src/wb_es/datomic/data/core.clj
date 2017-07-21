@@ -12,8 +12,12 @@
             [wb-es.datomic.data.feature :as feature]
             [wb-es.datomic.data.gene :as gene]
             [wb-es.datomic.data.gene-class :as gene-class]
+            [wb-es.datomic.data.gene-cluster :as gene-cluster]
             [wb-es.datomic.data.go-term :as go-term]
+            [wb-es.datomic.data.homology-group :as homology-group]
             [wb-es.datomic.data.interaction :as interaction]
+            [wb-es.datomic.data.laboratory :as laboratory]
+            [wb-es.datomic.data.life-stage :as life-stage]
             [wb-es.datomic.data.molecule :as molecule]
             [wb-es.datomic.data.paper :as paper]
             [wb-es.datomic.data.phenotype :as phenotype]
@@ -40,7 +44,11 @@
           :gene/id gene/->Gene
           :gene-class/id gene-class/->Gene-class
           :go-term/id go-term/->Go-term
+          :gene-cluster/id gene-cluster/->Gene-cluster
+          :homology-group/id homology-group/->Homology-group
           :interaction/id interaction/->Interaction
+          :laboratory/id laboratory/->Laboratory
+          :life-stage/id life-stage/->Life-stage
           :molecule/id molecule/->Molecule
           :paper/id paper/->Paper
           :phenotype/id phenotype/->Phenotype

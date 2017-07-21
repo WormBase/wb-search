@@ -152,12 +152,28 @@
                 jobs (make-batches 1000 :gene-class eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :gene-cluster/id)
+                jobs (make-batches 1000 :gene-cluster eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :go-term/id)
                 jobs (make-batches 1000 :go-term eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :homology-group/id)
+                jobs (make-batches 1000 :homology-group eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :interaction/id)
                 jobs (make-batches 1000 :interaction eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :laboratory/id)
+                jobs (make-batches 1000 :laboratory eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :life-stage/id)
+                jobs (make-batches 1000 :life-stage eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
           (let [eids (get-eids-by-type db :molecule/id)
