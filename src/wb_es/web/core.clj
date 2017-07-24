@@ -17,7 +17,6 @@
                   {:must [{:bool {:filter (get-filter options)}}
                           {:dis_max
                            {:queries [{:term {:wbid q}}
-                                      {:match {:wbid_as_label q}}
                                       {:match {:label q}}]
                             :tie_breaker 0.3}}]}}
                  :highlight
@@ -97,7 +96,6 @@
                   {:must [{:bool {:filter (get-filter options)}}
                           {:dis_max
                            {:queries [{:term {:wbid q}}
-                                      {:match {:wbid_as_label q}}
                                       {:match {:label q}}]
                             :tie_breaker 0.3}}]}}}
                 {:query {:bool {:filter (get-filter options)}}})

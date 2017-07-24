@@ -6,13 +6,6 @@
            :analyzer "keyword_ignore_case"
            :include_in_all false}
 
-    ;; Used when label isn't available and wbid has human readable parts
-    ;; that serve the purpose of a label (for autocompletion and tokenization)
-    :wbid_as_label {:type "string"
-                    :include_in_all false
-                    :fields {:autocomplete {:type "string"
-                                            :analyzer "autocomplete"
-                                            :search_analyzer "standard"}}}
     :label {:type "string"
             :include_in_all false
             :fields {:raw {:type "string"
