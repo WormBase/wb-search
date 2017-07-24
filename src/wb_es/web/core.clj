@@ -19,7 +19,13 @@
                            {:queries [{:term {:wbid q}}
                                       {:match {:wbid_as_label q}}
                                       {:match {:label q}}]
-                            :tie_breaker 0.3}}]}}}
+                            :tie_breaker 0.3}}]}}
+                 :highlight
+                 {:fields {:wbid {}
+                           :wbid_as_label {}
+                           :label {}
+                           :other_names {}
+                           :description {}}}}
                 {:query {:bool {:filter (get-filter options)}}})
 
         response
