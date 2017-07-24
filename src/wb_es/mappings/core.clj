@@ -9,7 +9,6 @@
     ;; Used when label isn't available and wbid has human readable parts
     ;; that serve the purpose of a label (for autocompletion and tokenization)
     :wbid_as_label {:type "string"
-                    :analyzer "simple"
                     :include_in_all false
                     :fields {:autocomplete {:type "string"
                                             :analyzer "autocomplete"
