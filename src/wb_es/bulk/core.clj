@@ -200,6 +200,10 @@
                 jobs (make-batches 1000 :paper eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :person/id)
+                jobs (make-batches 1000 :person eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :pcr-product/id)
                 jobs (make-batches 1000 :pcr-product eids)]
             (doseq [job jobs]
