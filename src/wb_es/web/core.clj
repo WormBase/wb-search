@@ -15,10 +15,11 @@
                 {:query
                  {:bool
                   {:must [{:bool {:filter (get-filter options)}}
-                          {:bool {:should [{:dis_max {:queries [{:term {:wbid q}}
-                                                                {:match {:wbid_as_label q}}]}}
-                                           {:match {:label q}}
-                                           {:match {:_all q}}]}}]}}}
+                          {:dis_max
+                           {:queries [{:term {:wbid q}}
+                                      {:match {:wbid_as_label q}}
+                                      {:match {:label q}}]
+                            :tie_breaker 0.3}}]}}}
                 {:query {:bool {:filter (get-filter options)}}})
 
         response
@@ -88,10 +89,11 @@
                 {:query
                  {:bool
                   {:must [{:bool {:filter (get-filter options)}}
-                          {:bool {:should [{:dis_max {:queries [{:term {:wbid q}}
-                                                                {:match {:wbid_as_label q}}]}}
-                                           {:match {:label q}}
-                                           {:match {:_all q}}]}}]}}}
+                          {:dis_max
+                           {:queries [{:term {:wbid q}}
+                                      {:match {:wbid_as_label q}}
+                                      {:match {:label q}}]
+                            :tie_breaker 0.3}}]}}}
                 {:query {:bool {:filter (get-filter options)}}})
 
         response
