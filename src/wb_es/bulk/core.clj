@@ -188,20 +188,28 @@
                 jobs (make-batches 1000 :motif eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
-          (let [eids (get-eids-by-type db :operon/id)
-                jobs (make-batches 1000 :operon eids)]
+          (let [eids (get-eids-by-type db :oligo/id)
+                jobs (make-batches 1000 :oligo eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
-          (let [eids (get-eids-by-type db :position-matrix/id)
-                jobs (make-batches 1000 :position-matrix eids)]
+          (let [eids (get-eids-by-type db :operon/id)
+                jobs (make-batches 1000 :operon eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
           (let [eids (get-eids-by-type db :paper/id)
                 jobs (make-batches 1000 :paper eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :pcr-product/id)
+                jobs (make-batches 1000 :pcr-product eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :phenotype/id)
                 jobs (make-batches 1000 :phenotype eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :position-matrix/id)
+                jobs (make-batches 1000 :position-matrix eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
           (let [eids (get-eids-by-type db :protein/id)

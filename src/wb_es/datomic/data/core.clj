@@ -21,10 +21,12 @@
             [wb-es.datomic.data.molecule :as molecule]
             [wb-es.datomic.data.microarray-results :as microarray-results]
             [wb-es.datomic.data.motif :as motif]
+            [wb-es.datomic.data.oligo :as oligo]
             [wb-es.datomic.data.operon :as operon]
-            [wb-es.datomic.data.position-matrix :as position-matrix]
             [wb-es.datomic.data.paper :as paper]
+            [wb-es.datomic.data.pcr-product :as pcr-product]
             [wb-es.datomic.data.phenotype :as phenotype]
+            [wb-es.datomic.data.position-matrix :as position-matrix]
             [wb-es.datomic.data.protein :as protein]
             [wb-es.datomic.data.pseudogene :as pseudogene]
             [wb-es.datomic.data.rearrangement :as rearrangement]
@@ -67,10 +69,12 @@
           :molecule/id molecule/->Molecule
           :microarray-results/id microarray-results/->Microarray-results
           :motif/id motif/->Motif
+          :oligo/id oligo/->Oligo
           :operon/id operon/->Operon
-          :position-matrix/id position-matrix/->Position-matrix
           :paper/id paper/->Paper
+          :pcr-product/id pcr-product/->Pcr-product
           :phenotype/id phenotype/->Phenotype
+          :position-matrix/id position-matrix/->Position-matrix
           :protein/id protein/->Protein
           :pseudogene/id pseudogene/->Pseudogene
           :rearrangement/id rearrangement/->Rearrangement
