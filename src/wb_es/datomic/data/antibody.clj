@@ -9,7 +9,7 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:antibody/id entity)
-     :wbid_as_label (:antibody/id entity)
+     :label (:antibody/id entity)
      :other_names (:antibody/other-name entity)
      :description (->> entity
                        (:antibody/summary)

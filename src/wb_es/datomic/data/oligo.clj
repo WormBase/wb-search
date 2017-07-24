@@ -9,4 +9,4 @@
   (metadata [this] (assoc (data-util/default-metadata entity) :_type "pcr-oligo"))
   (data [this]
     {:wbid (:oligo/id entity)
-     :wbid_as_label (:oligo/id entity)}))
+     :label (:oligo/id entity)}))
