@@ -4,7 +4,8 @@
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.json :refer [wrap-json-response]]
             [ring.util.response :refer [response not-found]]
-            [wb-es.web.core :as web-core]))
+            [wb-es.web.core :as web-core]
+            [wb-es.web.integration :as web-integration]))
 (def search-route
   (GET "/search" [q & options]
        (response (web-core/search q options))))
@@ -32,11 +33,11 @@
   count-route
   random-route
   (context "/integration" []
-           search-route
-           autocomplete-route
-           search-exact-route
-           count-route
-           random-route)
+           (web-integration/wrap-search search-route)
+           (web-integration/wrap-autocomplete autocomplete-route)
+           (web-integration/wrap-search-exact search-exact-route)
+           (web-integration/wrap-count count-route)
+           (web-integration/wrap-random random-route))
   (route/not-found (response {:message "endpoint not found"})))
 
 (defn handler [request]
