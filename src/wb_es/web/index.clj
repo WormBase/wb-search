@@ -26,6 +26,13 @@
   (GET "/random" [q & options]
        (response (web-core/random options))))
 
+(defroutes integration-routes
+  (wrap-routes search-route web-integration/wrap-search)
+  (wrap-routes autocomplete-route web-integration/wrap-autocomplete)
+  (wrap-routes search-exact-route web-integration/wrap-search-exact)
+  (wrap-routes count-route web-integration/wrap-count)
+  (wrap-routes random-route web-integration/wrap-random))
+
 (defroutes app
   search-route
   autocomplete-route
@@ -33,11 +40,7 @@
   count-route
   random-route
   (context "/integration" []
-           (web-integration/wrap-search search-route)
-           (web-integration/wrap-autocomplete autocomplete-route)
-           (web-integration/wrap-search-exact search-exact-route)
-           (web-integration/wrap-count count-route)
-           (web-integration/wrap-random random-route))
+           integration-routes)
   (route/not-found (response {:message "endpoint not found"})))
 
 (defn handler [request]
