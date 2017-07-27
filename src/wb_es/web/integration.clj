@@ -64,4 +64,8 @@
       (assoc response :body {:count count}))))
 
 (defn wrap-random [handler]
-  handler)
+  (fn [request]
+    (let [response (handler request)]
+      (assoc response :body (->> (get-in response [:body :hits :hits])
+                                 (first)
+                                 (get-obj))))))
