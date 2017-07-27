@@ -18,29 +18,37 @@
   (fn [request]
     (let [params (:params request)
           page (get params :page 1)
-          page_size (get params :page_size 10)
+          page-size (get params :page_size 10)
           params-new (assoc params
-                            :size page_size
+                            :size page-size
                             :from (->> page
                                        (Integer.)
                                        (dec)
-                                       (* page_size)))
+                                       (* page-size)))
           request-new (assoc request :params params-new)
           response (handler request-new)
-          body-new {
-                    :matches (->> (get-in response [:body :hits :hits])
+          body-new {:matches (->> (get-in response [:body :hits :hits])
                                   (map get-obj))
                     :query (:q params)
-                    :querytime (->> (get-in response [:body :took])
-                                    (Integer.)
-                                    (#(/ % 1000.0)))
+                    :querytime (->> (get-in response [:body :took]))
                     :count (get-in response [:body :hits :total])
                     :page page
-                    :page_size page_size}]
+                    :page_size page-size}]
       (assoc response :body body-new))))
 
 (defn wrap-autocomplete [handler]
-  handler)
+  (fn [request]
+    (let [params (:params request)
+          page-size (get params :page_size 10)
+          params-new (assoc params :size page-size)
+          response (handler (assoc request :params params-new))
+          body-new {:struct (->> (get-in response [:body :hits :hits])
+                                 (map pack-search-obj))
+                    :query (:q params)
+                    :page 1
+                    :page_size page-size
+                    }]
+      (assoc response :body body-new))))
 
 (defn wrap-search-exact [handler]
   (fn [request]
