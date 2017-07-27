@@ -46,8 +46,7 @@
                                  (map pack-search-obj))
                     :query (:q params)
                     :page 1
-                    :page_size page-size
-                    }]
+                    :page_size page-size}]
       (assoc response :body body-new))))
 
 (defn wrap-search-exact [handler]
@@ -59,7 +58,10 @@
       (assoc response :body content-new))))
 
 (defn wrap-count [handler]
-  handler)
+  (fn [request]
+    (let [response (handler request)
+          count (get-in response [:body :count])]
+      (assoc response :body {:count count}))))
 
 (defn wrap-random [handler]
   handler)
