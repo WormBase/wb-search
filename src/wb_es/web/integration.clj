@@ -51,9 +51,13 @@
 
 (defn wrap-search-exact [handler]
   (fn [request]
-    (let [response (handler request)
+    (let [params (:params request)
+          response (handler (assoc request :params {:q (get params :q (:query params))
+                                                    :type (get params :type (:class params))
+                                                    :species (:species params)}))
+          pack-function pack-search-obj
           content-new (->> (get-in response [:body :hits :hits])
-                           (map pack-search-obj)
+                           (map pack-function)
                            (first))]
       (assoc response :body content-new))))
 
