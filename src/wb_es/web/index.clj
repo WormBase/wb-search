@@ -27,11 +27,21 @@
        (response (web-core/random options))))
 
 (defroutes integration-routes
-  (wrap-routes search-route web-integration/wrap-search)
-  (wrap-routes autocomplete-route web-integration/wrap-autocomplete)
-  (wrap-routes search-exact-route web-integration/wrap-search-exact)
-  (wrap-routes count-route web-integration/wrap-count)
-  (wrap-routes random-route web-integration/wrap-random))
+  (-> search-route
+      (wrap-routes web-integration/wrap-params)
+      (wrap-routes web-integration/wrap-search))
+  (-> autocomplete-route
+      (wrap-routes web-integration/wrap-params)
+      (wrap-routes web-integration/wrap-autocomplete))
+  (-> search-exact-route
+      (wrap-routes web-integration/wrap-params)
+      (wrap-routes web-integration/wrap-search-exact))
+  (-> count-route
+      (wrap-routes web-integration/wrap-params)
+      (wrap-routes web-integration/wrap-count))
+  (-> random-route
+      (wrap-routes web-integration/wrap-params)
+      (wrap-routes web-integration/wrap-random)))
 
 (defroutes app
   search-route

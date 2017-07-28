@@ -14,7 +14,7 @@
      :description (:description doc-source)
      :taxonomy nil}))
 
-(defn wrap-search [handler]
+(defn wrap-params [handler]
   (fn [request]
     (let [params (:params request)
           page (get params :page 1)
@@ -24,42 +24,43 @@
                             :from (->> page
                                        (Integer.)
                                        (dec)
-                                       (* page-size)))
-          request-new (assoc request :params params-new)
-          response (handler request-new)
+                                       (* page-size))
+                            :q (get params :q (:query params))
+                            :type (get params :type (:class params))
+                            :species (:species params)
+                            :raw params)]
+      (handler (assoc request :params params-new)))))
+
+(defn wrap-search [handler]
+  (fn [request]
+    (let [response (handler request)
           body-new {:matches (->> (get-in response [:body :hits :hits])
                                   (map get-obj))
-                    :query (:q params)
+                    :query (get-in request [:params :q])
                     :querytime (->> (get-in response [:body :took]))
                     :count (get-in response [:body :hits :total])
-                    :page page
-                    :page_size page-size}]
+                    :page (get-in request [:params :raw :page])
+                    :page_size (get-in request [:params :raw :page_size])}]
       (assoc response :body body-new))))
 
 (defn wrap-autocomplete [handler]
   (fn [request]
-    (let [params (:params request)
-          page-size (get params :page_size 10)
-          params-new (assoc params :size page-size)
-          response (handler (assoc request :params params-new))
+    (let [response (handler request)
           body-new {:struct (->> (get-in response [:body :hits :hits])
                                  (map pack-search-obj))
-                    :query (:q params)
+                    :query (get-in request [:params :q])
                     :page 1
-                    :page_size page-size}]
+                    :page_size (get-in request [:params :raw :page_size])}]
       (assoc response :body body-new))))
 
 (defn wrap-search-exact [handler]
   (fn [request]
-    (let [params (:params request)
-          response (handler (assoc request :params {:q (get params :q (:query params))
-                                                    :type (get params :type (:class params))
-                                                    :species (:species params)}))
+    (let [response (handler request)
           pack-function pack-search-obj
-          content-new (->> (get-in response [:body :hits :hits])
-                           (map pack-function)
-                           (first))]
-      (assoc response :body content-new))))
+          body-new (->> (get-in response [:body :hits :hits])
+                        (map pack-function)
+                        (first))]
+      (assoc response :body body-new))))
 
 (defn wrap-count [handler]
   (fn [request]
