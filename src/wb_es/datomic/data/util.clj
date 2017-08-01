@@ -1,5 +1,6 @@
 (ns wb-es.datomic.data.util
-  (:require [wb-es.env :refer [release-id]]))
+  (:require [wb-es.env :refer [release-id]]
+            [datomic.api :as d]))
 
 (defprotocol Document
   (metadata [this])
@@ -37,15 +38,39 @@
 
 (defn format-species-enum
   "format a species entity as a elasticsearch term"
-  [species-entity]
-  (if species-entity
-    (let [[genus-name species-name] (-> (:species/id species-entity)
-                                        (clojure.string/lower-case)
-                                        (clojure.string/split #"\s+"))]
-      (format "%s_%s" (str (first genus-name)) species-name))))
+  ([species-entity] (format-species-enum species-entity nil))
+  ([species-entity bioproject-id]
+   (if species-entity
+     (let [[genus-name species-name] (-> (:species/id species-entity)
+                                         (clojure.string/lower-case)
+                                         (clojure.string/split #"\s+"))
+           genus-short (str (first genus-name))]
+       (if bioproject-id
+         (format "%s_%s_%s" genus-short species-name bioproject-id)
+         (format "%s_%s" genus-short species-name))))))
 
+(def format-species-enum-memoized (memoize format-species-enum))
 
+(defn- bioprojec-to-strain [db bioproject-id]
+  (d/q '[:find ?sid .
+         :in $ ?b
+         :where
+         [?c :sequence-collection.database/accession ?b]
+         [?e :sequence-collection/database ?c]
+         [?e :sequence-collection/strain ?s]
+         [?s strain/id ?sid]]
+       db bioproject-id))
 
+(defn format-species-text
+  "format the species as full text"
+  ([species-entity] (format-species-text species-entity nil))
+  ([species-entity bioproject-id]
+   (if species-entity
+     (if bioproject-id
+         (format "%s (%s)" (:species/id species-entity) (bioprojec-to-strain (d/entity-db species-entity) bioproject-id))
+         (:species/id species-entity)))))
+
+(def format-species-text-memoized (memoize format-species-text))
 ;;
 ;; START of a section lifted out of WormBase/datomic-to-catalyst
 ;; https://github.com/WormBase/datomic-to-catalyst/blob/develop/src/rest_api/formatters/object.clj
