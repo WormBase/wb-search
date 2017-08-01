@@ -8,14 +8,26 @@
                 (:wbid doc-source))
      :taxonomy (:species doc-source)}))
 
+(defn- pack-species [species-name]
+  (if species-name
+    (let [[genus-name species-name] (clojure.string/split species-name #"\s+" 2)]
+      {:genus genus-name
+       :species species-name})))
+
 (defn- get-obj [doc]
   (let [search-obj (pack-search-obj doc)
         doc-source (:_source doc)]
     {:name search-obj
      :description (:description doc-source)
-     :taxonomy nil
-     :gene (:gene doc-source)
-     :phenotype (:phenotype doc-source)}))
+     :taxonomy (pack-species (:species_name doc-source))
+     :gene (->> (:gene doc-source)
+                (not-empty))
+     :phenotype (->> (:phenotype doc-source)
+                     (not-empty))
+     :genotype (->> (:genotype doc-source)
+                    (not-empty))
+     :strain (->> (:strain doc-source)
+                  (not-empty))}))
 
 (defn wrap-params [handler]
   (fn [request]
@@ -41,7 +53,8 @@
           body-new {:matches (->> (get-in response [:body :hits :hits])
                                   (map get-obj))
                     :query (get-in request [:params :q])
-                    :querytime (->> (get-in response [:body :took]))
+                    :querytime (-> (get-in response [:body :took])
+                                   (/ 1000.0))
                     :count (get-in response [:body :hits :total])
                     :page (get-in request [:params :raw :page])
                     :page_size (get-in request [:params :raw :page_size])}]
