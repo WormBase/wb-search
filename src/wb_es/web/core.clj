@@ -7,7 +7,8 @@
   (->> []
        (cons (when-let [type-value (:type options)]
                {:type {:value (clojure.string/replace type-value #"_" "-")}}))
-       (cons (when-let [species-value (:species options)]
+       (cons (when-let [species-value (some->> (:species options)
+                                               (clojure.string/lower-case))]
                {:term {:species species-value}}))
        (filter identity)))
 
