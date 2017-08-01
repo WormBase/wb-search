@@ -40,8 +40,8 @@
                                        (Integer.)
                                        (dec)
                                        (* page-size))
-                            :q (-> (get params :q (:query params))
-                                   (clojure.string/replace #"\*" ""))
+                            :q (some-> (get params :q (:query params))
+                                       (clojure.string/replace #"\*" ""))
                             :type (get params :type (:class params))
                             :species (:species params)
                             :raw params)]
