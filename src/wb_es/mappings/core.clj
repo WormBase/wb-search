@@ -1,5 +1,12 @@
 (ns wb-es.mappings.core)
 
+(defn ref-mapping []
+  {:type "nested"
+   :properties {:wbid {:type "string"
+                       :analyzer "keyword_ignore_case"}
+                :label {:type "string"}
+                :ref_type {:type "string"}}})
+
 (def default-mapping
   {:properties
    {:wbid {:type "string"
@@ -20,8 +27,17 @@
                  :analyzer "keyword_ignore_case"}
     :species {:type "string"
               :analyzer "keyword_ignore_case"}
-    :gene {:type "string"
-           :analyzer "keyword_ignore_case"}}})
+    :species_name {:type "string"}
+
+    :genotype {:type "string"}
+
+    ;; start of refs
+    :author (ref-mapping)
+    :gene (ref-mapping)
+    :phenotype (ref-mapping)
+    :strain (ref-mapping)
+    ;; end of refs
+    }})
 
 (def index-settings
   {:settings

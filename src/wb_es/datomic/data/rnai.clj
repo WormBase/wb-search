@@ -11,4 +11,7 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:rnai/id entity)
-     :species (data-util/format-species-enum (:rnai/species entity))}))
+     :species (data-util/format-species-enum (:rnai/species entity))
+     :phenotype (->> (:rnai/phenotype entity)
+                     (map :rnai.phenotype/phenotype)
+                     (map data-util/pack-obj))}))
