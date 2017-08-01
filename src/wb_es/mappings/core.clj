@@ -10,7 +10,7 @@
 (def default-mapping
   {:properties
    {:wbid {:type "string"
-           :analyzer "keyword_ignore_case"
+           :analyzer "keyword"
            :include_in_all false}
 
     :label {:type "string"
