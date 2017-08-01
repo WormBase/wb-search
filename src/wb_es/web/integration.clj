@@ -28,6 +28,8 @@
      :genotype (->> (:genotype doc-source)
                     (not-empty))
      :strain (->> (:strain doc-source)
+                  (not-empty))
+     :author (->> (:author doc-source)
                   (not-empty))}))
 
 (defn wrap-params [handler]
