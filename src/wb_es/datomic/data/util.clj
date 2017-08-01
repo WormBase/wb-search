@@ -58,7 +58,7 @@
          [?c :sequence-collection.database/accession ?b]
          [?e :sequence-collection/database ?c]
          [?e :sequence-collection/strain ?s]
-         [?s strain/id ?sid]]
+         [?s :strain/id ?sid]]
        db bioproject-id))
 
 (defn format-species-text
