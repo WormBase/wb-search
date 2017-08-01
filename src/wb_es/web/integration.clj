@@ -4,7 +4,8 @@
   (let [doc-source (:_source doc)]
     {:id (:wbid doc-source)
      :class (clojure.string/replace (:_type doc) "-" "_")
-     :label (:label doc-source)
+     :label (or (:label doc-source)
+                (:wbid doc-source))
      :taxonomy (:species doc-source)}))
 
 (defn- get-obj [doc]
@@ -12,7 +13,9 @@
         doc-source (:_source doc)]
     {:name search-obj
      :description (:description doc-source)
-     :taxonomy nil}))
+     :taxonomy nil
+     :gene (:gene doc-source)
+     :phenotype (:phenotype doc-source)}))
 
 (defn wrap-params [handler]
   (fn [request]
@@ -25,7 +28,8 @@
                                        (Integer.)
                                        (dec)
                                        (* page-size))
-                            :q (get params :q (:query params))
+                            :q (-> (get params :q (:query params))
+                                   (clojure.string/replace #"\*" ""))
                             :type (get params :type (:class params))
                             :species (:species params)
                             :raw params)]
