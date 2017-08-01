@@ -6,7 +6,7 @@
      :class (clojure.string/replace (:_type doc) "-" "_")
      :label (or (:label doc-source)
                 (:wbid doc-source))
-     :taxonomy (:species doc-source)}))
+     :taxonomy (get-in doc-source [:species :key])}))
 
 (defn- pack-species [species-name]
   (if species-name
@@ -19,7 +19,8 @@
         doc-source (:_source doc)]
     {:name search-obj
      :description (:description doc-source)
-     :taxonomy (pack-species (:species_name doc-source))
+     :taxonomy (->> (get-in doc-source [:species :name])
+                    (pack-species))
      :gene (->> (:gene doc-source)
                 (not-empty))
      :phenotype (->> (:phenotype doc-source)

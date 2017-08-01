@@ -9,7 +9,7 @@
                {:type {:value (clojure.string/replace type-value #"_" "-")}}))
        (cons (when-let [species-value (some->> (:species options)
                                                (clojure.string/lower-case))]
-               {:term {:species species-value}}))
+               {:term {:species.key species-value}}))
        (filter identity)))
 
 

@@ -22,11 +22,4 @@
                         (:gene/automated-description)
                         (first)
                         (:gene.automated-description/text)))
-     :species (let [species-entity (:gene/species entity)]
-                (if-let [[_ bioproject-id] (re-matches #"(PRJ.*):.*" (:gene/id entity))]
-                  (data-util/format-species-enum-memoized species-entity bioproject-id)
-                  (data-util/format-species-enum-memoized species-entity)))
-     :species_name (let [species-entity (:gene/species entity)]
-                     (if-let [[_ bioproject-id] (re-matches #"(PRJ.*):.*" (:gene/id entity))]
-                       (data-util/format-species-text-memoized species-entity bioproject-id)
-                       (data-util/format-species-text-memoized species-entity)))}))
+     :species (data-util/format-entity-species :gene/species entity)}))

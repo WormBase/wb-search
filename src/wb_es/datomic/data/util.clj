@@ -71,6 +71,19 @@
          (:species/id species-entity)))))
 
 (def format-species-text-memoized (memoize format-species-text))
+
+(defmulti format-entity-species
+  "format the species as an object"
+  (fn [species-key entity] species-key))
+
+(defmethod format-entity-species :default [species-key entity]
+  (if-let [species-entity (species-key entity)]
+    (let [entity-id-attr (keyword (namespace species-key) "id")
+          [_ bioproject-id] (re-matches #"(PRJ.*):.*" (entity-id-attr entity))]
+      {:key (format-species-enum-memoized species-entity bioproject-id)
+       :name (format-species-text-memoized species-entity bioproject-id)})))
+
+
 ;;
 ;; START of a section lifted out of WormBase/datomic-to-catalyst
 ;; https://github.com/WormBase/datomic-to-catalyst/blob/develop/src/rest_api/formatters/object.clj

@@ -25,9 +25,10 @@
                   :analyzer "keyword_ignore_case"}
     :paper_type {:type "string"
                  :analyzer "keyword_ignore_case"}
-    :species {:type "string"
-              :analyzer "keyword_ignore_case"}
-    :species_name {:type "string"}
+    :species {:properties
+              {:key {:type "string"
+                     :analyzer "keyword_ignore_case"}
+               :name {:type "string"}}}
 
     :genotype {:type "string"}
 
