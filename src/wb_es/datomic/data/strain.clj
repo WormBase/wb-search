@@ -11,4 +11,4 @@
     {:wbid (:strain/id entity)
      :label (:strain/id entity)
      :description (:strain/genotype entity)
-     :species (data-util/format-species-enum (:strain/species entity))}))
+     :species (data-util/format-entity-species :strain/species entity)}))

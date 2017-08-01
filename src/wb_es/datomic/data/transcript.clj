@@ -11,4 +11,4 @@
   (data [this]
     {:wbid (:transcript/id entity)
      :label (:transcript/id entity)
-     :species (data-util/format-species-enum (:transcript/species entity))}))
+     :species (data-util/format-entity-species :transcript/species entity)}))

@@ -10,4 +10,4 @@
   (data [this]
     {:wbid (:microarray-results/id entity)
      :label (:microarray-results/id entity)
-     :species (data-util/format-species-enum (:microarray-results/species entity))}))
+     :species (data-util/format-entity-species :microarray-results/species entity)}))

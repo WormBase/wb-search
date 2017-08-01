@@ -11,4 +11,4 @@
   (data [this]
     {:wbid (:expression-cluster/id entity)
      :description (first (:expression-cluster/description entity))
-     :species (data-util/format-species-enum (:expression-cluster/species entity))}))
+     :species (data-util/format-entity-species :expression-cluster/species entity)}))

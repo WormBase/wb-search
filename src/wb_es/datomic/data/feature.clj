@@ -11,4 +11,4 @@
     {:wbid (:feature/id entity)
      :label (:feature/id entity)
      :description (first (:feature/description entity))
-     :species (data-util/format-species-enum (:feature/species entity))}))
+     :species (data-util/format-entity-species :feature/species entity)}))

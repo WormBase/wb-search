@@ -13,4 +13,4 @@
      :description (->> entity
                        (:pseudogene/brief-identification)
                        (:pseudogene.brief-identification/text))
-     :species (data-util/format-species-enum (:pseudogene/species entity))}))
+     :species (data-util/format-entity-species :pseudogene/species entity)}))

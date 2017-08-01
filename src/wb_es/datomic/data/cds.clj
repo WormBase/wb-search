@@ -11,4 +11,4 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:cds/id entity)
-     :species (data-util/format-species-enum (:cds/species entity))}))
+     :species (data-util/format-entity-species :cds/species entity)}))

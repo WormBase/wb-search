@@ -9,4 +9,4 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:sequence/id entity)
-     :species (data-util/format-species-enum (:sequence/species entity))}))
+     :species (data-util/format-entity-species :sequence/species entity)}))

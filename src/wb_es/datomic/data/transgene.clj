@@ -15,4 +15,5 @@
      :other_names (:transgene/synonym entity)
      :description (->> entity
                        (:transgene/summary)
-                       (:transgene.summary/text))}))
+                       (:transgene.summary/text))
+     :species (data-util/format-entity-species :transgene/species entity)}))

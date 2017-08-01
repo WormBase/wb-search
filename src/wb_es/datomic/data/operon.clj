@@ -13,4 +13,4 @@
      :description (->> entity
                        (:operon/description)
                        (:operon.description/text))
-     :species (data-util/format-species-enum (:operon/species entity))}))
+     :species (data-util/format-entity-species :operon/species entity)}))

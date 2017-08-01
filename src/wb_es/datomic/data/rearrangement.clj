@@ -11,4 +11,4 @@
   (data [this]
     {:wbid (:rearrangement/id entity)
      :label (:rearrangement/id entity)
-     :species (data-util/format-species-enum (:rearrangement/species entity))}))
+     :species (data-util/format-entity-species :rearrangement/species entity)}))

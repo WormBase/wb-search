@@ -11,4 +11,4 @@
   (data [this]
     {:wbid (:variation/id entity)
      :label (:variation/public-name entity)
-     :species (data-util/format-species-enum (:variation/species entity))}))
+     :species (data-util/format-entity-species :variation/species entity)}))

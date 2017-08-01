@@ -8,4 +8,5 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:expr-pattern/id entity)
-     :description (first (:expr-pattern/pattern entity))}))
+     :description (first (:expr-pattern/pattern entity))
+     :species (data-util/format-entity-species :expr-pattern/species entity)}))

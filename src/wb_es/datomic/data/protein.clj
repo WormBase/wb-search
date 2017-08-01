@@ -12,4 +12,4 @@
     {:wbid (:protein/id entity)
      :label (first (:protein/gene-name entity))
      :description (:protein/description entity)
-     :species (data-util/format-species-enum (:protein/species entity))}))
+     :species (data-util/format-entity-species :protein/species entity)}))

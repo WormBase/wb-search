@@ -10,4 +10,4 @@
   (data [this]
     {:wbid (:transposon/id entity)
      :label (:transposon/id entity)
-     :species (data-util/format-species-enum (:transposon/species entity))}))
+     :species (data-util/format-entity-species :transposon/species entity)}))
