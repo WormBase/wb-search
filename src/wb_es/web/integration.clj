@@ -48,6 +48,7 @@
                             :type (get params :type (:class params))
                             :species (:species params)
                             :raw params)]
+      ;;(prn (select-keys request [:uri :params]))
       (handler (assoc request :params params-new)))))
 
 (defn wrap-search [handler]
