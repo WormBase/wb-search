@@ -8,20 +8,37 @@
 (defn get-label [entity]
   (->> (concat (->> entity
                     (:interaction/interactor-overlapping-gene)
-                    (map (comp :gene/public-name
-                               :interaction.interactor-overlapping-gene/gene)))
+                    (map :interaction.interactor-overlapping-gene/gene)
+                    (map (partial data-util/obj-label "gene")))
                (->> entity
                     (:interaction/feature-interactor)
-                    (map (comp :feature/public-name
-                               :interaction.feature-interactor/feature)))
+                    (map :interaction.feature-interactor/feature)
+                    (map (partial data-util/obj-label "feature")))
                (->> entity
                     (:interaction/other-interactor)
                     (map :interaction.other-interactor/text))
                (->> entity
                     (:interaction/molecule-interactor)
-                    (map (comp first
-                               :molecule/public-name
-                               :interaction.molecule-interactor/molecule))))
+                    (map :interaction.molecule-interactor/molecule)
+                    (map (partial data-util/obj-label "molecule")))
+               (->> entity
+                    (:interaction/pcr-interactor)
+                    (map :interaction.pcr-interactor/pcr-product)
+                    (map (partial data-util/obj-label "pcr-product")))
+               (->> entity
+                    (:interaction/sequence-interactor)
+                    (map :interaction.sequence-interactor/sequence)
+                    (map (partial data-util/obj-label "sequence")))
+               (->> entity
+                    (:interaction/variation-interactor)
+                    (map :interaction.variation-interactor/variation)
+                    (map (partial data-util/obj-label "variation")))
+               (->> entity
+                    (:interaction/rearrangement)
+                    (map :interaction.rearrangement/rearrangement)
+                    (map (partial data-util/obj-label "rearrangement")))
+
+               )
        (sort)
        (clojure.string/join " : ")))
 
