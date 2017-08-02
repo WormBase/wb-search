@@ -10,6 +10,9 @@
        (cons (when-let [species-value (some->> (:species options)
                                                (clojure.string/lower-case))]
                {:term {:species.key species-value}}))
+       (cons (when-let [species-value (some->> (:paper_type options)
+                                               (clojure.string/lower-case))]
+               {:term {:paper_type species-value}}))
        (filter identity)))
 
 
