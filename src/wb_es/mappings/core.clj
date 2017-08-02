@@ -19,7 +19,14 @@
                            :analyzer "keyword_ignore_case"}
                      :autocomplete {:type "string"
                                     :analyzer "autocomplete"
-                                    :search_analyzer "standard"}}
+                                    :search_analyzer "standard"}
+
+                     ;; autocomplete analyzer will handle gene name like unc-22 as phase search,
+                     ;; seeems sufficient for now, no need for autocomplete_keyword analyzer
+                     ;; :autocomplete_keyword {:type "string"
+                     ;;                        :analyzer "autocomplete_keyword"
+                     ;;                        :search_analyzer "keyword_ignore_case"}
+                     }
             }
     :other_names {:type "string"
                   :analyzer "keyword_ignore_case"}
@@ -49,6 +56,9 @@
                :analyzer {"autocomplete" {:type "custom"
                                           :tokenizer "standard"
                                           :filter ["lowercase" "autocomplete_filter"]}
+                          "autocomplete_keyword" {:type "custom"
+                                                  :tokenizer "keyword"
+                                                  :filter ["lowercase" "autocomplete_filter"]}
                           "keyword_ignore_case" {:type "custom"
                                                  :tokenizer "keyword"
                                                  :filter ["lowercase"]}}}}
