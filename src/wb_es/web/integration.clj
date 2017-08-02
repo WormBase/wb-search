@@ -67,7 +67,11 @@
   (fn [request]
     (let [response (handler request)
           body-new {:struct (->> (get-in response [:body :hits :hits])
-                                 (map pack-search-obj))
+                                 (map (fn [doc]
+                                        (let [packed-species (->> (get-in doc [:_source :species :name])
+                                                                  (pack-species))]
+                                          (-> (pack-search-obj doc)
+                                              (assoc :taxonomy packed-species))))))
                     :query (get-in request [:params :q])
                     :page 1
                     :page_size (get-in request [:params :raw :page_size])}]
