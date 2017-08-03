@@ -16,21 +16,21 @@
 
 (defn- get-obj [doc]
   (let [search-obj (pack-search-obj doc)
-        doc-source (:_source doc)]
-    {:name search-obj
-     :description (:description doc-source)
-     :taxonomy (->> (get-in doc-source [:species :name])
-                    (pack-species))
-     :gene (->> (:gene doc-source)
-                (not-empty))
-     :phenotype (->> (:phenotype doc-source)
-                     (not-empty))
-     :genotype (->> (:genotype doc-source)
-                    (not-empty))
-     :strain (->> (:strain doc-source)
-                  (not-empty))
-     :author (->> (:author doc-source)
-                  (not-empty))}))
+        doc-source (:_source doc)
+
+        non-empty-doc-source
+        (reduce (fn [result [k v]]
+                  (let [non-empty-v
+                        (if (sequential? v)
+                          (not-empty v)
+                          v)]
+                    (assoc result k non-empty-v)))
+                {}
+                doc-source)]
+    (assoc non-empty-doc-source
+           :name search-obj
+           :taxonomy (->> (get-in doc-source [:species :name])
+                          (pack-species)))))
 
 (defn wrap-params [handler]
   (fn [request]
