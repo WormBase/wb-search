@@ -11,7 +11,10 @@
   {:properties
    {:wbid {:type "string"
            :analyzer "keyword"
-           :include_in_all false}
+           :include_in_all false
+           :fields {:autocomplete_keyword {:type "string"
+                                           :analyzer "autocomplete"
+                                           :search_analyzer "keyword_ignore_case"}}}
 
     :label {:type "string"
             :include_in_all false
@@ -23,9 +26,9 @@
 
                      ;; autocomplete analyzer will handle gene name like unc-22 as phase search,
                      ;; seeems sufficient for now, no need for autocomplete_keyword analyzer
-                     ;; :autocomplete_keyword {:type "string"
-                     ;;                        :analyzer "autocomplete_keyword"
-                     ;;                        :search_analyzer "keyword_ignore_case"}
+                     :autocomplete_keyword {:type "string"
+                                            :analyzer "autocomplete_keyword"
+                                            :search_analyzer "keyword_ignore_case"}
                      }
             }
     :other_names {:type "string"

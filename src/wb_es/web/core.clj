@@ -54,8 +54,9 @@
                {:bool
                 {:must [{:bool {:filter (get-filter options)}}
                         {:bool
-                         {:should [{:match {:label.autocomplete q}}
-                                   {:match {:wbid_as_label q}}]}}]}}}
+                         {:should [{:match {:wbid.autocomplete_keyword q}}
+                                   {:bool {:should [{:match {:label.autocomplete_keyword q}}
+                                                    {:match {:label.autocomplete q}}]}}]}}]}}}
 
         response
         (http/get (format "%s/%s/_search?size=%s"
