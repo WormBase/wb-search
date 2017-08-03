@@ -23,4 +23,8 @@
      :paper_type (->> entity
                       (:paper/type)
                       (map :paper.type/type)
-                      (map data-util/format-enum))}))
+                      (map data-util/format-enum))
+     :journal (:paper/journal entity)
+     :year (some-> (:paper/publication-date entity)
+                   (clojure.string/split #"-")
+                   (first))}))

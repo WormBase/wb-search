@@ -22,4 +22,14 @@
                         (:gene/automated-description)
                         (first)
                         (:gene.automated-description/text)))
-     :species (data-util/format-entity-species :gene/species entity)}))
+     :species (data-util/format-entity-species :gene/species entity)
+     :dead (= "dead"
+              (some->> (:gene/status entity)
+                       (:gene.status/status)
+                       (name)))
+     :merged_into (->> entity
+                      (:gene/version-change)
+                      (map :gene-history-action/merged-into)
+                      (filter identity)
+                      (first)
+                      (data-util/pack-obj))}))

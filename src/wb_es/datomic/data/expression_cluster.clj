@@ -10,5 +10,9 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:expression-cluster/id entity)
-     :description (first (:expression-cluster/description entity))
+     :description (if-let [algorithms (:expression-cluster/algorithm entity)]
+                    (format "%s\n%s"
+                            (clojure.string/join ", " algorithms)
+                            (first (:expression-cluster/description entity)))
+                    (first (:expression-cluster/description entity)))
      :species (data-util/format-entity-species :expression-cluster/species entity)}))

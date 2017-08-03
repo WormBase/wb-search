@@ -13,4 +13,8 @@
      :other_names (:antibody/other-name entity)
      :description (->> entity
                        (:antibody/summary)
-                       (:antibody.summary/text))}))
+                       (:antibody.summary/text))
+     :gene (->> entity
+                (:antibody/gene)
+                (map :antibody.gene/gene)
+                (map data-util/pack-obj))}))

@@ -7,7 +7,7 @@
 
 (deftype Do-term [entity]
   data-util/Document
-  (metadata [this] (data-util/default-metadata entity))
+  (metadata [this] (assoc (data-util/default-metadata entity) :_type "disease"))
   (data [this]
     {:wbid (:do-term/id entity)
      :label (:do-term/name entity)
