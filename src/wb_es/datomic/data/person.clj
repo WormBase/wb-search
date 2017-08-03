@@ -13,6 +13,6 @@
      :label (:person/standard-name entity)
      :other_names (cons (:person/full-name entity)
                         (:person/also-known-as entity))
-     :description (->> (:person/address entity)
+     :institution (->> (:person/address entity)
                        (:address/institution)
                        (clojure.string/join "\n"))}))
