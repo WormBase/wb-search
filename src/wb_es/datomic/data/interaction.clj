@@ -40,7 +40,10 @@
 
                )
        (sort)
-       (clojure.string/join " : ")))
+       (#(case (count %)
+           0 nil
+           1 (format "Interaction involving %s" (first %))
+           (clojure.string/join " : " %)))))
 
 (deftype Interaction [entity]
   data-util/Document
