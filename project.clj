@@ -26,11 +26,11 @@
   :target-path "target/%s"
   :javac-options ["-target" "1.8" "-source" "1.8"]
   :license "GPLv2"
-  :jvm-opts ["-Xmx6G"
+  :jvm-opts ["-Xmx4G"
              ;; same GC options as the transactor,
              ;; should minimize long pauses.
              "-XX:+UseG1GC" "-XX:MaxGCPauseMillis=50"
-             "-Ddatomic.objectCacheMax=2500000000"
+             "-Ddatomic.objectCacheMax=1000000000"
              "-Ddatomic.txTimeoutMsec=1000000"]
   :profiles
   {:datomic-pro
