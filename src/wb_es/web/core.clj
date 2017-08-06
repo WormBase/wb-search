@@ -3,6 +3,13 @@
             [cheshire.core :as json]
             [wb-es.env :refer [es-base-url release-id]]))
 
+(defn wrap-query-lower-case [handler]
+  (fn [request]
+    (prn request)
+;;    (handler request)))
+    (handler (update-in request [:params :q] #(some-> % clojure.string/lower-case)))))
+
+
 (defn get-filter [options]
   (->> []
        (cons (when-let [type-value (:type options)]

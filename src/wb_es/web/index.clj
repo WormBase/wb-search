@@ -6,6 +6,7 @@
             [ring.util.response :refer [response not-found]]
             [wb-es.web.core :as web-core]
             [wb-es.web.integration :as web-integration]))
+
 (def search-route
   (GET "/search" [q & options]
        (response (web-core/search q options))))
@@ -26,27 +27,35 @@
   (GET "/random" [q & options]
        (response (web-core/random options))))
 
-(defroutes api-lite-routes
-  search-route
-  autocomplete-route
-  search-exact-route
-  count-route
-  random-route)
+(def api-lite-routes
+  (->
+    (context "/" []
+      search-route
+      autocomplete-route
+      search-exact-route
+      count-route
+      random-route)
+    (wrap-routes web-core/wrap-query-lower-case)))
 
 (defroutes integration-routes
   (-> search-route
+      (wrap-routes web-core/wrap-query-lower-case)
       (wrap-routes web-integration/wrap-params)
       (wrap-routes web-integration/wrap-search))
   (-> autocomplete-route
+      (wrap-routes web-core/wrap-query-lower-case)
       (wrap-routes web-integration/wrap-params)
       (wrap-routes web-integration/wrap-autocomplete))
   (-> search-exact-route
+      (wrap-routes web-core/wrap-query-lower-case)
       (wrap-routes web-integration/wrap-params)
       (wrap-routes web-integration/wrap-search-exact))
   (-> count-route
+      (wrap-routes web-core/wrap-query-lower-case)
       (wrap-routes web-integration/wrap-params)
       (wrap-routes web-integration/wrap-count))
   (-> random-route
+      (wrap-routes web-core/wrap-query-lower-case)
       (wrap-routes web-integration/wrap-params)
       (wrap-routes web-integration/wrap-random)))
 
@@ -55,8 +64,10 @@
   (context "/integration" []
            integration-routes
            (context "/lite" []
-                    (wrap-routes api-lite-routes web-integration/wrap-params)))
-  (route/not-found (response {:message "endpoint not found"})))
+                    (-> api-lite-routes
+                        (wrap-routes web-integration/wrap-params)))
+  (route/not-found (response {:message "endpoint not found"}))))
+
 
 (defn handler [request]
   (let [enhanced-handler
