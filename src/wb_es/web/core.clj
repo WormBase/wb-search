@@ -1,7 +1,6 @@
 (ns wb-es.web.core
   (:require [clj-http.client :as http]
-            [cheshire.core :as json]
-            [wb-es.env :refer [es-base-url release-id]]))
+            [cheshire.core :as json]))
 
 (defn wrap-query-lower-case [handler]
   (fn [request]
@@ -23,7 +22,7 @@
        (filter identity)))
 
 
-(defn search [q options]
+(defn search [es-base-url index q options]
   (let [query (if (and q (not= (clojure.string/trim q) ""))
                 {;:explain true
                  :query
@@ -48,7 +47,7 @@
         response
         (http/get (format "%s/%s/_search?size=%s&from=%s"
                           es-base-url
-                          release-id
+                          index
                           (get options :size 10)
                           (get options :from 0))
                   {:content-type "application/json"
@@ -56,7 +55,7 @@
     (json/parse-string (:body response) true)))
 
 
-(defn autocomplete [q options]
+(defn autocomplete [es-base-url index q options]
   (let [query {:query
                {:bool
                 {:must [{:bool {:filter (get-filter options)}}
@@ -68,14 +67,14 @@
         response
         (http/get (format "%s/%s/_search?size=%s"
                           es-base-url
-                          release-id
+                          index
                           (get options :size 10))
                   {:content-type "application/json"
                    :body (json/generate-string query)})]
     (json/parse-string (:body response) true)))
 
 
-(defn search-exact [q options]
+(defn search-exact [es-base-url index q options]
   (let [query {:query
                {:bool
                 {:must [{:bool {:filter (get-filter options)}}
@@ -86,13 +85,13 @@
         response
         (http/get (format "%s/%s/_search"
                           es-base-url
-                          release-id)
+                          index)
                   {:content-type "application/json"
                    :body (json/generate-string query)})]
     (json/parse-string (:body response) true)))
 
 
-(defn random [options]
+(defn random [es-base-url index options]
   (let [date-seed (.format (java.text.SimpleDateFormat. "MM/dd/yyyy") (new java.util.Date))
         query {:query
                {:function_score
@@ -103,13 +102,13 @@
         response
         (http/get (format "%s/%s/_search"
                           es-base-url
-                          release-id)
+                          index)
                   {:content-type "application/json"
                    :body (json/generate-string query)})]
     (json/parse-string (:body response) true)))
 
 
-(defn count [q options]
+(defn count [es-base-url index q options]
   (let [query (if (and q (not= (clojure.string/trim q) ""))
                 {:query
                  {:bool
@@ -127,7 +126,7 @@
         response
         (http/get (format "%s/%s/_count"
                           es-base-url
-                          release-id)
+                          index)
                   {:content-type "application/json"
                    :body (json/generate-string query)})]
     (json/parse-string (:body response) true)))

@@ -4,28 +4,29 @@
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.json :refer [wrap-json-response]]
             [ring.util.response :refer [response not-found]]
+            [wb-es.env :refer [es-base-url release-id]]
             [wb-es.web.core :as web-core]
             [wb-es.web.integration :as web-integration]))
 
 (def search-route
   (GET "/search" [q & options]
-       (response (web-core/search q options))))
+       (response (web-core/search es-base-url release-id q options))))
 
 (def autocomplete-route
   (GET "/autocomplete" [q & options]
-       (response (web-core/autocomplete q options))))
+       (response (web-core/autocomplete es-base-url release-id q options))))
 
 (def search-exact-route
   (GET "/search-exact" [q & options]
-       (response (web-core/search-exact q options))))
+       (response (web-core/search-exact es-base-url release-id q options))))
 
 (def count-route
   (GET "/count" [q & options]
-       (response (web-core/count q options))))
+       (response (web-core/count es-base-url release-id q options))))
 
 (def random-route
   (GET "/random" [q & options]
-       (response (web-core/random options))))
+       (response (web-core/random es-base-url release-id options))))
 
 (def api-lite-routes
   (->
