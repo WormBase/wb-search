@@ -72,3 +72,28 @@
                     hits)))
         ))
     ))
+
+(deftest transgene-type-test
+  (let [db (d/db datomic-conn)
+        transgenes-prefixed-syis1 (->> (d/datoms db :aevt :transgene/public-name)
+                                       (keep (fn [[e _ v]]
+                                               (if (re-matches #"syIs1.*" v)
+                                                 e)))
+                                       (map (partial d/entity db))
+                                       (shuffle))]
+    (do
+      (apply index-datomic-entity transgenes-prefixed-syis1)
+      (testing "autocompletion by transgene name"
+        (let [hits (-> (autocomplete "syIs1")
+                       (get-in [:hits :hits]))]
+          (testing "result appears in autocompletion"
+            (is (some (fn [hit]
+                        (= "syIs101"
+                           (get-in hit [:_source :label])))
+                      hits)))
+          (testing "result in right order"
+            (is (= "syIs1" (-> (first hits)
+                               (get-in [:_source :label])))))))
+      (testing "autocompletion by transgene name in lowercase"
+        )))
+  )
