@@ -95,5 +95,11 @@
             (is (= "syIs1" (-> (first hits)
                                (get-in [:_source :label])))))))
       (testing "autocompletion by transgene name in lowercase"
-        )))
+        (let [hits (-> (autocomplete "syis1")
+                       (get-in [:hits :hits]))]
+          (is (some (fn [hit]
+                      (= "syIs101"
+                         (get-in hit [:_source :label])))
+                    hits))))
+      ))
   )
