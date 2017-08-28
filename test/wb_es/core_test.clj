@@ -29,34 +29,46 @@
 
 (use-fixtures :once wrap-setup)
 
-(defn index-docs [& docs]
+(defn index-doc [& docs]
   (let [formatted-docs (bulk/format-bulk "index" "test" docs)]
     (bulk/submit formatted-docs :refresh true)))
 
-(defn index-datomic-entity [entity]
-  (->> entity
-       (create-document)
-       (conj [])
-       (apply index-docs)))
+(defn index-datomic-entity [& entities]
+  (->> entities
+       (map create-document)
+       (apply index-doc)))
 
-(defn with-index [search-func]
+(defn with-default-options
+  "create a new search func that "
+  [search-func]
   (fn [& search-args]
-    (let [parameterized-search-func (partial search-func es-base-url index-name)]
-      (apply parameterized-search-func search-args))))
+    (let [[q options] search-args]
+      (search-func es-base-url
+                   index-name
+                   q
+                   (or options {})))))
 
-(def search (with-index web/search))
-(def autocomplete (with-index web/autocomplete))
+(def search (with-default-options web/search))
+(def autocomplete (with-default-options web/autocomplete))
 
 
-(deftest autocomplete-test
+(deftest clone-type-test
   (let [db (d/db datomic-conn)]
-    (testing "autocomplete by clone name"
-      (do
-        (index-datomic-entity (d/entity db [:clone/id "W02C12"]))
-        (let [first-hit (->> (search "W02C12" {})
+    (do
+      (index-datomic-entity (d/entity db [:clone/id "W02C12"]))
+      (testing "search by clone WBID"
+        (let [first-hit (->> (search "W02C12")
                              :hits
                              :hits
                              (first))]
           (is (= "W02C12" (get-in first-hit [:_source :wbid])))
           (is (= "clone" (get-in first-hit [:_type])))))
-      )))
+      (testing "autocomplete by clone WBID"
+        (let [hits (->> (autocomplete "W02C")
+                        :hits
+                        :hits)]
+          (is (some (fn [hit]
+                      (= "W02C12" (get-in hit [:_source :wbid])))
+                    hits)))
+        ))
+    ))
