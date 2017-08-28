@@ -52,6 +52,36 @@
 (def autocomplete (with-default-options web/autocomplete))
 
 
+(deftest anatomy-type-test
+  (testing "anatomy type using \"tl\" prefixed terms"
+    (let [db (d/db datomic-conn)
+          anatomy-tl-prefixed (->> (d/q '[:find [?e ...]
+                                          :in $ [?th ...]
+                                          :where
+                                          [?e :anatomy-term/term ?th]]
+                                        db
+                                        (->> (d/datoms db :aevt :anatomy-term.term/text)
+                                             (keep (fn [[e _ v]]
+                                                     (if (re-matches #"tl.*" (clojure.string/lower-case v))
+                                                       e)))))
+                                   (map (partial d/entity db))
+                                   (shuffle))]
+      (do
+        (apply index-datomic-entity anatomy-tl-prefixed)
+        (testing "autocomplete by term"
+          (let [hits (-> (autocomplete "tl")
+                         (get-in [:hits :hits]))]
+            (is (= "TL"
+                   (->> (get-in (first hits) [:_source :label]))))
+
+            (is (some (fn [hit]
+                        (= "TL.a"
+                           (get-in hit [:_source :label])))
+                      hits))
+            )))
+      )))
+
+
 (deftest clone-type-test
   (let [db (d/db datomic-conn)]
     (testing "clone type using W02C12 as example"
