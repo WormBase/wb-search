@@ -103,3 +103,35 @@
                     hits))))
       ))
   )
+
+(deftest disease-type-test
+  (testing "autocomplete by disease name using \"park\" as an example"
+    (let [db (d/db datomic-conn)
+          disease-parks (->> (d/datoms db :aevt :do-term/name)
+                             (keep (fn [[e _ v]]
+                                     (if (re-matches #".*park.*" (clojure.string/lower-case v))
+                                       e)))
+                             (map (partial d/entity db))
+                             (shuffle))]
+      (do
+        (apply index-datomic-entity disease-parks)
+        (let [hits (-> (autocomplete "park" {:size (count disease-parks)})
+                       (get-in [:hits :hits]))]
+
+          (testing "match Parkinson's disease"
+            (some (fn [hit]
+                    (= "Parkinson's disease"
+                       (get-in hit [:_source :label])))
+                  hits))
+          (testing "matching early-onset Parkinson disease"
+            (some (fn [hit]
+                    (= "early-onset Parkinson disease"
+                       (get-in hit [:_source :label])))
+                  hits))
+          (testing "X-linked dystonia-parkinsonism"
+            (some (fn [hit]
+                    (= "X-linked dystonia-parkinsonism"
+                       (get-in hit [:_source :label])))
+                  hits))
+
+          )))))
