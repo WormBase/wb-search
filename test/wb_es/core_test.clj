@@ -120,20 +120,20 @@
                          (get-in [:hits :hits]))]
 
             (testing "match Parkinson's disease"
-              (some (fn [hit]
-                      (= "Parkinson's disease"
-                         (get-in hit [:_source :label])))
-                    hits))
+              (is (some (fn [hit]
+                          (= "Parkinson's disease"
+                             (get-in hit [:_source :label])))
+                        hits)))
             (testing "matching early-onset Parkinson disease"
-              (some (fn [hit]
-                      (= "early-onset Parkinson disease"
-                         (get-in hit [:_source :label])))
-                    hits))
+              (is (some (fn [hit]
+                          (= "early-onset Parkinson disease"
+                             (get-in hit [:_source :label])))
+                        hits)))
             (testing "X-linked dystonia-parkinsonism"
-              (some (fn [hit]
-                      (= "X-linked dystonia-parkinsonism"
-                         (get-in hit [:_source :label])))
-                    hits))
+              (is (some (fn [hit]
+                          (= "X-linked dystonia-parkinsonism"
+                             (get-in hit [:_source :label])))
+                        hits)))
 
             ))))
     ))
