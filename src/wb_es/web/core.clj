@@ -4,8 +4,6 @@
 
 (defn wrap-query-lower-case [handler]
   (fn [request]
-    (prn request)
-;;    (handler request)))
     (handler (update-in request [:params :q] #(some-> % clojure.string/lower-case)))))
 
 
