@@ -56,7 +56,9 @@
 
 
 (defn autocomplete [es-base-url index q options]
-  (let [query {:query
+  (let [query {:sort [:_score
+                      {:label {:order :asc}}]
+               :query
                {:bool
                 {:must [{:bool {:filter (get-filter options)}}
                         {:bool
