@@ -53,7 +53,7 @@
           {:wb-db-uri "datomic:ddb://us-east-1/WS260/wormbase"
            :swagger-validator-url "http://localhost:8002"}
           :plugins
-          [[jonase/eastwood "0.2.3"
+          [[jonase/eastwood "0.2.4"
             :exclusions [org.clojure/clojure]]
            [lein-ancient "0.6.8"]
            [lein-bikeshed "0.3.0"]
