@@ -46,7 +46,7 @@
 (defn make-batches
   "turn a list datomic entity ids to batches of the given size.
   attach some metadata for debugging"
-  ([eids] (make-batches 500 nil))
+  ([eids] (make-batches 500 nil eids))
   ([batch-size order-info eids]
    (->> eids
         (sort)
