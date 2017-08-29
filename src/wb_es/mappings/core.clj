@@ -32,6 +32,7 @@
                      }
             }
     :other_names {:type "string"
+                  :include_in_all false
                   :analyzer "keyword_ignore_case"}
     :paper_type {:type "string"
                  :analyzer "keyword_ignore_case"}
