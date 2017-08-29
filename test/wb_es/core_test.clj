@@ -168,13 +168,27 @@
 (deftest phenotype-type-test
   (testing "phenotype with locomotion variant as example"
     (let [db (d/db datomic-conn)]
-      (index-datomic-entity (d/entity db [:phenotype/id "WBPhenotype:0000643"]))
-      (testing "search for phenotype by alias"
-        (is (->> (get-in (search "unc") [:hits :hits])
-                 (some (fn [hit]
-                         (= "WBPhenotype:0000643"
-                            (get-in hit [:_source :wbid]))))
-                 ))))))
+      (do
+        (index-datomic-entity (d/entity db [:phenotype/id "WBPhenotype:0000643"])
+                              (d/entity db [:gene-class/id "unc"]))
+        (testing "search for phenotype by alias"
+          (is (->> (get-in (search "unc") [:hits :hits])
+                   (some (fn [hit]
+                           (= "WBPhenotype:0000643"
+                              (get-in hit [:_source :wbid]))))
+                   )))
+        (testing "search by alias scores lower than by ID"
+          (let [hits (get-in (search "unc") [:hits :hits])
+                [phenotype-unc-hit] (filter (fn [hit]
+                                              (= "WBPhenotype:0000643"
+                                                 (get-in hit [:_source :wbid])))
+                                            hits)
+                [gene-class-unc-hit] (filter (fn [hit]
+                                               (= "unc"
+                                                (get-in hit [:_source :wbid])))
+                                             hits)]
+            (is (> (:_score gene-class-unc-hit)
+                   (:_score phenotype-unc-hit)))))))))
 
 (deftest transgene-type-test
   (testing "transgene using syis1 as example"
