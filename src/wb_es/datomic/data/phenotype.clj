@@ -13,6 +13,8 @@
      :label (->> entity
                  (:phenotype/primary-name)
                  (:phenotype.primary-name/text))
+     :other_names (->> (:phenotype/synonym entity)
+                       (map :phenotype.synonym/text))
      :description (->> entity
                        (:phenotype/description)
                        (:phenotype.description/text))}))

@@ -152,6 +152,17 @@
                     hits)))))
     ))
 
+(deftest phenotype-type-test
+  (testing "phenotype with locomotion variant as example"
+    (let [db (d/db datomic-conn)]
+      (index-datomic-entity (d/entity db [:phenotype/id "WBPhenotype:0000643"]))
+      (testing "search for phenotype by alias"
+        (is (->> (get-in (search "unc") [:hits :hits])
+                 (some (fn [hit]
+                         (= "WBPhenotype:0000643"
+                            (get-in hit [:_source :wbid]))))
+                 ))))))
+
 (deftest transgene-type-test
   (testing "transgene using syis1 as example"
     (let [db (d/db datomic-conn)
