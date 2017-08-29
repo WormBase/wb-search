@@ -8,4 +8,9 @@
   (data [this]
     {:wbid (:go-term/id entity)
      :label (first (:go-term/name entity))
+     :other_names (->> (:go-term/synonym entity)
+                       (keep (fn [holder]
+                               (if (= "exact" (name (:go-term.synonym/scope holder)))
+                                 (:go-term.synonym/text holder)))
+                             ))
      :description (first (:go-term/definition entity))}))

@@ -152,6 +152,19 @@
                     hits)))))
     ))
 
+(deftest go-term-type-test
+  (testing "go-term with creatine biosynthetic process as example"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:go-term/id "GO:0006601"]))
+        (testing "search for go-term by alias"
+          (is (some (fn [hit]
+                      (= "GO:0006601"
+                         (get-in hit [:_source :wbid])))
+                    (-> (search "creatine synthesis")
+                        (get-in [:hits :hits]))))))
+      )))
+
 (deftest phenotype-type-test
   (testing "phenotype with locomotion variant as example"
     (let [db (d/db datomic-conn)]
