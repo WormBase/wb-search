@@ -135,7 +135,21 @@
                              (get-in hit [:_source :label])))
                         hits)))
 
-            ))))
+            )))
+      (testing "search by do-term synonym"
+        (apply index-datomic-entity disease-parks)
+        (let [hits (-> (search "paralysis agitans")
+                       (get-in [:hits :hits]))]
+          (is (some (fn [hit]
+                      (= "Parkinson's disease"
+                         (get-in hit [:_source :label])))
+                    hits)))
+        (let [hits (-> (search "parkinson's disease")
+                       (get-in [:hits :hits]))]
+          (is (some (fn [hit]
+                      (= "Parkinson's disease"
+                         (get-in hit [:_source :label])))
+                    hits)))))
     ))
 
 (deftest transgene-type-test

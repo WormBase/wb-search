@@ -11,4 +11,9 @@
   (data [this]
     {:wbid (:do-term/id entity)
      :label (:do-term/name entity)
+     :other_names (->> (:do-term/synonym entity)
+                       (keep (fn [holder]
+                               (if (= "exact" (name (:do-term.synonym/scope holder)))
+                                 (:do-term.synonym/text holder)))
+                             ))
      :description (:do-term/definition entity)}))
