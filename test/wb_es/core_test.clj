@@ -230,3 +230,13 @@
                            (get-in hit [:_source :label])))
                       hits)))))
       )))
+
+(deftest pcr-product-type-test
+  (testing "pcr-product is searchable by page_type pcr_oligo"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:pcr-product/id "sjj_ZK822.2"]))
+        (let [hit (-> (search "sjj_ZK822.2" {:type "pcr_oligo"})
+                      (get-in [:hits :hits 0 :_source]))]
+          (= "sjj_ZK822.2" (:wbid hit))
+          (= "pcr_oligo" (:page_type hit)))))))
