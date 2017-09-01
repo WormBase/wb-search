@@ -22,12 +22,9 @@
 (defn default-metadata
   "default implementation of the data method of Document protocol"
   [entity]
-  (let [ident (get-ident-attr entity)]
-    (if ident
-      {:_index release-id
-       :_type "generic"
-       :_id (format "%s:%s" type (ident entity))}
-      (throw (Exception. "cannot identify ident attribute of the entity")))))
+  {:_index release-id
+   :_type "generic"
+   :_id (:db/id entity)})
 
 (defn format-enum
   "format the datomic enum into a elasticsearch term"
