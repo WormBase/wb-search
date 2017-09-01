@@ -149,7 +149,13 @@
           (is (some (fn [hit]
                       (= "Parkinson's disease"
                          (get-in hit [:_source :label])))
-                    hits)))))
+                    hits))))
+
+      (testing "search with page_type do_term"
+        (apply index-datomic-entity disease-parks)
+        (let [hits (search nil {:type "disease"})]
+          (is (= "disease"
+                 (get-in hits [:hits :hits 0 :_source :page_type]))))))
     ))
 
 (deftest go-term-type-test
