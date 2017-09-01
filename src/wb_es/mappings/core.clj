@@ -2,10 +2,10 @@
 
 (defn ref-mapping []
   {:type "nested"
-   :properties {:wbid {:type "string"
-                       :analyzer "keyword_ignore_case"}
+   :properties {:id {:type "string"
+                     :analyzer "keyword"}
                 :label {:type "string"}
-                :ref_type {:type "string"}}})
+                :class {:type "string"}}})
 
 (def generic-mapping
   {:properties
