@@ -10,7 +10,7 @@
 (defn get-filter [options]
   (->> []
        (cons (when-let [type-value (:type options)]
-               {:type {:value (clojure.string/replace type-value #"_" "-")}}))
+               {:term {:page_type type-value}}))
        (cons (when-let [species-value (some->> (:species options)
                                                (clojure.string/lower-case))]
                {:term {:species.key species-value}}))

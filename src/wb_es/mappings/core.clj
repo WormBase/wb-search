@@ -7,7 +7,7 @@
                 :label {:type "string"}
                 :ref_type {:type "string"}}})
 
-(def default-mapping
+(def generic-mapping
   {:properties
    {:wbid {:type "string"
            :analyzer "keyword"
@@ -66,4 +66,4 @@
                           "keyword_ignore_case" {:type "custom"
                                                  :tokenizer "keyword"
                                                  :filter ["lowercase"]}}}}
-   :mappings {:_default_ default-mapping}})
+   :mappings {:generic generic-mapping}})

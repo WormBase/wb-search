@@ -20,9 +20,9 @@
                (if-not (= (name action-name) "delete")
                  (format "%s\n%s"
                          (json/generate-string {action-name (if index
-                                                              (assoc (.metadata doc) :_index index) ; ie to specify test index
-                                                              (.metadata doc))})
-                         (json/generate-string (.data doc))))))
+                                                              (assoc (meta doc) :_index index) ; ie to specify test index
+                                                              (meta doc))})
+                         (json/generate-string doc)))))
         (clojure.string/join "\n")
         (format "%s\n")))) ;trailing \n is necessary for Elasticsearch to parse the request
 

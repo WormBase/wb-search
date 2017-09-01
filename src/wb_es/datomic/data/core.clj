@@ -91,4 +91,11 @@
           :variation/id variation/->Variation
           :wbprocess/id wbprocess/->Wbprocess
           (throw (Exception. "Not sure how to handle the data type. Throw an error to let you know")))]
-    (constructor-function entity)))
+    (let [document (constructor-function entity)
+          doc-data (.data document)
+          doc-meta (.metadata document)
+          page-type (clojure.string/replace (data-util/get-type-name entity) #"-" "_")]
+      (-> (merge {:page_type page-type}
+                 doc-data)
+          (with-meta doc-meta))
+      )))

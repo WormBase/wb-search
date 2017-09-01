@@ -6,7 +6,8 @@
 
 (deftype Pcr-product [entity]
   data-util/Document
-  (metadata [this] (assoc (data-util/default-metadata entity) :_type "pcr-oligo"))
+  (metadata [this] (data-util/default-metadata entity))
   (data [this]
-    {:wbid (:pcr-product/id entity)
+    {:page_type "pcr_oligo"
+     :wbid (:pcr-product/id entity)
      :label (:pcr-product/id entity)}))

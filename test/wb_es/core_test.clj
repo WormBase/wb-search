@@ -93,7 +93,7 @@
                                :hits
                                (first))]
             (is (= "W02C12" (get-in first-hit [:_source :wbid])))
-            (is (= "clone" (get-in first-hit [:_type])))))
+            (is (= "clone" (get-in first-hit [:_source :page_type])))))
         (testing "autocomplete by clone WBID"
           (let [hits (->> (autocomplete "W02C")
                           :hits

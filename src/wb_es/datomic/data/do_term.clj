@@ -7,9 +7,10 @@
 
 (deftype Do-term [entity]
   data-util/Document
-  (metadata [this] (assoc (data-util/default-metadata entity) :_type "disease"))
+  (metadata [this] (data-util/default-metadata entity))
   (data [this]
-    {:wbid (:do-term/id entity)
+    {:page_type "disease"
+     :wbid (:do-term/id entity)
      :label (:do-term/name entity)
      :other_names (->> (:do-term/synonym entity)
                        (keep (fn [holder]

@@ -22,11 +22,10 @@
 (defn default-metadata
   "default implementation of the data method of Document protocol"
   [entity]
-  (let [ident (get-ident-attr entity)
-        type (get-type-name entity)]
+  (let [ident (get-ident-attr entity)]
     (if ident
       {:_index release-id
-       :_type type
+       :_type "generic"
        :_id (format "%s:%s" type (ident entity))}
       (throw (Exception. "cannot identify ident attribute of the entity")))))
 

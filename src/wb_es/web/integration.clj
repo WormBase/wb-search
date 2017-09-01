@@ -3,7 +3,7 @@
 (defn- pack-search-obj [doc]
   (let [doc-source (:_source doc)]
     {:id (:wbid doc-source)
-     :class (clojure.string/replace (:_type doc) "-" "_")
+     :class (clojure.string/replace (get-in doc [:_source :page_type]) "-" "_")
      :label (or (:label doc-source)
                 (:wbid doc-source))
      :taxonomy (get-in doc-source [:species :key])}))
