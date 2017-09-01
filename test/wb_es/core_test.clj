@@ -19,7 +19,11 @@
   (do
     (let [index-url (format "%s/%s" es-base-url index-name)]
       (do
-        (http/delete index-url)
+        (try
+          (http/delete index-url)
+          (catch clojure.lang.ExceptionInfo e
+            (prn "failed to delete index.")
+            (prn e)))
         (http/put index-url {:headers {:content-type "application/json"}
                              :body (json/generate-string mappings/index-settings)})
         (mount/start)
