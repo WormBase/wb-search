@@ -29,7 +29,7 @@
 (defn submit
   "submit formatted new line delimited JSON to elasticsearch"
   [formatted-docs & {:keys [refresh]}]
-  (http/post (format "%s/_bulk?refresh=%s" es-base-url (or refresh "false"))
+  (http/post (format "%s/_bulk?refresh=%s" es-base-url (or refresh "true"))
              {:headers {:content-type "application/x-ndjson"}
               :body formatted-docs}))
 
