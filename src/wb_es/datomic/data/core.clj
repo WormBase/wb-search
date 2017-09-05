@@ -95,7 +95,6 @@
           doc-data (.data document)
           doc-meta (.metadata document)
           page-type (clojure.string/replace (data-util/get-type-name entity) #"-" "_")]
-      (-> (merge {:page_type page-type}
-                 doc-data)
+      (-> (merge {:page_type page-type} doc-data)
           (with-meta doc-meta))
       )))

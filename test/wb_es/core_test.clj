@@ -34,7 +34,7 @@
 (use-fixtures :once wrap-setup)
 
 (defn index-doc [& docs]
-  (let [formatted-docs (bulk/format-bulk "index" "test" docs)]
+  (let [formatted-docs (bulk/format-bulk "update" "test" docs)]
     (bulk/submit formatted-docs :refresh true)))
 
 (defn index-datomic-entity [& entities]

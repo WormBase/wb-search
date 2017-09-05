@@ -13,16 +13,30 @@
 (defn format-bulk
   "returns a new line delimited JSON based on
   an action name and a list of Documents (acoording to Document protocol)"
-  ([action-name documents] (format-bulk action-name nil documents))
-  ([action-name index documents]
+  ([action documents] (format-bulk action nil documents))
+  ([action index documents]
    (->> documents
         (map (fn [doc]
-               (if-not (= (name action-name) "delete")
-                 (format "%s\n%s"
-                         (json/generate-string {action-name (if index
-                                                              (assoc (meta doc) :_index index) ; ie to specify test index
-                                                              (meta doc))})
-                         (json/generate-string doc)))))
+               (let [action-data {action (if index
+                                                (assoc (meta doc) :_index index) ; ie to specify test index
+                                                (meta doc))}
+                     action-name (name action)]
+                 (cond
+                   (or (= action-name "index")
+                       (= action-name "create"))
+                   (format "%s\n%s"
+                           (json/generate-string action-data)
+                           (json/generate-string doc))
+
+                   (= action-name "update")
+                   (format "%s\n%s"
+                           (json/generate-string action-data)
+                           (json/generate-string {:doc doc
+                                                  :doc_as_upsert true}))
+
+                   (= action-name "delete")
+                   (json/parse-string action-data))
+                 )))
         (clojure.string/join "\n")
         (format "%s\n")))) ;trailing \n is necessary for Elasticsearch to parse the request
 
@@ -62,7 +76,7 @@
   [db batch]
   (->> batch
        (map #(create-document (d/entity db %)))
-       (format-bulk "index")
+       (format-bulk "update")
        (submit)))
 
 (defn run []
@@ -271,6 +285,7 @@
                 jobs (make-batches 1000 :variation eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+
 
           ;; close the channel to indicate no more input
           ;; existing jobs on the channel will remain available for consumers
