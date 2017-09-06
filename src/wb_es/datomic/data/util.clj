@@ -22,8 +22,7 @@
 (defn default-metadata
   "default implementation of the data method of Document protocol"
   [entity]
-  {:_index release-id
-   :_type "generic"
+  {:_type "generic"
    :_id (:db/id entity)})
 
 (defn format-enum

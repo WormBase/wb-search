@@ -45,56 +45,62 @@
 
 (defn create-document
   "returns document of the desirable type"
-  [entity]
-  (let [constructor-function
-        (case (data-util/get-ident-attr entity)
-          :analysis/id analysis/->Analysis
-          :anatomy-term/id anatomy-term/->Anatomy-term
-          :antibody/id antibody/->Antibody
-          :cds/id cds/->Cds
-          :clone/id clone/->Clone
-          :construct/id construct/->Construct
-          :do-term/id do-term/->Do-term
-          :expression-cluster/id expression-cluster/->Expression-cluster
-          :expr-pattern/id expr-pattern/->Expr-pattern
-          :expr-profile/id expr-profile/->Expr-profile
-          :feature/id feature/->Feature
-          :gene/id gene/->Gene
-          :gene-class/id gene-class/->Gene-class
-          :go-term/id go-term/->Go-term
-          :gene-cluster/id gene-cluster/->Gene-cluster
-          :homology-group/id homology-group/->Homology-group
-          :interaction/id interaction/->Interaction
-          :laboratory/id laboratory/->Laboratory
-          :life-stage/id life-stage/->Life-stage
-          :molecule/id molecule/->Molecule
-          :microarray-results/id microarray-results/->Microarray-results
-          :motif/id motif/->Motif
-          :oligo/id oligo/->Oligo
-          :operon/id operon/->Operon
-          :paper/id paper/->Paper
-          :person/id person/->Person
-          :pcr-product/id pcr-product/->Pcr-product
-          :phenotype/id phenotype/->Phenotype
-          :position-matrix/id position-matrix/->Position-matrix
-          :protein/id protein/->Protein
-          :pseudogene/id pseudogene/->Pseudogene
-          :rearrangement/id rearrangement/->Rearrangement
-          :rnai/id rnai/->Rnai
-          :sequence/id sequence/->Sequence
-          :strain/id strain/->Strain
-          :structure-data/id structure-data/->Structure-data
-          :transcript/id transcript/->Transcript
-          :transgene/id transgene/->Transgene
-          :transposon/id transposon/->Transposon
-          :transposon-family/id transposon-family/->Transposon-family
-          :variation/id variation/->Variation
-          :wbprocess/id wbprocess/->Wbprocess
-          (throw (Exception. "Not sure how to handle the data type. Throw an error to let you know")))]
-    (let [document (constructor-function entity)
-          doc-data (.data document)
-          doc-meta (.metadata document)
-          page-type (clojure.string/replace (data-util/get-type-name entity) #"-" "_")]
-      (-> (merge {:page_type page-type} doc-data)
-          (with-meta doc-meta))
-      )))
+  ([entity]
+   (let [constructor-function
+         (case (data-util/get-ident-attr entity)
+           :analysis/id analysis/->Analysis
+           :anatomy-term/id anatomy-term/->Anatomy-term
+           :antibody/id antibody/->Antibody
+           :cds/id cds/->Cds
+           :clone/id clone/->Clone
+           :construct/id construct/->Construct
+           :do-term/id do-term/->Do-term
+           :expression-cluster/id expression-cluster/->Expression-cluster
+           :expr-pattern/id expr-pattern/->Expr-pattern
+           :expr-profile/id expr-profile/->Expr-profile
+           :feature/id feature/->Feature
+           :gene/id gene/->Gene
+           :gene-class/id gene-class/->Gene-class
+           :go-term/id go-term/->Go-term
+           :gene-cluster/id gene-cluster/->Gene-cluster
+           :homology-group/id homology-group/->Homology-group
+           :interaction/id interaction/->Interaction
+           :laboratory/id laboratory/->Laboratory
+           :life-stage/id life-stage/->Life-stage
+           :molecule/id molecule/->Molecule
+           :microarray-results/id microarray-results/->Microarray-results
+           :motif/id motif/->Motif
+           :oligo/id oligo/->Oligo
+           :operon/id operon/->Operon
+           :paper/id paper/->Paper
+           :person/id person/->Person
+           :pcr-product/id pcr-product/->Pcr-product
+           :phenotype/id phenotype/->Phenotype
+           :position-matrix/id position-matrix/->Position-matrix
+           :protein/id protein/->Protein
+           :pseudogene/id pseudogene/->Pseudogene
+           :rearrangement/id rearrangement/->Rearrangement
+           :rnai/id rnai/->Rnai
+           :sequence/id sequence/->Sequence
+           :strain/id strain/->Strain
+           :structure-data/id structure-data/->Structure-data
+           :transcript/id transcript/->Transcript
+           :transgene/id transgene/->Transgene
+           :transposon/id transposon/->Transposon
+           :transposon-family/id transposon-family/->Transposon-family
+           :variation/id variation/->Variation
+           :wbprocess/id wbprocess/->Wbprocess
+           (throw (Exception. "Not sure how to handle the data type. Throw an error to let you know")))]
+     (let [document (constructor-function entity)
+           doc-data (.data document)
+           doc-meta (.metadata document)
+           page-type (clojure.string/replace (data-util/get-type-name entity) #"-" "_")]
+       (-> (merge {:page_type page-type} doc-data)
+           (with-meta doc-meta))
+       )))
+  ([entity constructor-fn target-id]
+   (let [document (constructor-fn entity)
+         doc-meta (assoc (.metadata document)
+                         :_id target-id)]
+     (with-meta (.data document) doc-meta)))
+  )

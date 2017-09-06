@@ -33,3 +33,19 @@
                       (filter identity)
                       (first)
                       (data-util/pack-obj))}))
+
+(deftype Variation [variation]
+  data-util/Document
+  (metadata [this] (data-util/default-metadata variation))
+  (data [this] {:alleles (data-util/pack-obj variation)}))
+
+;; (deftype GeneVariation [variation-gene-holder]
+;;   data-util/Document
+;;   (metadata [this] (assoc (data-util/default-metadata variation-gene-holder)
+;;                           :_id (->> variation-gene-holder
+;;                                     (:variation.gene/gene)
+;;                                     (:db/id))))
+;;   (data [this] {:variations []
+;;                 ;; (let [variation (:variation/_gene variation-gene-holder)]
+;;                 ;;   [(data-util/pack-obj variation)])
+;;                 }))
