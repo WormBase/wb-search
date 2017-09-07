@@ -68,6 +68,10 @@
   ([eids] (make-batches 500 nil eids))
   ([batch-size order-info eids]
    (->> eids
+        (sort-by (fn [param]
+                   (if (sequential? param)
+                     (first param)
+                     (identity param))))
         (partition batch-size batch-size [])
         (map (fn [batch]
                (with-meta batch {:order order-info
@@ -304,7 +308,6 @@
                                  [?v :variation/gene ?gh]
                                  [?gh :variation.gene/gene ?g]]
                                db)
-                          (sort-by (fn [[v g]] v))
                           (map (fn [[v g]]
                                  [v gene/->Variation g]))
                           (make-batches 1000 :gene->variation))]
