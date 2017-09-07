@@ -62,8 +62,9 @@
   ([species-entity bioproject-id]
    (if species-entity
      (if bioproject-id
-         (format "%s (%s)" (:species/id species-entity) (bioprojec-to-strain (d/entity-db species-entity) bioproject-id))
-         (:species/id species-entity)))))
+       ;; (format "%s (%s)" (:species/id species-entity) (bioprojec-to-strain (d/entity-db species-entity) bioproject-id)) ;; broken in ws259
+       (format "%s (%s)" (:species/id species-entity) bioproject-id) ;; temp fix for ws259
+       (:species/id species-entity)))))
 
 (def format-species-text-memoized (memoize format-species-text))
 
