@@ -7,6 +7,7 @@
             [mount.core :as mount]
             [wb-es.datomic.data.core :refer [create-document]]
             [wb-es.datomic.data.gene :as gene]
+            [wb-es.datomic.data.variation :as variation]
             [wb-es.datomic.db :refer [datomic-conn]]
             [wb-es.env :refer [es-base-url release-id]]
             [wb-es.mappings.core :refer [index-settings]]))
@@ -302,17 +303,24 @@
               (>!! scheduler job)))
 
           ;; get index gene by variation
-          (let [jobs (->> (d/q '[:find ?v ?g
-                                 :where
-                                 [?v :variation/allele true]
-                                 [?v :variation/gene ?gh]
-                                 [?gh :variation.gene/gene ?g]]
-                               db)
-                          (map (fn [[v g]]
-                                 [v gene/->Variation g]))
-                          (make-batches 1000 :gene->variation))]
-            (doseq [job jobs]
-              (>!! scheduler job)))
+          (let [v-g (d/q '[:find ?v ?g
+                           :where
+                           [?v :variation/allele true]
+                           [?v :variation/gene ?gh]
+                           [?gh :variation.gene/gene ?g]]
+                         db)]
+            (let [jobs (->> (map (fn [[v g]]
+                                   [v gene/->Variation g]) v-g)
+                            (make-batches 1000 :gene->variation))]
+              (doseq [job jobs]
+                (>!! scheduler job)))
+            (let [jobs (->> (map (fn [[v g]]
+                                   [g variation/->Gene v]) v-g)
+                            (make-batches 1000 :variation->gene))]
+              (doseq [job jobs]
+                (>!! scheduler job)))
+
+            )
 
           ;; close the channel to indicate no more input
           ;; existing jobs on the channel will remain available for consumers

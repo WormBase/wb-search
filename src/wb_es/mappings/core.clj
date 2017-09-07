@@ -46,6 +46,7 @@
     :genotype {:type "string"}
 
     ;; start of refs
+    :allele (ref-mapping)
     :author (ref-mapping)
     :gene (ref-mapping)
     :phenotype (ref-mapping)

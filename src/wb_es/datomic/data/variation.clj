@@ -16,3 +16,8 @@
                 (map :variation.gene/gene)
                 (map data-util/pack-obj))
      }))
+
+(deftype Gene [gene]
+  data-util/Document
+  (metadata [this] (data-util/default-metadata gene))
+  (data [this] {:gene (data-util/pack-obj gene)}))
