@@ -96,12 +96,13 @@
        (format-bulk "update")
        ((fn [formatted-bulk]
           (submit formatted-bulk :index index)))
-       ))
+       )
+  )
 
 
-(defn run []
-  (let [db (d/db datomic-conn)
-        index-url (format "%s/%s " es-base-url release-id)]
+(defn run [& {:keys [db]
+              :or {db (d/db datomic-conn)}}]
+  (let [index-url (format "%s/%s " es-base-url release-id)]
     (do
       (http/put index-url {:headers {:content-type "application/json"}
                            :body (json/generate-string index-settings)})
