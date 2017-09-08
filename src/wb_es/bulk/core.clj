@@ -31,11 +31,15 @@
                            (json/generate-string doc))
 
                    (= action-name "update")
-                   (format "%s\n%s"
-                           (json/generate-string action-data)
-                           (json/generate-string {:doc doc
-                                                  :doc_as_upsert true})
-                           )
+                   (if (:script doc)
+                     (format "%s\n%s"
+                             (json/generate-string action-data)
+                             (json/generate-string doc))
+                     (format "%s\n%s"
+                             (json/generate-string action-data)
+                             (json/generate-string {:doc doc
+                                                    :doc_as_upsert true})
+                             ))
 
                    (= action-name "delete")
                    (json/parse-string action-data))
