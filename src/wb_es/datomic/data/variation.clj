@@ -17,4 +17,9 @@
 (deftype Gene [gene]
   data-util/Document
   (metadata [this] (data-util/default-metadata gene))
-  (data [this] {:gene (data-util/pack-obj gene)}))
+  (data [this]
+    (let [packed-gene (data-util/pack-obj gene)]
+      {:script
+       {:inline "ctx._source.gene += gene"
+        :params {:gene packed-gene}}
+       :upsert {:gene [packed-gene]}})))
