@@ -29,10 +29,10 @@
                     (:interaction/sequence-interactor)
                     (map :interaction.sequence-interactor/sequence)
                     (map (partial data-util/obj-label "sequence")))
-               (->> entity
-                    (:interaction/variation-interactor)
-                    (map :interaction.variation-interactor/variation)
-                    (map (partial data-util/obj-label "variation")))
+               ;; (->> entity
+               ;;      (:interaction/variation-interactor)
+               ;;      (map :interaction.variation-interactor/variation)
+               ;;      (map (partial data-util/obj-label "variation")))
                (->> entity
                     (:interaction/rearrangement)
                     (map :interaction.rearrangement/rearrangement)
