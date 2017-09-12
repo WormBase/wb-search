@@ -20,6 +20,6 @@
   (data [this]
     (let [packed-gene (data-util/pack-obj gene)]
       {:script
-       {:inline "ctx._source.gene += gene"
+       {:inline "ctx._source.gene =  ctx._source.containsKey(\"gene\") ? ctx._source.gene + gene : [gene]"
         :params {:gene packed-gene}}
        :upsert {:gene [packed-gene]}})))

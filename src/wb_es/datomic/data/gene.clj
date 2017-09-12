@@ -40,6 +40,6 @@
   (data [this]
     (let [packed-variation (data-util/pack-obj variation)]
       {:script
-       {:inline "ctx._source.allele += allele"
+       {:inline "ctx._source.allele = ctx._source.containsKey(\"allele\") ? + ctx._source.allele + allele : [allele]"
         :params {:allele packed-variation}}
        :upsert {:allele [packed-variation]}})))
