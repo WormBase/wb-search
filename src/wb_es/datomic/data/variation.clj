@@ -12,6 +12,11 @@
     {:wbid (:variation/id entity)
      :label (:variation/public-name entity)
      :species (data-util/format-entity-species :variation/species entity)
+     ;; :gene (if (:variation/allele entity)
+     ;;         (->> entity
+     ;;              (:variation/gene)
+     ;;              (map :variation.gene/gene)
+     ;;              (map data-util/pack-obj)))
      }))
 
 (deftype Gene [gene]
