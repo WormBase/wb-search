@@ -53,7 +53,7 @@
   (let [url-prefix (if index
                      (format "%s/%s" es-base-url index)
                      es-base-url)]
-    (http/post (format "%s/_bulk?refresh=%s" url-prefix (or refresh "true"))
+    (http/post (format "%s/_bulk?refresh=%s" url-prefix (or refresh "false"))
                {:headers {:content-type "application/x-ndjson"}
                 :body formatted-docs})))
 
@@ -71,7 +71,8 @@
   "turn a list datomic entity ids to batches of the given size.
   attach some metadata for debugging"
   ([eids] (make-batches 500 nil eids))
-  ([batch-size order-info eids]
+  ([batch-size order-info eids] (make-batches batch-size order-info "index" eids))
+  ([batch-size order-info action eids]
    (->> eids
         (sort-by (fn [param]
                    (if (sequential? param)
@@ -80,6 +81,7 @@
         (partition batch-size batch-size [])
         (map (fn [batch]
                (with-meta batch {:order order-info
+                                 :action action
                                  :size (count batch)
                                  :start (first batch)
                                  :end (last batch)}))))))
@@ -93,7 +95,7 @@
                 (let [[eid & other-params] param]
                   (apply create-document (d/entity db eid) other-params))
                 (create-document (d/entity db param)))))
-       (format-bulk "update")
+       (format-bulk (:action (meta batch)))
        ((fn [formatted-bulk]
           (submit formatted-bulk :index index)))
        )
@@ -316,16 +318,16 @@
                          db)]
             (let [jobs (->> (map (fn [[v g]]
                                    [v gene/->Variation g]) v-g)
-                            (make-batches 1000 :gene->variation))]
+                            (make-batches 1000 :gene->variation "update"))]
               (doseq [job jobs]
                 (>!! scheduler job)))
             (let [jobs (->> (map (fn [[v g]]
                                    [g variation/->Gene v]) v-g)
-                            (make-batches 1000 :variation->gene))]
+                            (make-batches 1000 :variation->gene "update"))]
               (doseq [job jobs]
                 (>!! scheduler job)))
-
             )
+
 
           ;; close the channel to indicate no more input
           ;; existing jobs on the channel will remain available for consumers
