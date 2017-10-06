@@ -25,7 +25,8 @@
             (prn "failed to delete index.")
             (prn e)))
         (http/put index-url {:headers {:content-type "application/json"}
-                             :body (json/generate-string mappings/index-settings)})
+                             :body (->> (assoc mappings/index-settings :number_of_shards 1)
+                                        (json/generate-string))})
         (mount/start)
         (f)
         (mount/stop))
