@@ -26,7 +26,7 @@
   :target-path "target/%s"
   :javac-options ["-target" "1.8" "-source" "1.8"]
   :license "GPLv2"
-  :jvm-opts ["-Xmx4G"
+  :jvm-opts ["-Xmx2G"
              ;; same GC options as the transactor,
              ;; should minimize long pauses.
              "-XX:+UseG1GC" "-XX:MaxGCPauseMillis=50"
