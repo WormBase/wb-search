@@ -4,13 +4,7 @@
 
 (defn wrap-query-lower-case [handler]
   (fn [request]
-    (let [q-raw (get-in request [:params :q])
-          new-request (-> request
-                          (update-in [:params :q] #(some-> % clojure.string/lower-case))
-                          (assoc-in [:params :q_raw] q-raw)
-                          )]
-      (handler new-request))
-    ))
+    (handler (update-in request [:params :q] #(some-> % clojure.string/lower-case)))))
 
 
 (defn get-filter [options]
@@ -35,7 +29,7 @@
                  {:bool
                   {:must [{:bool {:filter (get-filter options)}}
                           {:dis_max
-                           {:queries [{:term {:wbid (:q_raw options)}}
+                           {:queries [{:term {:wbid q}}
                                       {:match_phrase {:label {:query q
                                                               :minimum_should_match "70%"}}}
                                       {:match_phrase {:other_names {:query q
@@ -125,7 +119,7 @@
                  {:bool
                   {:must [{:bool {:filter (get-filter options)}}
                           {:dis_max
-                           {:queries [{:term {:wbid (:q_raw options)}}
+                           {:queries [{:term {:wbid q}}
                                       {:match_phrase {:label {:query q
                                                               :minimum_should_match "70%"}}}
                                       {:match_phrase {:other_names {:query q
