@@ -69,7 +69,8 @@
            (context "/lite" []
                     (-> api-lite-routes
                         (wrap-routes web-integration/wrap-params)))
-  (route/not-found (response {:message "endpoint not found"}))))
+           (route/not-found (response {:message "endpoint not found"})))
+  (route/not-found (response {:message "endpoint not found"})))
 
 
 (defn handler [request]
