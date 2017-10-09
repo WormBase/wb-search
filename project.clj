@@ -12,17 +12,13 @@
    [org.clojure/clojure "1.8.0"]
 
    ;; the following dependecies are only needed for web
-   [compojure "1.6.0"]
-   [ring/ring-defaults "0.3.0"]
-   [ring/ring-core "1.6.2"]
-   [ring/ring-json "0.4.0"]]
+   ]
   :source-paths ["src"]
   :plugins [[lein-environ "1.1.0"]
             [lein-pprint "1.1.1"]]
   :main ^:skip-aot wb-es.core
-  :ring {:handler wb-es.web.index/handler}
-  :resource-paths ["resources"]
   :uberjar {:aot :all}
+  :resource-paths ["resources"]
   :target-path "target/%s"
   :javac-options ["-target" "1.8" "-source" "1.8"]
   :license "GPLv2"
@@ -40,14 +36,26 @@
    {:dependencies
     [[com.amazonaws/aws-java-sdk-dynamodb "1.11.82"
       :exclusions [joda-time]]]}
-   :dev [:datomic-pro
-         :ddb
+   :indexer [:datomic-pro :ddb]
+   :web {:dependencies [[compojure "1.6.0"]
+                        [ring/ring-defaults "0.3.0"]
+                        [ring/ring-core "1.6.2"]
+                        [ring/ring-json "0.4.0"]]
+         :ring {:handler wb-es.web.index/handler}
+         :uberjar {:main ^:skip-aot wb-es.web.index
+                   :uberjar-name "web.jar"
+                   :aot :all}
+         }
+   :web-dev {:dependencies [[ring/ring-devel "1.5.1"]]
+             :plugins [[lein-ring "0.12.0"]]}
+   :dev [:indexer
+         :web
+         :web-dev
          {:aliases
           {"code-qa"
            ["do"
             ["eastwood"]
             "test"]}
-          :dependencies [[ring/ring-devel "1.5.1"]]
           :source-paths ["dev"]
           :env
           {:wb-db-uri "datomic:ddb://us-east-1/WS260/wormbase"
@@ -58,11 +66,12 @@
            [lein-ancient "0.6.8"]
            [lein-bikeshed "0.3.0"]
            [lein-ns-dep-graph "0.1.0-SNAPSHOT"]
-           [lein-ring "0.12.0"]
            [venantius/yagni "0.1.4"]
            [com.jakemccrary/lein-test-refresh "0.17.0"]]}]
-      :test
-      {:resource-paths ["test/resources"]}}
+   :test
+   {:resource-paths ["test/resources"]}}
+  :aliases {"test" ["with-profile" "+indexer,+web" "test"]
+            "test-refresh" ["with-profile" "+indexer,+web" "test-refresh"]}
   :repl-options {:init (do
                          (set! *print-length* 10)
                          (use 'wb-es.env)
