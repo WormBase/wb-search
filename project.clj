@@ -17,7 +17,6 @@
   :plugins [[lein-environ "1.1.0"]
             [lein-pprint "1.1.1"]]
   :main ^:skip-aot wb-es.core
-  :uberjar {:aot :all}
   :resource-paths ["resources"]
   :target-path "target/%s"
   :javac-options ["-target" "1.8" "-source" "1.8"]
@@ -29,7 +28,10 @@
              "-Ddatomic.objectCacheMax=1000000000"
              "-Ddatomic.txTimeoutMsec=1000000"]
   :profiles
-  {:datomic-pro
+  {:datomic-free
+   {:dependencies [[com.datomic/datomic-free "0.9.5561.50"
+                    :exclusions [joda-time]]]}
+   :datomic-pro
    {:dependencies [[com.datomic/datomic-pro "0.9.5561.50"
                     :exclusions [joda-time]]]}
    :ddb
@@ -37,15 +39,14 @@
     [[com.amazonaws/aws-java-sdk-dynamodb "1.11.82"
       :exclusions [joda-time]]]}
    :indexer [:datomic-pro :ddb]
-   :web {:dependencies [[compojure "1.6.0"]
-                        [ring/ring-defaults "0.3.0"]
-                        [ring/ring-core "1.6.2"]
-                        [ring/ring-json "0.4.0"]]
-         :ring {:handler wb-es.web.index/handler}
-         :uberjar {:main ^:skip-aot wb-es.web.index
-                   :uberjar-name "web.jar"
-                   :aot :all}
-         }
+   :web [:datomic-free
+         {:main ^:skip-aot wb-es.web.index
+          :uberjar-name "wb-es-web-%s-standalone.jar"
+          :dependencies [[compojure "1.6.0"]
+                         [ring/ring-defaults "0.3.0"]
+                         [ring/ring-core "1.6.2"]
+                         [ring/ring-json "0.4.0"]]
+          :ring {:handler wb-es.web.index/handler}}]
    :web-dev {:dependencies [[ring/ring-devel "1.5.1"]]
              :plugins [[lein-ring "0.12.0"]]}
    :dev [:indexer
@@ -68,6 +69,7 @@
            [lein-ns-dep-graph "0.1.0-SNAPSHOT"]
            [venantius/yagni "0.1.4"]
            [com.jakemccrary/lein-test-refresh "0.17.0"]]}]
+   :uberjar {:aot :all}
    :test
    {:resource-paths ["test/resources"]}}
   :aliases {"test" ["with-profile" "+indexer,+web" "test"]
