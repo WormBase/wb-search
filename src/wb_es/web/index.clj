@@ -3,6 +3,7 @@
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.json :refer [wrap-json-response]]
+            [ring.middleware.resource :refer [wrap-resource]]
             [ring.util.response :refer [response not-found]]
             [wb-es.env :refer [es-base-url release-id]]
             [wb-es.web.core :as web-core]
@@ -76,6 +77,7 @@
 (defn handler [request]
   (let [enhanced-handler
         (-> app
+            (wrap-resource "public")
             (wrap-json-response {:pretty true})
             (wrap-defaults api-defaults))]
     (enhanced-handler request)))
