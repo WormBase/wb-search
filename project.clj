@@ -40,7 +40,7 @@
       :exclusions [joda-time]]]}
    :indexer [:datomic-pro :ddb]
    :web [:datomic-free
-         {:uberjar-name "wb-es-web-%s-standalone.jar"
+         {:uberjar-name "wb-es-web-standalone.jar"
           :dependencies [[compojure "1.6.0"]
                          [ring/ring-defaults "0.3.0"]
                          [ring/ring-core "1.6.2"]
