@@ -1,0 +1,5 @@
+FROM openjdk:8-jre-alpine
+
+ADD ./target/uberjar/wb-es-web-standalone.jar /srv/app.jar
+
+CMD ["java", "-server", "-jar", "/srv/app.jar"]
