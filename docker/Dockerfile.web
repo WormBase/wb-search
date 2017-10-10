@@ -1,5 +1,9 @@
 FROM openjdk:8-jre-alpine
 
+ENV ES_BASE_URI=http://172.17.0.1:9200
+
 ADD ./target/uberjar/wb-es-web-standalone.jar /srv/app.jar
+
+EXPOSE 3000
 
 CMD ["java", "-server", "-jar", "/srv/app.jar"]

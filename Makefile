@@ -10,4 +10,4 @@ docker-build-web: uberjar-build-web
 
 .PHONY: docker-run-web
 docker-run-web:
-	docker run -p 3000:3000 -p 2900:2900 wb-es-web
+	docker run -p 3000:3000 wb-es-web
