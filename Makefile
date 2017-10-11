@@ -6,11 +6,11 @@ uberjar-build-web:
 
 .PHONY: docker-build-web
 docker-build-web: uberjar-build-web
-	docker build -t wb-es-web -f ./docker/Dockerfile.web .
+	docker build -t wormbase/search-web-api -f ./docker/Dockerfile.web .
 
 .PHONY: docker-run-web
 docker-run-web:
-	docker run -p 3000:3000 wb-es-web
+	docker run -p 3000:3000 wormbase/search-web-api
 
 .PHONY: docker-build-aws-es
 docker-build-aws-es:
