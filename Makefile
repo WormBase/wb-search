@@ -11,3 +11,11 @@ docker-build-web: uberjar-build-web
 .PHONY: docker-run-web
 docker-run-web:
 	docker run -p 3000:3000 wb-es-web
+
+.PHONY: docker-build-aws-es
+docker-build-aws-es:
+	docker build -t wb-es-aws-elasticsearch -f ./docker/Dockerfile.aws-elasticsearch .
+
+.PHONY: docker-run-aws-es
+docker-run-aws-es:
+	docker run -p 9200:9200 wb-es-aws-elasticsearch
