@@ -18,4 +18,6 @@ docker-build-aws-es:
 
 .PHONY: docker-run-aws-es
 docker-run-aws-es:
-	docker run -p 9200:9200 wb-es-aws-elasticsearch
+	@docker run -p 9200:9200 wb-es-aws-elasticsearch \
+		-Des.cloud.aws.access_key=${AWS_ACCESS_KEY_ID} \
+		-Des.cloud.aws.secret_key=${AWS_SECRET_ACCESS_KEY}
