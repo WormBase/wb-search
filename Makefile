@@ -22,6 +22,6 @@ docker-run-aws-es:
 		-Des.cloud.aws.access_key=${AWS_ACCESS_KEY_ID} \
 		-Des.cloud.aws.secret_key=${AWS_SECRET_ACCESS_KEY}
 
-.PHONY: run-eb-local
-run-eb-local:
+.PHONY: eb-local-run
+eb-local-run:
 	@eb local run --envvars AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID},AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY}
