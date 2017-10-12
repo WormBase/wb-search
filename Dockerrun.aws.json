@@ -1,5 +1,13 @@
 {
     "AWSEBDockerrunVersion": 2,
+    "volumes": [
+	{
+	    "name": "elasticsearch-data",
+	    "host": {
+		"sourcePath": "/var/lib/elasticsearch/data"
+	    }
+	}
+    ],
     "containerDefinitions": [
         {
             "name": "search-web-api",
@@ -31,6 +39,16 @@
 		{
 		    "hostPort": 9300,
 		    "containerPort": 9300
+		}
+	    ],
+	    "mountPoints": [
+                {
+                    "sourceVolume": "elasticsearch-data",
+                    "containerPath": "/usr/share/elasticsearch/data"
+                },
+		{
+		    "sourceVolume": "awseb-logs-elasticsearch",
+		    "containerPath": "/usr/share/elasticsearch/logs"
 		}
 	    ]
 	}
