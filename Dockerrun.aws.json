@@ -25,7 +25,8 @@
 		    "name": "ES_BASE_URI",
 		    "value": "http://elasticsearch:9200"
 		}
-	    ]
+	    ],
+	    "memory": 1024
         },
 	{
 	    "name": "elasticsearch",
@@ -50,7 +51,8 @@
 		    "sourceVolume": "awseb-logs-elasticsearch",
 		    "containerPath": "/usr/share/elasticsearch/logs"
 		}
-	    ]
+	    ],
+	    "memory": 2048
 	}
     ]
 }
