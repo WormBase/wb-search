@@ -11,10 +11,11 @@
                     "containerPort": 3000
                 }
             ],
+	    "links": ["elasticsearch"],
 	    "environment": [
 		{
 		    "name": "ES_BASE_URI",
-		    "value": "http://172.17.0.2:9200"
+		    "value": "http://elasticsearch:9200"
 		}
 	    ]
         },
