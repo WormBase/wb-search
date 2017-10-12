@@ -7,10 +7,31 @@
             "essential": true,
             "portMappings": [
                 {
-                    "hostPort": 80,
+                    "hostPort": 3006,
                     "containerPort": 3000
                 }
-            ]
-        }
+            ],
+	    "environment": [
+		{
+		    "name": "ES_BASE_URI",
+		    "value": "http://172.17.0.2:9200"
+		}
+	    ]
+        },
+	{
+	    "name": "elasticsearch",
+	    "image": "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch:latest",
+	    "essential": true,
+	    "portMappings": [
+		{
+		    "hostPort": 9200,
+		    "containerPort": 9200
+		},
+		{
+		    "hostPort": 9300,
+		    "containerPort": 9300
+		}
+	    ]
+	}
     ]
 }
