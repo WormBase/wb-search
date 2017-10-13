@@ -71,6 +71,9 @@
          (last)
          (:id))))
 
+(defn restore-snapshot
+  [repository-name snapshot-id])
+
 ;; (let [
 ;;       response
 ;;       (http/get (format "%s/%s" es-base-url index)
@@ -86,13 +89,23 @@
 ;;
 ;; wait until restoration finishes
 
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
+(defn run
+  "run setup"
+  []
   (let [index-id release-id]
     (do
       (es-connect)
       (if (has-index index-id)
-        (println (format "Index %s found, starting server..."))
-        (do
-          )))))
+        (println (format "Elasticsearch index %s is found, starting server..." index-id))
+        (let [repository-name "s3_repository"]
+          (do
+            (connect-snapshot-repository repository-name)
+            (let [snapshot-id (get-snapshot-id repository-name)]
+              (restore-snapshot repository-name snapshot-id)
+              (println (format "Elasticsearch is restored from snapshot %s" snapshot-id))))))
+      )))
+
+(defn -main
+  "I don't do a whole lot ... yet."
+  [& args]
+  (run))
