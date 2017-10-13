@@ -39,7 +39,18 @@
                   (flush)
                   (Thread/sleep interval))))))))))
 
-
+(defn get-snapshot-id
+  []
+  (let [response (http/get (format "%s/_cat/snapshots/s3_repository?format=json" es-base-url))
+        all-snapshots (json/parse-string (:body response) true)]
+    (->> all-snapshots
+         (filter (fn [snapshot]
+                   (and
+                    (= "SUCCESS" (:status snapshot))
+                    (let [id-pattern (re-pattern (format "snapshot_%s(_\\d+)?" release-id))]
+                      (re-matches id-pattern (:id snapshot))))))
+         (first)
+         (:id))))
 
 ;; (let [
 ;;       response
@@ -60,7 +71,9 @@
   "I don't do a whole lot ... yet."
   [& args]
   (let [index-id release-id]
-    (if (has-index index-id)
-      (println (format "Index %s found, starting server..."))
-      (do
-        ))))
+    (do
+      (es-connect)
+      (if (has-index index-id)
+        (println (format "Index %s found, starting server..."))
+        (do
+          )))))
