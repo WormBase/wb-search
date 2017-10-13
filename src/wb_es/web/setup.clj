@@ -42,14 +42,17 @@
 (defn get-snapshot-id
   []
   (let [response (http/get (format "%s/_cat/snapshots/s3_repository?format=json" es-base-url))
-        all-snapshots (json/parse-string (:body response) true)]
+        all-snapshots (json/parse-string (:body response) true)
+        id-pattern (re-pattern (format "snapshot_%s(_(\\d+))?" release-id))]
     (->> all-snapshots
          (filter (fn [snapshot]
                    (and
                     (= "SUCCESS" (:status snapshot))
-                    (let [id-pattern (re-pattern (format "snapshot_%s(_\\d+)?" release-id))]
-                      (re-matches id-pattern (:id snapshot))))))
-         (first)
+                    (re-matches id-pattern (:id snapshot)))))
+         (sort-by (fn [snapshot]
+                    (let [[_ _ version-id] (re-matches id-pattern (:id snapshot))]
+                      version-id)))
+         (last)
          (:id))))
 
 ;; (let [
