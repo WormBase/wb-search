@@ -39,9 +39,23 @@
                   (flush)
                   (Thread/sleep interval))))))))))
 
+(defn connect-snapshot-repository
+  ([repository-name]
+   (connect-snapshot-repository repository-name
+                                {"type" "s3"
+                                 "settings" {"bucket" "wormbase-elasticsearch-snapshots"
+                                             "region" "us-east-1"}}))
+  ([repository-name repository-settings]
+   (try
+     (http/get (format "%s/_snapshot/%s" es-base-url repository-name)
+               {:content-type "application/json"
+                :body (json/generate-string repository-settings)})
+     (catch Exception e
+       (throw (Exception. "Cannot connect to elasticsearch snapshot repository"))))))
+
 (defn get-snapshot-id
-  []
-  (let [response (http/get (format "%s/_cat/snapshots/s3_repository?format=json" es-base-url))
+  [repository-name]
+  (let [response (http/get (format "%s/_cat/snapshots/%s?format=json" es-base-url repository-name))
         all-snapshots (json/parse-string (:body response) true)
         id-pattern (re-pattern (format "snapshot_%s(_(\\d+))?" release-id))]
     (->> all-snapshots
