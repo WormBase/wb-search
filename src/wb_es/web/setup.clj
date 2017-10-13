@@ -72,7 +72,32 @@
          (:id))))
 
 (defn restore-snapshot
-  [repository-name snapshot-id])
+  [index-id repository-name snapshot-id]
+  (let [max-retry 50
+        interval 10000
+        counter (atom 0)
+        connected (atom false)]
+    (do
+      (try
+        (http/post (format "%s/_snapshot/%s/%s/_restore" es-base-url repository-name snapshot-id))
+        (catch Exception e
+          (throw (Exception. (format "Failed to restore snapshot %s" snapshot-id)))))
+      (println "Restoring index started")
+      (while (not (deref connected))
+        (do
+          (swap! counter inc)
+          (try
+            (do
+              (println (http/get (format "%s/%s/_search" es-base-url index-id)))
+              (swap! connected not)
+              (println "Connected."))
+            (catch Exception e
+              (if (>= (deref counter) max-retry)
+                (throw (Exception. (format "Failed to connect to %s. Start up terminated." es-base-url)))
+                (do
+                  (println (http/get (format "%s/_cat/recovery?format=json" es-base-url repository-name)))
+                  (flush)
+                  (Thread/sleep interval))))))))))
 
 ;; (let [
 ;;       response
@@ -101,7 +126,7 @@
           (do
             (connect-snapshot-repository repository-name)
             (let [snapshot-id (get-snapshot-id repository-name)]
-              (restore-snapshot repository-name snapshot-id)
+              (restore-snapshot index-id repository-name snapshot-id)
               (println (format "Elasticsearch is restored from snapshot %s" snapshot-id))))))
       )))
 
