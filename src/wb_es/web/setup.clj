@@ -12,8 +12,10 @@
 
 (defn has-index
   [index-id]
-  (let [response (http/get (format "%s/%s" es-base-url index-id))]
-    (= 200 (:status response))))
+  (try
+    (http/get (format "%s/%s" es-base-url index-id))
+    (catch Exception e
+      (println (format "Index %s is not found locally." index-id)))))
 
 (defn es-connect
   []
