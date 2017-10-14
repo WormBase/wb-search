@@ -49,7 +49,7 @@
                                              "region" "us-east-1"}}))
   ([repository-name repository-settings]
    (try
-     (http/get (format "%s/_snapshot/%s" es-base-url repository-name)
+     (http/put (format "%s/_snapshot/%s" es-base-url repository-name)
                {:content-type "application/json"
                 :body (json/generate-string repository-settings)})
      (catch Exception e
