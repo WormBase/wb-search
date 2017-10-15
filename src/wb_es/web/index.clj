@@ -64,6 +64,8 @@
       (wrap-routes web-integration/wrap-random)))
 
 (defroutes app
+  (GET "/" []
+       (response {:message "Welcome to the search API."}))
   api-lite-routes
   (context "/integration" []
            integration-routes
