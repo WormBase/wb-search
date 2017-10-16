@@ -1,0 +1,58 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "volumes": [
+	{
+	    "name": "elasticsearch-data",
+	    "host": {
+		"sourcePath": "/var/lib/elasticsearch/data"
+	    }
+	}
+    ],
+    "containerDefinitions": [
+        {
+            "name": "search-web-api",
+            "image": "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-web-api",
+            "essential": true,
+            "portMappings": [
+                {
+                    "hostPort": 80,
+                    "containerPort": 3000
+                }
+            ],
+	    "links": ["elasticsearch"],
+	    "environment": [
+		{
+		    "name": "ES_BASE_URI",
+		    "value": "http://elasticsearch:9200"
+		}
+	    ],
+	    "memory": 1024
+        },
+	{
+	    "name": "elasticsearch",
+	    "image": "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch:latest",
+	    "essential": true,
+	    "portMappings": [
+		{
+		    "hostPort": 9200,
+		    "containerPort": 9200
+		},
+		{
+		    "hostPort": 9300,
+		    "containerPort": 9300
+		}
+	    ],
+	    "mountPoints": [
+                {
+                    "sourceVolume": "elasticsearch-data",
+                    "containerPath": "/usr/share/elasticsearch/data"
+                },
+		{
+		    "sourceVolume": "awseb-logs-elasticsearch",
+		    "containerPath": "/usr/share/elasticsearch/logs"
+		}
+	    ],
+	    "memory": 2048
+	}
+    ]
+}

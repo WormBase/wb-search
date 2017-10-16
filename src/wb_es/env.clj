@@ -1,7 +1,7 @@
 (ns wb-es.env
   (:require [environ.core :refer [env]]))
 
-(def datomic-uri (env :wb-db-uri))
+(def datomic-uri (or (env :wb-db-uri) "datomic:ddb://us-east-1/WS261/wormbase"))
 
 (def es-base-url
   (or (env :es-base-uri) "http://localhost:9200"))
