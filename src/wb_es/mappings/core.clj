@@ -1,4 +1,7 @@
-(ns wb-es.mappings.core)
+(ns wb-es.mappings.core
+  (:require [clj-http.client :as http]
+            [cheshire.core :as json]
+            [wb-es.env :refer [es-base-url release-id]]))
 
 (defn ref-mapping []
   {:type "nested"
@@ -69,3 +72,12 @@
                                                  :tokenizer "keyword"
                                                  :filter ["lowercase"]}}}}
    :mappings {:generic generic-mapping}})
+
+(defn create-index
+  ([index & {:keys [default-index]}]
+   (let [index-url (format "%s/%s " es-base-url index)
+         settings (if default-index
+                    (assoc-in index-settings :aliases release-id {})
+                    index-settings)]
+     (http/put index-url {:headers {:content-type "application/json"}
+                          :body (json/generate-string settings)}))))

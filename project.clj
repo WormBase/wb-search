@@ -7,6 +7,7 @@
   [[cheshire "5.7.0"]
    [clj-http "2.3.0"]
    [org.clojure/core.async "0.3.442"]
+   [org.clojure/tools.cli "0.3.5"]
    [environ "1.1.0"]
    [mount "0.1.11"]
    [org.clojure/clojure "1.8.0"]
