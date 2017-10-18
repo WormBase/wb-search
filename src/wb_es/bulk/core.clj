@@ -105,7 +105,7 @@
               :or {db (d/db datomic-conn)}}]
   (let [index-id (format "%s_tmp" release-id)]
     (do
-      (create-index index-id)
+      (create-index index-id :default-index true)
       (let [n-threads 4
             scheduler (chan n-threads)
             logger (chan n-threads)]
