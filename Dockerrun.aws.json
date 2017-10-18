@@ -6,7 +6,13 @@
 	    "host": {
 		"sourcePath": "/var/lib/elasticsearch/data"
 	    }
-	}
+	},
+        {
+            "name": "nginx-proxy-conf",
+            "host": {
+                "sourcePath": "/var/app/current/proxy/conf.d"
+            }
+        }
     ],
     "containerDefinitions": [
         {
@@ -15,7 +21,7 @@
             "essential": true,
             "portMappings": [
                 {
-                    "hostPort": 80,
+                    "hostPort": 3006,
                     "containerPort": 3000
                 }
             ],
@@ -53,6 +59,32 @@
 		}
 	    ],
 	    "memory": 2048
-	}
+	},
+        {
+            "name": "nginx-proxy",
+            "image": "nginx",
+            "essential": true,
+            "memory": 128,
+            "portMappings": [
+                {
+                    "hostPort": 80,
+                    "containerPort": 80
+                }
+            ],
+            "links": [
+                "search-web-api"
+            ],
+            "mountPoints": [
+                {
+                    "sourceVolume": "awseb-logs-nginx-proxy",
+                    "containerPath": "/var/log/nginx"
+                },
+                {
+                    "sourceVolume": "nginx-proxy-conf",
+                    "containerPath": "/etc/nginx/conf.d",
+                    "readOnly": true
+                }
+            ]
+        }
     ]
 }
