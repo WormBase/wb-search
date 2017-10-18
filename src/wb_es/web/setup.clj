@@ -59,7 +59,7 @@
   [repository-name]
   (let [response (http/get (format "%s/_cat/snapshots/%s?format=json" es-base-url repository-name))
         all-snapshots (json/parse-string (:body response) true)
-        id-pattern (re-pattern (format "snapshot_%s(_(\\d+))?" release-id))]
+        id-pattern (re-pattern (format "snapshot_%s(_v(\\d+))?" release-id))]
     (->> all-snapshots
          (filter (fn [snapshot]
                    (and
