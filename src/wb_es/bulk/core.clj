@@ -10,7 +10,7 @@
             [wb-es.datomic.data.variation :as variation]
             [wb-es.datomic.db :refer [datomic-conn]]
             [wb-es.env :refer [es-base-url release-id]]
-            [wb-es.mappings.core :refer [index-settings]]))
+            [wb-es.mappings.core :refer [create-index]]))
 
 (defn format-bulk
   "returns a new line delimited JSON based on
@@ -101,13 +101,11 @@
        )
   )
 
-
 (defn run [& {:keys [db]
               :or {db (d/db datomic-conn)}}]
-  (let [index-url (format "%s/%s " es-base-url release-id)]
+  (let [index-id (format "%s_v0" release-id)]
     (do
-      (http/put index-url {:headers {:content-type "application/json"}
-                           :body (json/generate-string index-settings)})
+      (create-index index-id :default-index true)
       (let [n-threads 4
             scheduler (chan n-threads)
             logger (chan n-threads)]
