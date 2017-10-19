@@ -34,7 +34,15 @@
     (if (and old-index new-index)
       (do
         (create-index new-index)
-        ;;      (reindex old-index new-index)
-        (if (:steal-alias parsed-options)
-          (update-alias old-index new-index)))
+        (println (format "Index is created %s" new-index))
+        (time
+         (do
+           (println (format "Reindex %s into %s started" old-index new-index))
+           (reindex old-index new-index)
+
+           (println "Reindex done.")))
+        (if (get-in parsed-options [:options :steal-alias])
+          (do
+            (update-alias old-index new-index)
+            (println (format "Alias %s is reassigned to index %s" release-id new-index)))))
       (throw (Exception. "Please provide source index and destination index as CLI arguments")))))
