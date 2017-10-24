@@ -58,7 +58,13 @@
 		    "containerPath": "/usr/share/elasticsearch/logs"
 		}
 	    ],
-	    "memory": 2048
+            "environment": [
+                {
+                    "name": "ES_HEAP_SIZE",
+                    "value": "6g"
+                }
+            ],
+            "memory": 12288
 	},
         {
             "name": "nginx-proxy",
