@@ -35,8 +35,9 @@
 (defn wrap-params [handler]
   (fn [request]
     (let [params (:params request)
-          page (get params :page 1)
-          page-size (get params :page_size 10)
+          raw_page_count (get params :page 1)
+          page (if (= raw_page_count "all") 1 raw_page_count)
+          page-size (if (= raw_page_count "all") 500 (get params :page_size 10))
           params-new (assoc params
                             :size page-size
                             :from (->> page
