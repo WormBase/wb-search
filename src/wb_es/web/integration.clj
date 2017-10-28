@@ -38,14 +38,17 @@
           raw_page_count (get params :page 1)
           page (if (= raw_page_count "all") 1 raw_page_count)
           page-size (if (= raw_page_count "all") 500 (get params :page_size 10))
+          raw_q (some-> (get params :q (:query params))
+                        (clojure.string/trim))
           params-new (assoc params
                             :size page-size
                             :from (->> page
                                        (Integer.)
                                        (dec)
                                        (* page-size))
-                            :q (some-> (get params :q (:query params))
-                                       (clojure.string/replace #"\*" ""))
+                            :q (clojure.string/replace raw_q #"\*" "")
+                            :autocomplete (if (re-matches #".+\*" raw_q)
+                                            true)
                             :type (get params :type (:class params))
                             :species (:species params)
                             :raw params)]

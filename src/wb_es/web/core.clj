@@ -20,42 +20,46 @@
        (filter identity)))
 
 
-(defn search [es-base-url index q options]
-  (let [query (if (and q (not= (clojure.string/trim q) ""))
-                {;:explain true
-                 :sort [:_score
-                        {:label {:order :asc}}]
-                 :query
-                 {:bool
-                  {:must [{:bool {:filter (get-filter options)}}
-                          {:dis_max
-                           {:queries [{:term {:wbid q}}
-                                      {:match_phrase {:label {:query q
-                                                              :minimum_should_match "70%"}}}
-                                      {:match_phrase {:other_names {:query q
-                                                                    :minimum_should_match "70%"
-                                                                    :boost 0.9}}}
-                                      {:match_phrase {:_all {:query q
-                                                             :minimum_should_match "70%"
-                                                             :boost 0.1}}}]
-                            :tie_breaker 0.3}}]}}
-                 :highlight
-                 {:fields {:wbid {}
-                           :wbid_as_label {}
-                           :label {}
-                           :other_names {}
-                           :description {}}}}
-                {:query {:bool {:filter (get-filter options)}}})
+(declare autocomplete)
 
-        response
-        (http/get (format "%s/%s/_search?size=%s&from=%s"
-                          es-base-url
-                          index
-                          (get options :size 10)
-                          (get options :from 0))
-                  {:content-type "application/json"
-                   :body (json/generate-string query)})]
-    (json/parse-string (:body response) true)))
+(defn search [es-base-url index q options]
+  (if (:autocomplete options)
+    (autocomplete es-base-url index q options)
+    (let [query (if (and q (not= (clojure.string/trim q) ""))
+                  {;:explain true
+                   :sort [:_score
+                          {:label {:order :asc}}]
+                   :query
+                   {:bool
+                    {:must [{:bool {:filter (get-filter options)}}
+                            {:dis_max
+                             {:queries [{:term {:wbid q}}
+                                        {:match_phrase {:label {:query q
+                                                                :minimum_should_match "70%"}}}
+                                        {:match_phrase {:other_names {:query q
+                                                                      :minimum_should_match "70%"
+                                                                      :boost 0.9}}}
+                                        {:match_phrase {:_all {:query q
+                                                               :minimum_should_match "70%"
+                                                               :boost 0.1}}}]
+                              :tie_breaker 0.3}}]}}
+                   :highlight
+                   {:fields {:wbid {}
+                             :wbid_as_label {}
+                             :label {}
+                             :other_names {}
+                             :description {}}}}
+                  {:query {:bool {:filter (get-filter options)}}})
+
+          response
+          (http/get (format "%s/%s/_search?size=%s&from=%s"
+                            es-base-url
+                            index
+                            (get options :size 10)
+                            (get options :from 0))
+                    {:content-type "application/json"
+                     :body (json/generate-string query)})]
+      (json/parse-string (:body response) true))))
 
 
 (defn autocomplete [es-base-url index q options]
@@ -114,27 +118,29 @@
 
 
 (defn count [es-base-url index q options]
-  (let [query (if (and q (not= (clojure.string/trim q) ""))
-                {:query
-                 {:bool
-                  {:must [{:bool {:filter (get-filter options)}}
-                          {:dis_max
-                           {:queries [{:term {:wbid q}}
-                                      {:match_phrase {:label {:query q
-                                                              :minimum_should_match "70%"}}}
-                                      {:match_phrase {:other_names {:query q
-                                                                    :minimum_should_match "70%"
-                                                                    :boost 0.9}}}
-                                      {:match_phrase {:_all {:query q
-                                                             :minimum_should_match "70%"
-                                                             :boost 0.1}}}]
-                            :tie_breaker 0.3}}]}}}
-                {:query {:bool {:filter (get-filter options)}}})
+  (if (:autocomplete options)
+    (autocomplete es-base-url index q options)
+    (let [query (if (and q (not= (clojure.string/trim q) ""))
+                  {:query
+                   {:bool
+                    {:must [{:bool {:filter (get-filter options)}}
+                            {:dis_max
+                             {:queries [{:term {:wbid q}}
+                                        {:match_phrase {:label {:query q
+                                                                :minimum_should_match "70%"}}}
+                                        {:match_phrase {:other_names {:query q
+                                                                      :minimum_should_match "70%"
+                                                                      :boost 0.9}}}
+                                        {:match_phrase {:_all {:query q
+                                                               :minimum_should_match "70%"
+                                                               :boost 0.1}}}]
+                              :tie_breaker 0.3}}]}}}
+                  {:query {:bool {:filter (get-filter options)}}})
 
-        response
-        (http/get (format "%s/%s/_count"
-                          es-base-url
-                          index)
-                  {:content-type "application/json"
-                   :body (json/generate-string query)})]
-    (json/parse-string (:body response) true)))
+          response
+          (http/get (format "%s/%s/_count"
+                            es-base-url
+                            index)
+                    {:content-type "application/json"
+                     :body (json/generate-string query)})]
+      (json/parse-string (:body response) true))))
