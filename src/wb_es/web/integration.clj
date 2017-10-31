@@ -46,8 +46,9 @@
                                        (Integer.)
                                        (dec)
                                        (* page-size))
-                            :q (clojure.string/replace raw_q #"\*" "")
-                            :autocomplete (if (re-matches #".+\*" raw_q)
+                            :q (if raw_q (clojure.string/replace raw_q #"\*" ""))
+                            :autocomplete (if (and raw_q
+                                                   (re-matches #".+\*" raw_q))
                                             true)
                             :type (get params :type (:class params))
                             :species (:species params)
