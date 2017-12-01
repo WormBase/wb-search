@@ -13,7 +13,7 @@
 (def generic-mapping
   {:properties
    {:wbid {:type "string"
-           :analyzer "keyword"
+           :analyzer "keyword_ignore_case"
            :include_in_all false
            :fields {:autocomplete_keyword {:type "string"
                                            :analyzer "autocomplete"
