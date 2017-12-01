@@ -9,27 +9,28 @@
             [wb-es.web.core :as web-core]
             [wb-es.web.integration :as web-integration]))
 
-(def index-id release-id)
+;; hack to let test server to bind to different index
+(def ^:private ^:dynamic *index-id*)
 
 (def search-route
   (GET "/search" [q & options]
-       (response (web-core/search es-base-url index-id q options))))
+       (response (web-core/search es-base-url *index-id* q options))))
 
 (def autocomplete-route
   (GET "/autocomplete" [q & options]
-       (response (web-core/autocomplete es-base-url index-id q options))))
+       (response (web-core/autocomplete es-base-url *index-id* q options))))
 
 (def search-exact-route
   (GET "/search-exact" [q & options]
-       (response (web-core/search-exact es-base-url index-id q options))))
+       (response (web-core/search-exact es-base-url *index-id* q options))))
 
 (def count-route
   (GET "/count" [q & options]
-       (response (web-core/count es-base-url index-id q options))))
+       (response (web-core/count es-base-url *index-id* q options))))
 
 (def random-route
   (GET "/random" [q & options]
-       (response (web-core/random es-base-url index-id options))))
+       (response (web-core/random es-base-url *index-id* options))))
 
 (def api-lite-routes
   (->
@@ -76,10 +77,16 @@
   (route/not-found (response {:message "endpoint not found"})))
 
 
-(defn handler [request]
-  (let [enhanced-handler
-        (-> app
-            (wrap-resource "public")
-            (wrap-json-response {:pretty true})
-            (wrap-defaults api-defaults))]
-    (enhanced-handler request)))
+(defn make-handler [index-id]
+  (fn handler [request]
+    (binding [*index-id* index-id]
+      (let [enhanced-handler
+            (-> app
+                (wrap-resource "public")
+                (wrap-json-response {:pretty true})
+                (wrap-defaults api-defaults))]
+        (enhanced-handler request)))
+    )
+  )
+
+(def handler (make-handler release-id))

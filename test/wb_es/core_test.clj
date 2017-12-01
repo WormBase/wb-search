@@ -11,15 +11,16 @@
    [wb-es.datomic.db :refer [datomic-conn]]
    [wb-es.env :refer [es-base-url]]
    [wb-es.mappings.core :as mappings]
-   [wb-es.web.index :refer [handler]]
+   [wb-es.web.index :refer [make-handler]]
    [wb-es.web.core :as web])
   )
 
 (def index-name "test")
 
 (mount/defstate test-server
-  :start (run-jetty handler {:port 0 ;find available ones
-                             :join? false})
+  :start (let [handler (make-handler index-name)]
+           (run-jetty handler  {:port 0 ;find available ones
+                                :join? false}))
   :stop (.stop test-server))
 
 (mount/defstate test-server-uri
