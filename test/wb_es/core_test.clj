@@ -63,16 +63,6 @@
        (map create-document)
        (apply index-doc)))
 
-;; (defn with-default-options
-;;   "create a new search func that "
-;;   [search-func]
-;;   (fn [& search-args]
-;;     (let [[q options] search-args]
-;;       (search-func es-base-url
-;;                    index-name
-;;                    q
-;;                    (or options {})))))
-
 (defn web-query
   "returns a function that submits a web query and parses its results"
   [path]
