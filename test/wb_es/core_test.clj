@@ -88,7 +88,15 @@
 (deftest server-start-test
   (testing "server started"
     (let [response (http/get test-server-uri)]
-      (is (= 200 (:status response))))))
+      (is (= 200 (:status response)))))
+  (testing "server using correct index"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:gene/id "WBGene00000904"]))
+        (let [hit (-> (search "WBGene00000904")
+                      (get-in [:hits :hits 0]))]
+          (is (= "WBGene00000904" (get-in hit [:_source :wbid])))
+          (is (= index-name (:_index hit))))))))
 
 (deftest anatomy-type-test
   (testing "anatomy type using \"tl\" prefixed terms"
