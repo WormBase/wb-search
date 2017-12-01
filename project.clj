@@ -45,7 +45,9 @@
           :dependencies [[compojure "1.6.0"]
                          [ring/ring-defaults "0.3.0"]
                          [ring/ring-core "1.6.2"]
-                         [ring/ring-json "0.4.0"]]
+                         [ring/ring-json "0.4.0"]
+                         ;; use jetty in tests
+                         [ring/ring-jetty-adapter "1.6.3"]]
           :ring {:handler wb-es.web.index/handler
                  :init wb-es.web.setup/run}}]
    :web-dev {:dependencies [[ring/ring-devel "1.5.1"]]

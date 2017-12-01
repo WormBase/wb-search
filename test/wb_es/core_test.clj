@@ -4,16 +4,32 @@
    [clj-http.client :as http]
    [clojure.test :refer :all]
    [datomic.api :as d]
-   [mount.core :as mount]
+   [mount.core :as mount ]
+   [ring.adapter.jetty :refer [run-jetty]]
    [wb-es.bulk.core :as bulk]
    [wb-es.datomic.data.core :refer [create-document]]
    [wb-es.datomic.db :refer [datomic-conn]]
    [wb-es.env :refer [es-base-url]]
    [wb-es.mappings.core :as mappings]
+   [wb-es.web.index :refer [handler]]
    [wb-es.web.core :as web])
   )
 
 (def index-name "test")
+
+(mount/defstate test-server
+  :start (run-jetty handler {:port 0 ;find available ones
+                             :join? false})
+  :stop (.stop test-server))
+
+(mount/defstate test-server-uri
+  :start (->> test-server
+              (.getConnectors)
+              (first)
+              (.getLocalPort)
+              (format "http://localhost:%s")))
+
+
 
 (defn wrap-setup [f]
   (do
@@ -43,19 +59,33 @@
        (map create-document)
        (apply index-doc)))
 
-(defn with-default-options
-  "create a new search func that "
-  [search-func]
+;; (defn with-default-options
+;;   "create a new search func that "
+;;   [search-func]
+;;   (fn [& search-args]
+;;     (let [[q options] search-args]
+;;       (search-func es-base-url
+;;                    index-name
+;;                    q
+;;                    (or options {})))))
+
+(defn web-query
+  "returns a function that submits a web query and parses its results"
+  [path]
   (fn [& search-args]
-    (let [[q options] search-args]
-      (search-func es-base-url
-                   index-name
-                   q
-                   (or options {})))))
+    (let [[q options] search-args
+          endpoint (str test-server-uri path)
+          response (http/get endpoint {:query-params (assoc options :q q)})]
+      (json/parse-string (:body response) true))))
 
-(def search (with-default-options web/search))
-(def autocomplete (with-default-options web/autocomplete))
+(def search (web-query "/search"))
+(def autocomplete (web-query "/autocomplete"))
 
+(deftest server-start-test
+  (testing "server started"
+    (try
+      (prn test-server-uri)
+      (prn (http/get test-server-uri)))))
 
 (deftest anatomy-type-test
   (testing "anatomy type using \"tl\" prefixed terms"
