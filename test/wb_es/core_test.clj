@@ -45,6 +45,9 @@
                              :body (->> (assoc-in mappings/index-settings [:settings :number_of_shards] 1)
                                         (json/generate-string))})
         (mount/start)
+        (if test-server-uri
+          (println (format "Testing server is started at %s" test-server-uri))
+          (println "Testing server failed to start"))
         (f)
         (mount/stop))
       )))
@@ -84,9 +87,8 @@
 
 (deftest server-start-test
   (testing "server started"
-    (try
-      (prn test-server-uri)
-      (prn (http/get test-server-uri)))))
+    (let [response (http/get test-server-uri)]
+      (is (= 200 (:status response))))))
 
 (deftest anatomy-type-test
   (testing "anatomy type using \"tl\" prefixed terms"
