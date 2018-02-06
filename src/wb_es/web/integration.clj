@@ -38,7 +38,9 @@
           raw_page_count (get params :page 1)
           page (if (= raw_page_count "all") 1 raw_page_count)
           page-size (if (= raw_page_count "all") 500 (get params :page_size 10))
-          raw_q (some-> (get params :q (:query params))
+          raw_q (some-> (or (:id params)
+                            (:query params)
+                            (:q params))
                         (clojure.string/trim))
           params-new (assoc params
                             :size page-size
@@ -85,12 +87,17 @@
 
 (defn wrap-search-exact [handler]
   (fn [request]
-    (let [response (handler request)
-          pack-function pack-search-obj
-          body-new (->> (get-in response [:body :hits :hits])
-                        (map pack-function)
-                        (first))]
-      (assoc response :body body-new))))
+    (let [params (:params request)
+          response (handler request)
+          pack-function get-obj
+          body (->> (get-in response [:body :hits :hits])
+                    (first))]
+      (assoc response :body (if body
+                              (if (or (:fill params)
+                                      (:footer params))
+                                (assoc (get-obj body) :footer (get-in request [:params :footer]))
+                                (pack-search-obj body))
+                              {})))))
 
 (defn wrap-count [handler]
   (fn [request]
