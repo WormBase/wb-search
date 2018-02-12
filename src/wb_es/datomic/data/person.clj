@@ -11,8 +11,10 @@
   (data [this]
     {:wbid (:person/id entity)
      :label (:person/standard-name entity)
-     :other_names (cons (:person/full-name entity)
-                        (:person/also-known-as entity))
+     :other_names (concat [(:person/full-name entity)]
+                          (:person/also-known-as entity)
+                          (->> (:person/possibly-publishes-as entity)
+                               (map :author/id)))
      :institution (->> (:person/address entity)
                        (:address/institution)
                        (clojure.string/join "\n"))}))
