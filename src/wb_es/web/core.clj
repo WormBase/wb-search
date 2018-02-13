@@ -89,6 +89,7 @@
                 {:must [{:bool {:filter (get-filter options)}}
                         {:bool
                          {:should [{:term {:wbid q}}
+                                   {:term {:other_unique_ids q}}
                                    {:term {"label.raw" q}}]}}]}}}
 
         response

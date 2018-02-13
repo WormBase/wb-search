@@ -34,6 +34,9 @@
                                             :search_analyzer "keyword_ignore_case"}
                      }
             }
+    :other_unique_ids {:type "string"
+                       :analyzer "keyword_ignore_case"
+                       :include_in_all false}
     :other_names {:type "string"
                   :include_in_all false
                   :analyzer "keyword_ignore_case"}
