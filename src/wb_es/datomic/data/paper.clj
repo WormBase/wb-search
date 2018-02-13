@@ -15,6 +15,11 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:paper/id entity)
+     :other_unique_ids (->> (:paper/name entity)
+                            (map (fn [id]
+                                   (if-let [match (re-matches #"^(?:doi[^/]*)?(10\.[^/]+.+)$" id)]
+                                     (second match)
+                                     id))))
      :label (:paper/brief-citation entity)
      :description (->> (:paper/abstract entity)
                        (map :longtext/text)
