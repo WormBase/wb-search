@@ -85,6 +85,7 @@
             "test-refresh" ["with-profile" "+indexer,+web" "test-refresh"]}
   :release-tasks [["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
+                  ["run" "-m" "wb-es.eb-setup"]
                   ["vcs" "commit"]
                   ["vcs" "tag"]
                   ["shell" "make" "aws-ecr-login"]
