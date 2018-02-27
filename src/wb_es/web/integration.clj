@@ -12,7 +12,12 @@
   (if species-name
     (let [[genus-name species-name] (clojure.string/split species-name #"\s+" 2)]
       {:genus genus-name
-       :species species-name})))
+       :species species-name
+       :id (format "%s_%s"
+                   (->> genus-name
+                        (first)
+                        (clojure.string/lower-case))
+                   species-name)})))
 
 (defn- get-obj [doc]
   (let [search-obj (pack-search-obj doc)
