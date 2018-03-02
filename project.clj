@@ -87,7 +87,7 @@
                   ["change" "version" "leiningen.release/bump-version" "release"]
                   ["run" "-m" "wb-es.eb-setup"]
                   ["vcs" "commit"]
-                  ["vcs" "tag"]
+                  ["vcs" "tag" "v"]
                   ["shell" "make" "aws-ecr-login"]
                   ["with-profile" "indexer" "docker" "build"]
                   ["with-profile" "indexer" "docker" "push"]
