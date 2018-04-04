@@ -101,11 +101,12 @@
        )
   )
 
-(defn run [& {:keys [db]
-              :or {db (d/db datomic-conn)}}]
-  (let [index-id (format "%s_v0" release-id)]
+(defn run [& {:keys [db index-revision-number]
+              :or {db (d/db datomic-conn)
+                   index-revision-number 0}}]
+  (let [index-id (format "%s_v%s" release-id index-revision-number)]
     (do
-      (create-index index-id :default-index true)
+      (create-index index-id :default-index (= index-revision-number 0))
       (let [n-threads 4
             scheduler (chan n-threads)
             logger (chan n-threads)]
@@ -333,11 +334,15 @@
           (close! scheduler))
         ))))
 
+
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
   (do
-    (println "Hello, Bulky World!")
+    (println "Indexer starting!")
     (mount/start)
-    (run)
-    (mount/stop)))
+    (if-let [index-revision-number (first args)]
+      (run :index-revision-number index-revision-number)
+      (run))
+    (mount/stop))
+  )
