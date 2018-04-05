@@ -28,7 +28,7 @@ eb-local-run:
 
 .PHONY: eb-setenv
 eb-setenv:
-	@eb setenv AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY} WB_DB_URI=${WB_DB_URI}
+	@(cd eb/default && eb setenv AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY} WB_DB_URI=${WB_DB_URI})
 
 
 .PHONY: aws-ecr-login
