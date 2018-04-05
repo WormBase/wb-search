@@ -13,6 +13,13 @@
    [org.clojure/clojure "1.8.0"]
 
    ;; the following dependecies are only needed for web
+   [compojure "1.6.0"]
+   [ring/ring-defaults "0.3.0"]
+   [ring/ring-core "1.6.2"]
+   [ring/ring-json "0.4.0"]
+   ;; use jetty in tests
+   [ring/ring-jetty-adapter "1.6.3"]
+
    ]
   :source-paths ["src"]
   :plugins [[lein-environ "1.1.0"]
@@ -26,7 +33,7 @@
              ;; same GC options as the transactor,
              ;; should minimize long pauses.
              "-XX:+UseG1GC" "-XX:MaxGCPauseMillis=50"
-             "-Ddatomic.objectCacheMax=1000000000"
+             ;;"-Ddatomic.objectCacheMax=1000000000" ; when commented out, the default 50% RAM takes effect
              "-Ddatomic.txTimeoutMsec=1000000"]
   :profiles
   {:datomic-free
@@ -41,15 +48,12 @@
       :exclusions [joda-time]]]}
    :indexer [:datomic-pro :ddb
              {:docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch"
-                       :dockerfile "docker/Dockerfile.aws-elasticsearch"}}]
+                       :dockerfile "docker/Dockerfile.aws-elasticsearch"}}
+             {:main wb-es.bulk.core
+              :uberjar-name "wb-es-indexer-standalone.jar" ;this ubjer contains Datomic pro, hence must be kept private
+              }]
    :web [:datomic-free
          {:uberjar-name "wb-es-web-standalone.jar"
-          :dependencies [[compojure "1.6.0"]
-                         [ring/ring-defaults "0.3.0"]
-                         [ring/ring-core "1.6.2"]
-                         [ring/ring-json "0.4.0"]
-                         ;; use jetty in tests
-                         [ring/ring-jetty-adapter "1.6.3"]]
           :ring {:handler wb-es.web.index/handler
                  :init wb-es.web.setup/run}
           :docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-web-api"
