@@ -34,6 +34,26 @@
          (last)
          (:id))))
 
+(defn get-next-snapshot-id
+  [repository-name release-id]
+  (let [pattern (re-pattern (format "snapshot_%s(_v(\\d+))?" release-id))
+        current-id (get-lateset-snapshot-id repository-name release-id)
+        [_ _ version-id] (re-matches pattern current-id)]
+    (format "snapshot_%s_v%s" release-id (or (+ 1 (Integer. version-id))
+                                             0))))
+
+(defn save-snapshot
+  [index-id repository-name snapshot-id]
+  (let [snapshot-url (format "%s/_snapshot/%s/%s" es-base-url repository-name snapshot-id)]
+    (do
+      (println (format "Saving index %s to %s in repository %s" index-id snapshot-id repository-name))
+      (println (format "View progress with `curl -XGET %s`" snapshot-url))
+      (http/put (format "%s?wait_for_completion=true" snapshot-url)
+                {:headers {:content-type "application/json"}
+                 :body (json/generate-string {:indices index-id})}
+                )
+      )))
+
 (defn restore-snapshot
   [index-id repository-name snapshot-id]
   (let [max-retry 50

@@ -10,7 +10,8 @@
             [wb-es.datomic.data.variation :as variation]
             [wb-es.datomic.db :refer [datomic-conn]]
             [wb-es.env :refer [es-base-url release-id]]
-            [wb-es.mappings.core :refer [create-index]]))
+            [wb-es.mappings.core :refer [create-index]]
+            [wb-es.snapshot.core :refer [save-snapshot get-next-snapshot-id]]))
 
 (defn format-bulk
   "returns a new line delimited JSON based on
@@ -332,7 +333,13 @@
           ;; existing jobs on the channel will remain available for consumers
           ;; https://clojure.github.io/core.async/#clojure.core.async/close!
           (close! scheduler))
-        ))))
+        )
+
+
+      (let [repository-name "s3_repository"
+            snapshot-id (get-next-snapshot-id repository-name release-id)]
+        (save-snapshot index-id repository-name snapshot-id))
+      )))
 
 
 (defn -main
