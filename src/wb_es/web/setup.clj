@@ -48,25 +48,26 @@
 
 (defn run
   "run setup"
-  [release-id snapshot]
-  (let [index-id release-id]
-    (do
-      (es-connect)
-      (if (has-index index-id)
-        (println (format "Elasticsearch index %s is found locally. No attempt will be made to restore snapshots." index-id))
-        (if snapshot
-          (let [repository-name "s3_repository"]
-            (do
-              (connect-snapshot-repository repository-name)
+  ([] (run release-id restore-from-snapshot))
+  ([release-id snapshot]
+     (let [index-id release-id]
+       (do
+         (es-connect)
+         (if (has-index index-id)
+           (println (format "Elasticsearch index %s is found locally. No attempt will be made to restore snapshots." index-id))
+           (if snapshot
+             (let [repository-name "s3_repository"]
+               (do
+                 (connect-snapshot-repository repository-name)
 
-              (let [snapshot-id (if (= "latest" snapshot)
-                                  (get-lateset-snapshot-id repository-name release-id)
-                                  snapshot)]
-                (restore-snapshot index-id repository-name snapshot-id)
-                (println (format "Elasticsearch is restored from snapshot %s" snapshot-id)))))))
-      )))
+                 (let [snapshot-id (if (= "latest" snapshot)
+                                     (get-lateset-snapshot-id repository-name release-id)
+                                     snapshot)]
+                   (restore-snapshot index-id repository-name snapshot-id)
+                   (println (format "Elasticsearch is restored from snapshot %s" snapshot-id)))))))
+         ))))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (run release-id restore-from-snapshot))
+  (run))

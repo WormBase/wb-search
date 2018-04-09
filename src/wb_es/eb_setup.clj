@@ -14,6 +14,7 @@
     (->> eb-json-str
          (replace-image-tag "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch" version)
          (replace-image-tag "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-web-api" version)
+         (replace-image-tag "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-indexer" version)
          (spit eb-json-path))
     ))
 
