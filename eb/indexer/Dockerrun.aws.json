@@ -30,6 +30,10 @@
 		{
 		    "name": "ES_BASE_URI",
 		    "value": "http://elasticsearch:9200"
+		},
+		{
+		    "name": "RESTORE_FROM_SNAPSHOT",
+		    "value": "latest"
 		}
 	    ],
 	    "memory": 512
