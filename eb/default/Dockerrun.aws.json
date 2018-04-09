@@ -65,7 +65,7 @@
             "environment": [
                 {
                     "name": "ES_HEAP_SIZE",
-                    "value": "6g"
+                    "value": "1g"
                 }
             ],
             "memory": 3072
