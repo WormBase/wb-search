@@ -46,9 +46,10 @@
    {:dependencies
     [[com.amazonaws/aws-java-sdk-dynamodb "1.11.82"
       :exclusions [joda-time]]]}
+   :search-engine
+   {:docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch"
+             :dockerfile "docker/Dockerfile.aws-elasticsearch"}}
    :indexer [:datomic-pro :ddb
-             {:docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch"
-                       :dockerfile "docker/Dockerfile.aws-elasticsearch"}}
              {:main wb-es.bulk.core
               :uberjar-name "wb-es-indexer-standalone.jar" ;this ubjer contains Datomic pro, hence must be kept private
               :docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-indexer"
@@ -95,6 +96,8 @@
                   ["vcs" "commit"]
                   ["vcs" "tag" "v" "--no-sign"]
                   ["shell" "make" "aws-ecr-login"]
+                  ["with-profile" "search-engine" "docker" "build"]
+                  ["with-profile" "search-engine" "docker" "push"]
                   ["with-profile" "indexer" "uberjar"]
                   ["with-profile" "indexer" "docker" "build"]
                   ["with-profile" "indexer" "docker" "push"]
