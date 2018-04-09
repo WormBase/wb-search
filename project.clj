@@ -29,8 +29,7 @@
   :target-path "target/%s"
   :javac-options ["-target" "1.8" "-source" "1.8"]
   :license "GPLv2"
-  :jvm-opts ["-Xmx2G"
-             ;; same GC options as the transactor,
+  :jvm-opts [;; same GC options as the transactor,
              ;; should minimize long pauses.
              "-XX:+UseG1GC" "-XX:MaxGCPauseMillis=50"
              ;;"-Ddatomic.objectCacheMax=1000000000" ; when commented out, the default 50% RAM takes effect

@@ -75,6 +75,10 @@
 		{
 		    "name": "ES_BASE_URI",
 		    "value": "http://elasticsearch:9200"
+		},
+		{
+		    "name": "_JAVA_OPTIONS",
+		    "value": "-Xms8000m -Xmx9216m"
 		}
 	    ],
 	    "memory": 10240
