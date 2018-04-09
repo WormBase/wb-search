@@ -12,19 +12,19 @@
     {:wbid (:variation/id entity)
      :label (:variation/public-name entity)
      :species (data-util/format-entity-species :variation/species entity)
-     ;; :gene (if (:variation/allele entity)
-     ;;         (->> entity
-     ;;              (:variation/gene)
-     ;;              (map :variation.gene/gene)
-     ;;              (map data-util/pack-obj)))
+     :gene (if (:variation/allele entity)
+             (->> entity
+                  (:variation/gene)
+                  (map :variation.gene/gene)
+                  (map data-util/pack-obj)))
      }))
 
-(deftype Gene [gene]
-  data-util/Document
-  (metadata [this] (data-util/default-metadata gene))
-  (data [this]
-    (let [packed-gene (data-util/pack-obj gene)]
-      {:script
-       {:inline "ctx._source.gene =  ctx._source.containsKey(\"gene\") ? ctx._source.gene + gene : [gene]"
-        :params {:gene packed-gene}}
-       :upsert {:gene [packed-gene]}})))
+;; (deftype Gene [gene]
+;;   data-util/Document
+;;   (metadata [this] (data-util/default-metadata gene))
+;;   (data [this]
+;;     (let [packed-gene (data-util/pack-obj gene)]
+;;       {:script
+;;        {:inline "ctx._source.gene =  ctx._source.containsKey(\"gene\") ? ctx._source.gene + gene : [gene]"
+;;         :params {:gene packed-gene}}
+;;        :upsert {:gene [packed-gene]}})))

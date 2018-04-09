@@ -309,24 +309,25 @@
             (doseq [job jobs]
               (>!! scheduler job)))
 
-          ;; get index gene by variation
-          (let [v-g (d/q '[:find ?v ?g
-                           :where
-                           [?v :variation/allele true]
-                           [?v :variation/gene ?gh]
-                           [?gh :variation.gene/gene ?g]]
-                         db)]
-            (let [jobs (->> (map (fn [[v g]]
-                                   [v gene/->Variation g]) v-g)
-                            (make-batches 1000 :gene->variation "update"))]
-              (doseq [job jobs]
-                (>!! scheduler job)))
-            (let [jobs (->> (map (fn [[v g]]
-                                   [g variation/->Gene v]) v-g)
-                            (make-batches 1000 :variation->gene "update"))]
-              (doseq [job jobs]
-                (>!! scheduler job)))
-            )
+          ;; now handled within indexing of genes and variations
+          ;; ;; get index gene by variation
+          ;; (let [v-g (d/q '[:find ?v ?g
+          ;;                  :where
+          ;;                  [?v :variation/allele true]
+          ;;                  [?v :variation/gene ?gh]
+          ;;                  [?gh :variation.gene/gene ?g]]
+          ;;                db)]
+          ;;   (let [jobs (->> (map (fn [[v g]]
+          ;;                          [v gene/->Variation g]) v-g)
+          ;;                   (make-batches 1000 :gene->variation "update"))]
+          ;;     (doseq [job jobs]
+          ;;       (>!! scheduler job)))
+          ;;   (let [jobs (->> (map (fn [[v g]]
+          ;;                          [g variation/->Gene v]) v-g)
+          ;;                   (make-batches 1000 :variation->gene "update"))]
+          ;;     (doseq [job jobs]
+          ;;       (>!! scheduler job)))
+          ;;   )
 
 
           ;; close the channel to indicate no more input

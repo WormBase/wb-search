@@ -23,6 +23,11 @@
                         (first)
                         (:gene.automated-description/text)))
      :species (data-util/format-entity-species :gene/species entity)
+     :allele (->> entity
+                  (:variation.gene/_gene)
+                  (map :variation/_gene)
+                  (filter :variation/allele)
+                  (map data-util/pack-obj))
      :dead (= "dead"
               (some->> (:gene/status entity)
                        (:gene.status/status)
@@ -34,12 +39,13 @@
                       (first)
                       (data-util/pack-obj))}))
 
-(deftype Variation [variation]
-  data-util/Document
-  (metadata [this] (data-util/default-metadata variation))
-  (data [this]
-    (let [packed-variation (data-util/pack-obj variation)]
-      {:script
-       {:inline "ctx._source.allele = ctx._source.containsKey(\"allele\") ? + ctx._source.allele + allele : [allele]"
-        :params {:allele packed-variation}}
-       :upsert {:allele [packed-variation]}})))
+
+;; (deftype Variation [variation]
+;;   data-util/Document
+;;   (metadata [this] (data-util/default-metadata variation))
+;;   (data [this]
+;;     (let [packed-variation (data-util/pack-obj variation)]
+;;       {:script
+;;        {:inline "ctx._source.allele = ctx._source.containsKey(\"allele\") ? + ctx._source.allele + allele : [allele]"
+;;         :params {:allele packed-variation}}
+;;        :upsert {:allele [packed-variation]}})))
