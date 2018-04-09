@@ -40,12 +40,7 @@ docker-run-aws-es:
 
 .PHONY: eb-local-run
 eb-local-run:
-	@(cd eb/default && eb local run --envvars AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID},AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY},WB_DB_URI=${WB_DB_URI})
-
-.PHONY: eb-setenv
-eb-setenv:
-	@(cd eb/default && eb setenv AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY} WB_DB_URI=${WB_DB_URI})
-
+	$(MAKE) -C ./eb/default eb-local-run
 
 .PHONY: aws-ecr-login
 aws-ecr-login:
