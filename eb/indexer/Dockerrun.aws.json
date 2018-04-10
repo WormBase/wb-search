@@ -64,7 +64,7 @@
                     "value": "1g"
                 }
             ],
-            "memory": 3072
+            "memory": 2048
 	},
         {
             "name": "search-indexer",
@@ -78,10 +78,10 @@
 		},
 		{
 		    "name": "_JAVA_OPTIONS",
-		    "value": "-Xms8000m -Xmx9216m"
+		    "value": "-Xms8000m -Xmx11264m"
 		}
 	    ],
-	    "memory": 10240
+	    "memory": 12288
         },
         {
             "name": "nginx-proxy",
