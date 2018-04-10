@@ -185,7 +185,7 @@
             (doseq [job jobs]
               (>!! scheduler job)))
           (let [eids (get-eids-by-type db :gene/id)
-                jobs (make-batches 1000 :gene eids)]
+                jobs (make-batches 100 :gene eids)]  ; smaller batch for slower ones
             (doseq [job jobs]
               (>!! scheduler job)))
           (let [eids (get-eids-by-type db :gene-class/id)
@@ -305,7 +305,7 @@
             (doseq [job jobs]
               (>!! scheduler job)))
           (let [eids (get-eids-by-type db :variation/id)
-                jobs (make-batches 1000 :variation eids)]
+                jobs (make-batches 100 :variation eids)] ; smaller batch for slower ones
             (doseq [job jobs]
               (>!! scheduler job)))
 
