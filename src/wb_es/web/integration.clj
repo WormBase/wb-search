@@ -95,13 +95,14 @@
     (let [params (:params request)
           response (handler request)
           pack-function get-obj
-          body (->> (get-in response [:body :hits :hits])
-                    (first))]
-      (assoc response :body (if body
+          body (get-in response [:body :hits :hits])
+          exact-match (if (= 1 (count body))
+                        (first body))]
+      (assoc response :body (if exact-match
                               (if (or (:fill params)
                                       (:footer params))
-                                (assoc (get-obj body) :footer (get-in request [:params :footer]))
-                                (pack-search-obj body))
+                                (assoc (get-obj exact-match) :footer (get-in request [:params :footer]))
+                                (pack-search-obj exact-match))
                               {})))))
 
 (defn wrap-count [handler]
