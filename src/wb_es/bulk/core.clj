@@ -10,7 +10,8 @@
             [wb-es.datomic.data.variation :as variation]
             [wb-es.datomic.db :refer [datomic-conn]]
             [wb-es.env :refer [es-base-url release-id]]
-            [wb-es.mappings.core :refer [create-index]]))
+            [wb-es.mappings.core :refer [create-index]]
+            [wb-es.snapshot.core :refer [connect-snapshot-repository save-snapshot get-next-snapshot-id]]))
 
 (defn format-bulk
   "returns a new line delimited JSON based on
@@ -101,11 +102,12 @@
        )
   )
 
-(defn run [& {:keys [db]
-              :or {db (d/db datomic-conn)}}]
-  (let [index-id (format "%s_v0" release-id)]
+(defn run [& {:keys [db index-revision-number]
+              :or {db (d/db datomic-conn)
+                   index-revision-number 0}}]
+  (let [index-id (format "%s_v%s" release-id index-revision-number)]
     (do
-      (create-index index-id :default-index true)
+      (create-index index-id :default-index (= index-revision-number 0))
       (let [n-threads 4
             scheduler (chan n-threads)
             logger (chan n-threads)]
@@ -183,7 +185,7 @@
             (doseq [job jobs]
               (>!! scheduler job)))
           (let [eids (get-eids-by-type db :gene/id)
-                jobs (make-batches 1000 :gene eids)]
+                jobs (make-batches 100 :gene eids)]  ; smaller batch for slower ones
             (doseq [job jobs]
               (>!! scheduler job)))
           (let [eids (get-eids-by-type db :gene-class/id)
@@ -303,41 +305,53 @@
             (doseq [job jobs]
               (>!! scheduler job)))
           (let [eids (get-eids-by-type db :variation/id)
-                jobs (make-batches 1000 :variation eids)]
+                jobs (make-batches 100 :variation eids)] ; smaller batch for slower ones
             (doseq [job jobs]
               (>!! scheduler job)))
 
-          ;; get index gene by variation
-          (let [v-g (d/q '[:find ?v ?g
-                           :where
-                           [?v :variation/allele true]
-                           [?v :variation/gene ?gh]
-                           [?gh :variation.gene/gene ?g]]
-                         db)]
-            (let [jobs (->> (map (fn [[v g]]
-                                   [v gene/->Variation g]) v-g)
-                            (make-batches 1000 :gene->variation "update"))]
-              (doseq [job jobs]
-                (>!! scheduler job)))
-            (let [jobs (->> (map (fn [[v g]]
-                                   [g variation/->Gene v]) v-g)
-                            (make-batches 1000 :variation->gene "update"))]
-              (doseq [job jobs]
-                (>!! scheduler job)))
-            )
+          ;; now handled within indexing of genes and variations
+          ;; ;; get index gene by variation
+          ;; (let [v-g (d/q '[:find ?v ?g
+          ;;                  :where
+          ;;                  [?v :variation/allele true]
+          ;;                  [?v :variation/gene ?gh]
+          ;;                  [?gh :variation.gene/gene ?g]]
+          ;;                db)]
+          ;;   (let [jobs (->> (map (fn [[v g]]
+          ;;                          [v gene/->Variation g]) v-g)
+          ;;                   (make-batches 1000 :gene->variation "update"))]
+          ;;     (doseq [job jobs]
+          ;;       (>!! scheduler job)))
+          ;;   (let [jobs (->> (map (fn [[v g]]
+          ;;                          [g variation/->Gene v]) v-g)
+          ;;                   (make-batches 1000 :variation->gene "update"))]
+          ;;     (doseq [job jobs]
+          ;;       (>!! scheduler job)))
+          ;;   )
 
 
           ;; close the channel to indicate no more input
           ;; existing jobs on the channel will remain available for consumers
           ;; https://clojure.github.io/core.async/#clojure.core.async/close!
           (close! scheduler))
-        ))))
+        )
+
+      (let [repository-name "s3_repository"]
+        (do
+          (connect-snapshot-repository repository-name)
+          (let [snapshot-id (get-next-snapshot-id repository-name release-id)]
+            (save-snapshot index-id repository-name snapshot-id))))
+      )))
+
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
   (do
-    (println "Hello, Bulky World!")
+    (println "Indexer starting!")
     (mount/start)
-    (run)
-    (mount/stop)))
+    (if-let [index-revision-number (first args)]
+      (run :index-revision-number index-revision-number)
+      (run))
+    (mount/stop))
+  )

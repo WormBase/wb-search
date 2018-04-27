@@ -12,6 +12,22 @@ docker-build-web: uberjar-build-web
 docker-run-web:
 	docker run -p 3000:3000 -e WB_DB_URI=${WB_DB_URI} wormbase/search-web-api
 
+.PHONY: uberjar-build-indexer
+uberjar-build-indexer:
+	lein with-profile indexer uberjar
+
+.PHONY: docker-build-indexer
+docker-build-indexer: uberjar-build-indexer
+	docker build -t wormbase/search-indexer -f ./docker/Dockerfile.indexer .
+
+.PHONY: docker-run-indexer
+docker-run-indexer:
+	docker run \
+		-e WB_DB_URI=${WB_DB_URI} \
+		-e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+		-e AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY} \
+		wormbase/search-indexer
+
 .PHONY: docker-build-aws-es
 docker-build-aws-es:
 	docker build -t wormbase/aws-elasticsearch -f ./docker/Dockerfile.aws-elasticsearch .
@@ -24,12 +40,7 @@ docker-run-aws-es:
 
 .PHONY: eb-local-run
 eb-local-run:
-	@eb local run --envvars AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID},AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY},WB_DB_URI=${WB_DB_URI}
-
-.PHONY: eb-setenv
-eb-setenv:
-	@eb setenv AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY} WB_DB_URI=${WB_DB_URI}
-
+	$(MAKE) -C ./eb/default eb-local-run
 
 .PHONY: aws-ecr-login
 aws-ecr-login:

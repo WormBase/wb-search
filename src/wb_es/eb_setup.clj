@@ -8,17 +8,25 @@
                             (fn [[_ group1]]
                               (format "%s:%s" group1 tag)))))
 
-(defn update-eb-json! []
+(defn update-eb-json! [eb-json-path]
   (let [version (System/getProperty "wb-es.version")
-        eb-json-path "Dockerrun.aws.json"
         eb-json-str (slurp eb-json-path)]
     (->> eb-json-str
          (replace-image-tag "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch" version)
          (replace-image-tag "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-web-api" version)
+         (replace-image-tag "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-indexer" version)
          (spit eb-json-path))
     ))
+
+(defn find-eb-json [path]
+  (->> (clojure.java.io/file path)
+       (file-seq)
+       (filter #(= "Dockerrun.aws.json" (.getName %)))
+       (map #(.getAbsoluteFile %))))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (update-eb-json!))
+  (let [eb-json-paths (find-eb-json "./eb")]
+    (doseq [eb-json-path eb-json-paths]
+      (update-eb-json! eb-json-path))))

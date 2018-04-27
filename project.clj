@@ -1,4 +1,4 @@
-(defproject wb-es "0.2.7-SNAPSHOT"
+(defproject wb-es "0.2.12-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.7.0"
@@ -13,6 +13,13 @@
    [org.clojure/clojure "1.8.0"]
 
    ;; the following dependecies are only needed for web
+   [compojure "1.6.0"]
+   [ring/ring-defaults "0.3.0"]
+   [ring/ring-core "1.6.2"]
+   [ring/ring-json "0.4.0"]
+   ;; use jetty in tests
+   [ring/ring-jetty-adapter "1.6.3"]
+
    ]
   :source-paths ["src"]
   :plugins [[lein-environ "1.1.0"]
@@ -22,11 +29,10 @@
   :target-path "target/%s"
   :javac-options ["-target" "1.8" "-source" "1.8"]
   :license "GPLv2"
-  :jvm-opts ["-Xmx2G"
-             ;; same GC options as the transactor,
+  :jvm-opts [;; same GC options as the transactor,
              ;; should minimize long pauses.
              "-XX:+UseG1GC" "-XX:MaxGCPauseMillis=50"
-             "-Ddatomic.objectCacheMax=1000000000"
+             ;;"-Ddatomic.objectCacheMax=1000000000" ; when commented out, the default 50% RAM takes effect
              "-Ddatomic.txTimeoutMsec=1000000"]
   :profiles
   {:datomic-free
@@ -39,17 +45,17 @@
    {:dependencies
     [[com.amazonaws/aws-java-sdk-dynamodb "1.11.82"
       :exclusions [joda-time]]]}
+   :search-engine
+   {:docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch"
+             :dockerfile "docker/Dockerfile.aws-elasticsearch"}}
    :indexer [:datomic-pro :ddb
-             {:docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch"
-                       :dockerfile "docker/Dockerfile.aws-elasticsearch"}}]
+             {:main wb-es.bulk.core
+              :uberjar-name "wb-es-indexer-standalone.jar" ;this ubjer contains Datomic pro, hence must be kept private
+              :docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-indexer"
+                       :dockerfile "docker/Dockerfile.indexer"}
+              }]
    :web [:datomic-free
          {:uberjar-name "wb-es-web-standalone.jar"
-          :dependencies [[compojure "1.6.0"]
-                         [ring/ring-defaults "0.3.0"]
-                         [ring/ring-core "1.6.2"]
-                         [ring/ring-json "0.4.0"]
-                         ;; use jetty in tests
-                         [ring/ring-jetty-adapter "1.6.3"]]
           :ring {:handler wb-es.web.index/handler
                  :init wb-es.web.setup/run}
           :docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-web-api"
@@ -82,18 +88,24 @@
    :test
    {:resource-paths ["test/resources"]}}
   :aliases {"test" ["with-profile" "+indexer,+web" "test"]
-            "test-refresh" ["with-profile" "+indexer,+web" "test-refresh"]}
+            "test-refresh" ["with-profile" "+indexer,+web" "test-refresh"]
+            "aws-ecr-publish" ["do"
+                               ["shell" "make" "aws-ecr-login"]
+                               ["with-profile" "search-engine" "docker" "build"]
+                               ["with-profile" "search-engine" "docker" "push"]
+                               ["with-profile" "indexer" "uberjar"]
+                               ["with-profile" "indexer" "docker" "build"]
+                               ["with-profile" "indexer" "docker" "push"]
+                               ["with-profile" "web" "ring" "uberjar"]
+                               ["with-profile" "web" "docker" "build"]
+                               ["with-profile" "web" "docker" "push"]]
+            "eb-container-version-update" ["run" "-m" "wb-es.eb-setup"]}
   :release-tasks [["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
-                  ["run" "-m" "wb-es.eb-setup"]
+                  ["eb-container-version-update"]
                   ["vcs" "commit"]
-                  ["vcs" "tag" "v"]
-                  ["shell" "make" "aws-ecr-login"]
-                  ["with-profile" "indexer" "docker" "build"]
-                  ["with-profile" "indexer" "docker" "push"]
-                  ["with-profile" "web" "ring" "uberjar"]
-                  ["with-profile" "web" "docker" "build"]
-                  ["with-profile" "web" "docker" "push"]
+                  ["vcs" "tag" "v" "--no-sign"]
+                  ["aws-ecr-publish"]
                   ["change" "version" "leiningen.release/bump-version"]
                   ["vcs" "commit"]
                   ["vcs" "push"]]

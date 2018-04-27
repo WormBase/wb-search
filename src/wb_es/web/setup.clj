@@ -2,7 +2,11 @@
   (:gen-class)
   (:require [clj-http.client :as http]
             [cheshire.core :as json]
-            [wb-es.env :refer [es-base-url release-id]]))
+            [wb-es.env :refer [es-base-url release-id restore-from-snapshot]]
+            [wb-es.snapshot.core :refer [connect-snapshot-repository
+                                         get-lateset-snapshot-id
+                                         restore-snapshot]]
+            ))
 
 
 
@@ -41,94 +45,27 @@
                   (flush)
                   (Thread/sleep interval))))))))))
 
-(defn connect-snapshot-repository
-  ([repository-name]
-   (connect-snapshot-repository repository-name
-                                {"type" "s3"
-                                 "settings" {"bucket" "wormbase-elasticsearch-snapshots"
-                                             "region" "us-east-1"}}))
-  ([repository-name repository-settings]
-   (try
-     (http/put (format "%s/_snapshot/%s" es-base-url repository-name)
-               {:content-type "application/json"
-                :body (json/generate-string repository-settings)})
-     (catch Exception e
-       (throw (Exception. "Cannot connect to elasticsearch snapshot repository"))))))
-
-(defn get-snapshot-id
-  [repository-name]
-  (let [response (http/get (format "%s/_cat/snapshots/%s?format=json" es-base-url repository-name))
-        all-snapshots (json/parse-string (:body response) true)
-        id-pattern (re-pattern (format "snapshot_%s(_v(\\d+))?" release-id))]
-    (->> all-snapshots
-         (filter (fn [snapshot]
-                   (and
-                    (= "SUCCESS" (:status snapshot))
-                    (re-matches id-pattern (:id snapshot)))))
-         (sort-by (fn [snapshot]
-                    (let [[_ _ version-id] (re-matches id-pattern (:id snapshot))]
-                      version-id)))
-         (last)
-         (:id))))
-
-(defn restore-snapshot
-  [index-id repository-name snapshot-id]
-  (let [max-retry 50
-        interval 10000
-        counter (atom 0)
-        connected (atom false)]
-    (do
-      (try
-        (http/post (format "%s/_snapshot/%s/%s/_restore" es-base-url repository-name snapshot-id))
-        (catch Exception e
-          (throw (Exception. (format "Failed to restore snapshot %s" snapshot-id)))))
-      (println "Restoring index started")
-      (while (not (deref connected))
-        (do
-          (swap! counter inc)
-          (try
-            (do
-              (println (http/get (format "%s/%s/_search" es-base-url index-id)))
-              (swap! connected not)
-              (println "Connected."))
-            (catch Exception e
-              (if (>= (deref counter) max-retry)
-                (throw (Exception. (format "Failed to connect to %s. Start up terminated." es-base-url)))
-                (do
-                  (println (http/get (format "%s/_cat/recovery?format=json" es-base-url repository-name)))
-                  (flush)
-                  (Thread/sleep interval))))))))))
-
-;; (let [
-;;       response
-;;       (http/get (format "%s/%s" es-base-url index)
-;;                 {:content-type "application/json"
-;;                  :body (json/generate-string query)})]
-;;   (json/parse-string (:body response) true))
-
-
-;; if unavailable is provided:
-;; attempt to restore it from snapshot
-
-;; figure out which snapshot id to use
-;;
-;; wait until restoration finishes
 
 (defn run
   "run setup"
-  []
-  (let [index-id release-id]
-    (do
-      (es-connect)
-      (if (has-index index-id)
-        (println (format "Elasticsearch index %s is found, starting server..." index-id))
-        (let [repository-name "s3_repository"]
-          (do
-            (connect-snapshot-repository repository-name)
-            (let [snapshot-id (get-snapshot-id repository-name)]
-              (restore-snapshot index-id repository-name snapshot-id)
-              (println (format "Elasticsearch is restored from snapshot %s" snapshot-id))))))
-      )))
+  ([] (run release-id restore-from-snapshot))
+  ([release-id snapshot]
+     (let [index-id release-id]
+       (do
+         (es-connect)
+         (if (has-index index-id)
+           (println (format "Elasticsearch index %s is found locally. No attempt will be made to restore snapshots." index-id))
+           (if snapshot
+             (let [repository-name "s3_repository"]
+               (do
+                 (connect-snapshot-repository repository-name)
+
+                 (let [snapshot-id (if (= "latest" snapshot)
+                                     (get-lateset-snapshot-id repository-name release-id)
+                                     snapshot)]
+                   (restore-snapshot index-id repository-name snapshot-id)
+                   (println (format "Elasticsearch is restored from snapshot %s" snapshot-id)))))))
+         ))))
 
 (defn -main
   "I don't do a whole lot ... yet."
