@@ -252,6 +252,10 @@
                 jobs (make-batches 1000 :phenotype eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :picture/id)
+                jobs (make-batches 1000 :picture eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :position-matrix/id)
                 jobs (make-batches 1000 :position-matrix eids)]
             (doseq [job jobs]

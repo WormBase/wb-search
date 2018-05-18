@@ -27,6 +27,7 @@
             [wb-es.datomic.data.person :as person]
             [wb-es.datomic.data.pcr-product :as pcr-product]
             [wb-es.datomic.data.phenotype :as phenotype]
+            [wb-es.datomic.data.picture :as picture]
             [wb-es.datomic.data.position-matrix :as position-matrix]
             [wb-es.datomic.data.protein :as protein]
             [wb-es.datomic.data.pseudogene :as pseudogene]
@@ -76,6 +77,7 @@
            :person/id person/->Person
            :pcr-product/id pcr-product/->Pcr-product
            :phenotype/id phenotype/->Phenotype
+           :picture/id picture/->Picture
            :position-matrix/id position-matrix/->Position-matrix
            :protein/id protein/->Protein
            :pseudogene/id pseudogene/->Pseudogene
