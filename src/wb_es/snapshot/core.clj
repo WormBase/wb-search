@@ -38,9 +38,13 @@
   [repository-name release-id]
   (let [pattern (re-pattern (format "snapshot_%s(_v(\\d+))?" release-id))
         current-id (get-lateset-snapshot-id repository-name release-id)
-        [_ _ version-id] (re-matches pattern current-id)]
-    (format "snapshot_%s_v%s" release-id (or (+ 1 (Integer. version-id))
-                                             0))))
+        next-version-id (if current-id
+                          (->> (re-matches pattern current-id)
+                               (last)
+                               (Integer.)
+                               (+ 1))
+                          0)]
+    (format "snapshot_%s_v%s" release-id next-version-id)))
 
 (defn save-snapshot
   [index-id repository-name snapshot-id]
