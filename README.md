@@ -42,22 +42,61 @@ You will need to set the following environment variables:
 - AWS_SECRET_ACCESS_KEY
 - WB_DB_URI
 
+## Production environment
+
+Ensure the environment variables above are set appropriately before preceeding.
+
+### Deploy Indexer
+```
+(cd eb/indexer/ && make eb-create)
+```
+- Indexer is programmed to save a snapshot of the index to the snapshot repository on S3 when it finishes indexing. [Read more](#step-2-create-index-snapshot)
+- Remember to manually shut down beanstalk instance after the indexer finishes running and a snapshot is saved.
+
+
+### Deploy Web API
+```
+(cd eb/default/ && make eb-create)
+```
+
+To make a production-like environment locally, `(cd eb/default/ && make eb-local-run)`.
+
 ## Development environment
 
-Start Elasticsearch (refer to "Steps to build and depoloy search")
+Start Elasticsearch:
+
+- refer to [Step 0: Start Elasticsearch](#step-0-start-elasticsearch)
+
+Run indexer if necessary:
+
+- refer to [Step 1: Build index](#step-1-build-index)
 
 Starting web API for development:
 ```
 lein trampoline ring server-headless [port]
 ```
+- If no index of the appropriate version is found locally, it will attempt to restore the index from the snapshot repository on s3.
 
 Starting automated tests:
 ```
 lein trampoline test-refresh
 ```
 
+## Release containers
 
-## Steps to build and depoloy search
+_Note: a release of containers *may not* be necessary for every WS release. In general, we only need to release containers when source code changes._
+
+```
+make aws-ecr-login
+lein release [$LEVEL]
+```
+
+- [Learn more about release levels](https://github.com/technomancy/leiningen/blob/master/doc/DEPLOY.md#releasing-simplified)
+- [Learn more about the custom release steps](https://github.com/WormBase/wb-search/blob/develop/project.clj)
+
+
+## (Optional) Build and depoloy search *manually*
+_Not recommended except for development and troubleshooting_
 
 ### Step 0: Start Elasticsearch
 #### Start Elasticsearch from our custom Docker image for Elasticsearch
@@ -124,7 +163,7 @@ Containers run by Beanstalk are first build, tagged, and commited to AWS Contain
 Two containers needs to be prepared: Elasticsearch and the Web API.
 
 ```
-aws ecr get-login --no-include-email --region us-east-1   #and follow the instructions to login
+make aws-ecr-login
 ```
 
 For Elasticsearch:
