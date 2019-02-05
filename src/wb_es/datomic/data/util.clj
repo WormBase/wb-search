@@ -152,10 +152,12 @@
 (defmethod obj-label "do-term" [_ term]
   (:do-term/name term))
 
+(defmethod obj-label "author" [_ author]
+  (:author/id author))
+
 (defmethod obj-label "person" [_ person]
- (or (:person/standard-name person)
-     (or (:author/id (first (:person/possibly-publishes-as person)))
-         (:person/id person))))
+  (or (:person/standard-name person)
+      (:person/id person)))
 
 (defmethod obj-label "construct" [_ cons]
   (or (first (:construct/public-name cons))
@@ -287,9 +289,7 @@
      {:id ((keyword class "id") obj)
       :label (or label (obj-label class obj))
       :class (if class
-               (if (= class "author")
-                 "person"
-                 (clojure.string/replace class "-" "_")))})))
+               (clojure.string/replace class "-" "_"))})))
 
 
 ;;

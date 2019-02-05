@@ -3,12 +3,12 @@
             [wb-es.datomic.data.util :as data-util]))
 
 (defn pack-author [author-holder]
-  (or
-   (->> (:affiliation/person author-holder)
-        (first)
-        (data-util/pack-obj))
-   (-> (:paper.author/author author-holder)
-       (data-util/pack-obj))))
+  (let [author (:paper.author/author author-holder)
+        person (first (:affiliation/person author-holder))]
+    (if person
+      (-> (obj/pack-obj person)
+          (assoc :label (:author/id author)))
+      (obj/pack-obj author))))
 
 (deftype Paper [entity]
   data-util/Document
