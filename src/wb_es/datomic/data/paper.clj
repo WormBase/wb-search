@@ -6,9 +6,9 @@
   (let [author (:paper.author/author author-holder)
         person (first (:affiliation/person author-holder))]
     (if person
-      (-> (obj/pack-obj person)
+      (-> (data-util/pack-obj person)
           (assoc :label (:author/id author)))
-      (obj/pack-obj author))))
+      (data-util/pack-obj author))))
 
 (deftype Paper [entity]
   data-util/Document
