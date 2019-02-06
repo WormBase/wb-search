@@ -69,7 +69,7 @@
         {
             "name": "search-indexer",
             "image": "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-indexer:0.2.15",
-            "essential": true,
+            "essential": false,
 	    "links": ["elasticsearch"],
 	    "environment": [
 		{
