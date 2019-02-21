@@ -34,7 +34,9 @@ docker-build-aws-es:
 
 .PHONY: docker-run-aws-es
 docker-run-aws-es:
-	@docker run -p 9200:9200 wormbase/aws-elasticsearch \
+	@docker run -p 9200:9200 \
+		-v /var/lib/elasticsearch/data:/usr/share/elasticsearch/data \
+		wormbase/aws-elasticsearch \
 		-Des.cloud.aws.access_key=${AWS_ACCESS_KEY_ID} \
 		-Des.cloud.aws.secret_key=${AWS_SECRET_ACCESS_KEY}
 
