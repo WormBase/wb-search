@@ -36,11 +36,12 @@
   (do
     (let [index-url (format "%s/%s" es-base-url index-name)]
       (do
-        (try
-          (http/delete index-url)
-          (catch clojure.lang.ExceptionInfo e
-            (prn "failed to delete index.")
-            (prn e)))
+        (if (http/get index-url)
+          (try
+            (http/delete index-url)
+            (catch clojure.lang.ExceptionInfo e
+              (prn "failed to delete index.")
+              (prn e))))
         (http/put index-url {:headers {:content-type "application/json"}
                              :body (->> (assoc-in mappings/index-settings [:settings :number_of_shards] 1)
                                         (json/generate-string))})
@@ -160,9 +161,9 @@
                           (= "Parkinson's disease"
                              (get-in hit [:_source :label])))
                         hits)))
-            (testing "matching early-onset Parkinson disease"
+            (testing "matching early-onset Parkinson's disease"
               (is (some (fn [hit]
-                          (= "early-onset Parkinson disease"
+                          (= "early-onset Parkinson's disease"
                              (get-in hit [:_source :label])))
                         hits)))
             (testing "X-linked dystonia-parkinsonism"
