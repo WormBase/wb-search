@@ -36,12 +36,12 @@
   (do
     (let [index-url (format "%s/%s" es-base-url index-name)]
       (do
-        (if (http/get index-url)
-          (try
-            (http/delete index-url)
-            (catch clojure.lang.ExceptionInfo e
-              (prn "failed to delete index.")
-              (prn e))))
+        (try
+          (http/delete index-url)
+          (catch clojure.lang.ExceptionInfo e
+            (if-not (= (:status (ex-data e))
+                       404)
+              (prn "failed to delete index." (ex-data e)))))
         (http/put index-url {:headers {:content-type "application/json"}
                              :body (->> (assoc-in mappings/index-settings [:settings :number_of_shards] 1)
                                         (json/generate-string))})
