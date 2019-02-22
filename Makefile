@@ -10,7 +10,7 @@ docker-build-web: uberjar-build-web
 
 .PHONY: docker-run-web
 docker-run-web:
-	docker run -p 3000:3000 -e WB_DB_URI=${WB_DB_URI} wormbase/search-web-api
+	docker run -p 9006:3000 -e WB_DB_URI=${WB_DB_URI} wormbase/search-web-api
 
 .PHONY: uberjar-build-indexer
 uberjar-build-indexer:
