@@ -102,10 +102,11 @@
        )
   )
 
-(defn run [& {:keys [db index-revision-number]
+(defn run [& {:keys [db index-revision-number index-id]
               :or {db (d/db datomic-conn)
-                   index-revision-number 0}}]
-  (let [index-id (format "%s_v%s" release-id index-revision-number)]
+                   index-revision-number 0
+                   index-id (format "%s_v%s" release-id index-revision-number)}}]
+  (let []
     (do
       (create-index index-id :default-index (= index-revision-number 0))
       (let [n-threads 4
