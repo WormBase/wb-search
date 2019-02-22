@@ -10,7 +10,7 @@
                         :copy_to "other"}
                 :class {:type "keyword"}}})
 
-(def generic-mapping
+(def default-mapping
   {:properties
    {:wbid {:type "keyword"
            :normalizer "lowercase_normalizer"
@@ -86,6 +86,9 @@
     :phenotype (ref-mapping)
     :strain (ref-mapping)
     ;; end of refs
+
+    :join {:type "join"
+           :relations {"interaction_group" "interaction"}}
     }})
 
 (def index-settings
@@ -113,7 +116,7 @@
                           "split_underscore_analyzer"
                           {:char_filter ["replace_underscore"]
                            :tokenizer "standard"}}}}
-   :mappings {:_doc generic-mapping}})
+   :mappings {:_doc default-mapping}})
 
 (defn create-index
   ([index & {:keys [default-index delete-existing]}]

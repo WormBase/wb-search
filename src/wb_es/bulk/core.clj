@@ -73,8 +73,8 @@
   "turn a list datomic entity ids to batches of the given size.
   attach some metadata for debugging"
   ([eids] (make-batches 500 nil eids))
-  ([batch-size order-info eids] (make-batches batch-size order-info "index" eids))
-  ([batch-size order-info action eids]
+  ([batch-size scope eids] (make-batches batch-size scope "index" eids))
+  ([batch-size scope action eids]
    (->> eids
         (sort-by (fn [param]
                    (if (sequential? param)
@@ -82,7 +82,7 @@
                      (identity param))))
         (partition batch-size batch-size [])
         (map (fn [batch]
-               (with-meta batch {:order order-info
+               (with-meta batch {:scope scope
                                  :action action
                                  :size (count batch)
                                  :start (first batch)
@@ -96,7 +96,7 @@
               (if (sequential? param)
                 (let [[eid & other-params] param]
                   (apply create-document (d/entity db eid) other-params))
-                (create-document (d/entity db param)))))
+                (create-document (:scope (meta batch)) (d/entity db param)))))
        (format-bulk (:action (meta batch)))
        ((fn [formatted-bulk]
           (submit formatted-bulk :index index)))

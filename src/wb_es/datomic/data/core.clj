@@ -46,52 +46,56 @@
 
 (defn create-document
   "returns document of the desirable type"
-  ([entity]
+  ([entity] (let [scope (->> (data-util/get-ident-attr entity)
+                             (namespace)
+                             (keyword))]
+              (create-document entity scope)))
+  ([scope entity]
    (let [constructor-function
-         (case (data-util/get-ident-attr entity)
-           :analysis/id analysis/->Analysis
-           :anatomy-term/id anatomy-term/->Anatomy-term
-           :antibody/id antibody/->Antibody
-           :cds/id cds/->Cds
-           :clone/id clone/->Clone
-           :construct/id construct/->Construct
-           :do-term/id do-term/->Do-term
-           :expression-cluster/id expression-cluster/->Expression-cluster
-           :expr-pattern/id expr-pattern/->Expr-pattern
-           :expr-profile/id expr-profile/->Expr-profile
-           :feature/id feature/->Feature
-           :gene/id gene/->Gene
-           :gene-class/id gene-class/->Gene-class
-           :go-term/id go-term/->Go-term
-           :gene-cluster/id gene-cluster/->Gene-cluster
-           :homology-group/id homology-group/->Homology-group
-           :interaction/id interaction/->Interaction
-           :laboratory/id laboratory/->Laboratory
-           :life-stage/id life-stage/->Life-stage
-           :molecule/id molecule/->Molecule
-           :microarray-results/id microarray-results/->Microarray-results
-           :motif/id motif/->Motif
-           :oligo/id oligo/->Oligo
-           :operon/id operon/->Operon
-           :paper/id paper/->Paper
-           :person/id person/->Person
-           :pcr-product/id pcr-product/->Pcr-product
-           :phenotype/id phenotype/->Phenotype
-           :picture/id picture/->Picture
-           :position-matrix/id position-matrix/->Position-matrix
-           :protein/id protein/->Protein
-           :pseudogene/id pseudogene/->Pseudogene
-           :rearrangement/id rearrangement/->Rearrangement
-           :rnai/id rnai/->Rnai
-           :sequence/id sequence/->Sequence
-           :strain/id strain/->Strain
-           :structure-data/id structure-data/->Structure-data
-           :transcript/id transcript/->Transcript
-           :transgene/id transgene/->Transgene
-           :transposon/id transposon/->Transposon
-           :transposon-family/id transposon-family/->Transposon-family
-           :variation/id variation/->Variation
-           :wbprocess/id wbprocess/->Wbprocess
+         (case scope
+           :analysis analysis/->Analysis
+           :anatomy-term anatomy-term/->Anatomy-term
+           :antibody antibody/->Antibody
+           :cds cds/->Cds
+           :clone clone/->Clone
+           :construct construct/->Construct
+           :do-term do-term/->Do-term
+           :expression-cluster expression-cluster/->Expression-cluster
+           :expr-pattern expr-pattern/->Expr-pattern
+           :expr-profile expr-profile/->Expr-profile
+           :feature feature/->Feature
+           :gene gene/->Gene
+           :gene-class gene-class/->Gene-class
+           :go-term go-term/->Go-term
+           :gene-cluster gene-cluster/->Gene-cluster
+           :homology-group homology-group/->Homology-group
+           :interaction interaction/->Interaction
+           :laboratory laboratory/->Laboratory
+           :life-stage life-stage/->Life-stage
+           :molecule molecule/->Molecule
+           :microarray-results microarray-results/->Microarray-results
+           :motif motif/->Motif
+           :oligo oligo/->Oligo
+           :operon operon/->Operon
+           :paper paper/->Paper
+           :person person/->Person
+           :pcr-product pcr-product/->Pcr-product
+           :phenotype phenotype/->Phenotype
+           :picture picture/->Picture
+           :position-matrix position-matrix/->Position-matrix
+           :protein protein/->Protein
+           :pseudogene pseudogene/->Pseudogene
+           :rearrangement rearrangement/->Rearrangement
+           :rnai rnai/->Rnai
+           :sequence sequence/->Sequence
+           :strain strain/->Strain
+           :structure-data structure-data/->Structure-data
+           :transcript transcript/->Transcript
+           :transgene transgene/->Transgene
+           :transposon transposon/->Transposon
+           :transposon-family transposon-family/->Transposon-family
+           :variation variation/->Variation
+           :wbprocess wbprocess/->Wbprocess
            (throw (Exception. "Not sure how to handle the data type. Throw an error to let you know")))]
      (let [document (constructor-function entity)
            doc-data (.data document)
