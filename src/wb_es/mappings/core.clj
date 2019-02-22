@@ -10,7 +10,7 @@
                 :label {:type "string"}
                 :class {:type "string"}}})
 
-(def generic-mapping
+(def default-mapping
   {:properties
    {:wbid {:type "string"
            :analyzer "keyword_ignore_case"
@@ -74,7 +74,10 @@
                           "keyword_ignore_case" {:type "custom"
                                                  :tokenizer "keyword"
                                                  :filter ["lowercase"]}}}}
-   :mappings {:generic generic-mapping}})
+   :mappings {:_default_ default-mapping
+              :generic {}
+              :interaction_group {}
+              :interaction {:_parent {:type "interaction_group"}}}})
 
 (defn create-index
   ([index & {:keys [default-index]}]

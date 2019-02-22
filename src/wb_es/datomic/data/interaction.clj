@@ -47,7 +47,15 @@
 
 (deftype Interaction [entity]
   data-util/Document
-  (metadata [this] (data-util/default-metadata entity))
+  (metadata [this] (assoc (data-util/default-metadata entity)
+                     :_type "interaction"
+                     :_parent (->> entity
+                                   (:interaction/interactor-overlapping-gene)
+                                   (map :interaction.interactor-overlapping-gene/gene)
+                                   (map :db/id)
+                                   (sort)
+                                   (map str)
+                                   (clojure.string/join ":"))))
   (data [this]
     {:wbid (:interaction/id entity)
      :label (get-label entity)

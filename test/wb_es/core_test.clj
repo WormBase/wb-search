@@ -60,9 +60,9 @@
   (let [formatted-docs (bulk/format-bulk "update" "test" docs)]
     (bulk/submit formatted-docs :refresh true)))
 
-(defn index-datomic-entity [& entities]
+(defn index-datomic-entity [scope & entities]
   (->> entities
-       (map create-document)
+       (map #(create-document scope %))
        (apply index-doc)))
 
 (defn web-query
@@ -84,7 +84,7 @@
   (testing "server using correct index"
     (let [db (d/db datomic-conn)]
       (do
-        (index-datomic-entity (d/entity db [:gene/id "WBGene00000904"]))
+        (index-datomic-entity :gene (d/entity db [:gene/id "WBGene00000904"]))
         (let [hit (-> (search "WBGene00000904")
                       (get-in [:hits :hits 0]))]
           (is (= "WBGene00000904" (get-in hit [:_source :wbid])))
@@ -105,7 +105,7 @@
                                    (map (partial d/entity db))
                                    (shuffle))]
       (do
-        (apply index-datomic-entity anatomy-tl-prefixed)
+        (apply index-datomic-entity :anatomy-term anatomy-tl-prefixed)
         (testing "autocomplete by term"
           (let [hits (-> (autocomplete "tl")
                          (get-in [:hits :hits]))]
@@ -124,7 +124,7 @@
   (let [db (d/db datomic-conn)]
     (testing "clone type using W02C12 as example"
       (do
-        (index-datomic-entity (d/entity db [:clone/id "W02C12"]))
+        (index-datomic-entity :clone (d/entity db [:clone/id "W02C12"]))
         (testing "search by clone WBID"
           (let [first-hit (->> (search "W02C12")
                                :hits
@@ -153,7 +153,7 @@
                              (shuffle))]
       (testing "autocomplete by disease name"
         (do
-          (apply index-datomic-entity disease-parks)
+          (apply index-datomic-entity :do-term disease-parks)
           (let [hits (-> (autocomplete "park" {:size (count disease-parks)})
                          (get-in [:hits :hits]))]
 
@@ -175,7 +175,7 @@
 
             )))
       (testing "search by do-term synonym"
-        (apply index-datomic-entity disease-parks)
+        (apply index-datomic-entity :do-term disease-parks)
         (let [hits (-> (search "paralysis agitans")
                        (get-in [:hits :hits]))]
           (is (some (fn [hit]
@@ -190,7 +190,7 @@
                     hits))))
 
       (testing "search with page_type do_term"
-        (apply index-datomic-entity disease-parks)
+        (apply index-datomic-entity :do-term disease-parks)
         (let [hits (search nil {:type "disease"})]
           (is (= "disease"
                  (get-in hits [:hits :hits 0 :_source :page_type]))))))
@@ -200,7 +200,7 @@
   (testing "go-term with creatine biosynthetic process as example"
     (let [db (d/db datomic-conn)]
       (do
-        (index-datomic-entity (d/entity db [:go-term/id "GO:0006601"]))
+        (index-datomic-entity :go-term (d/entity db [:go-term/id "GO:0006601"]))
         (testing "search for go-term by alias"
           (is (some (fn [hit]
                       (= "GO:0006601"
@@ -209,11 +209,35 @@
                         (get-in [:hits :hits]))))))
       )))
 
+(deftest interaction-type-test
+  (testing "interaction let-23 : lin-7 as example"
+    (let [db (d/db datomic-conn)
+          interactions (->> (d/q '[:find [?int ...]
+                                   :in $ ?g
+                                   :where
+                                   [?inth :interaction.interactor-overlapping-gene/gene ?g]
+                                   [?int :interaction/interactor-overlapping-gene ?inth]]
+                                 db
+                                 [:gene/id "WBGene00002996"])
+                            (map #(d/entity db %)))]
+      (do
+        (apply index-datomic-entity :interaction interactions)
+        (testing "search for interactions"
+          (let [hits (-> (search "lin-7" {:type "interaction" :size (count interactions)})
+                         (get-in [:hits :hits]))]
+            (testing "find some interaction"
+              (is (some (fn [hit]
+                          (= "WBInteraction000009401"
+                             (get-in hit [:_source :wbid])))
+                        hits))
+              ))))
+      )))
+
 (deftest paper-type-test
   (testing "paper with long title not captured by brief citation"
     (let [db (d/db datomic-conn)]
       (do
-        (index-datomic-entity (d/entity db [:paper/id "WBPaper00004490"]))
+        (index-datomic-entity :paper (d/entity db [:paper/id "WBPaper00004490"]))
         (testing "search for paper by its long title"
           (let [hits (-> (search "FOG-2, a novel F-box containing protein, associates with the GLD-1 RNA binding protein and directs male sex determination in the C. elegans hermaphrodite germline."
                                  {:type "paper"})
@@ -228,8 +252,8 @@
   (testing "phenotype with locomotion variant as example"
     (let [db (d/db datomic-conn)]
       (do
-        (index-datomic-entity (d/entity db [:phenotype/id "WBPhenotype:0000643"])
-                              (d/entity db [:gene-class/id "unc"]))
+        (index-datomic-entity :phenotype (d/entity db [:phenotype/id "WBPhenotype:0000643"]))
+        (index-datomic-entity :gene-class (d/entity db [:gene-class/id "unc"]))
         (testing "search for phenotype by alias"
           (is (->> (get-in (search "unc") [:hits :hits])
                    (some (fn [hit]
@@ -261,7 +285,7 @@
 
       (testing "autocompletion by transgene name"
         (do
-          (apply index-datomic-entity transgenes-prefixed-syis1))
+          (apply index-datomic-entity :transgene transgenes-prefixed-syis1))
           (let [hits (-> (autocomplete "syIs1")
                          (get-in [:hits :hits]))]
             (testing "result appears in autocompletion"
@@ -275,7 +299,7 @@
 
       (testing "autocompletion by transgene name in lowercase"
         (do
-          (apply index-datomic-entity transgenes-prefixed-syis1)
+          (apply index-datomic-entity :transgene transgenes-prefixed-syis1)
           (let [hits (-> (autocomplete "syis1")
                          (get-in [:hits :hits]))]
             (is (some (fn [hit]
@@ -288,7 +312,7 @@
   (testing "pcr-product is searchable by page_type pcr_oligo"
     (let [db (d/db datomic-conn)]
       (do
-        (index-datomic-entity (d/entity db [:pcr-product/id "sjj_ZK822.2"]))
+        (index-datomic-entity :pcr-product (d/entity db [:pcr-product/id "sjj_ZK822.2"]))
         (let [hit (-> (search "sjj_ZK822.2" {:type "pcr_oligo"})
                       (get-in [:hits :hits 0 :_source]))]
           (= "sjj_ZK822.2" (:wbid hit))
