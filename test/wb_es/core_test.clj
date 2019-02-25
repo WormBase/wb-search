@@ -2,6 +2,7 @@
   (:require
    [cheshire.core :as json]
    [clj-http.client :as http]
+   [clojure.pprint :refer [pprint]]
    [clojure.test :refer :all]
    [datomic.api :as d]
    [mount.core :as mount ]
@@ -206,6 +207,21 @@
                          (get-in hit [:_source :wbid])))
                     (-> (search "creatine synthesis")
                         (get-in [:hits :hits]))))))
+      )))
+
+(deftest paper-type-test
+  (testing "paper with long title not captured by brief citation"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:paper/id "WBPaper00004490"]))
+        (testing "search for paper by its long title"
+          (let [hits (-> (search "FOG-2, a novel F-box containing protein, associates with the GLD-1 RNA binding protein and directs male sex determination in the C. elegans hermaphrodite germline."
+                                 {:type "paper"})
+                         (get-in [:hits :hits]))]
+            (is (some (fn [hit]
+                        (= "WBPaper00004490"
+                           (get-in hit [:_source :wbid])))
+                      hits)))))
       )))
 
 (deftest phenotype-type-test
