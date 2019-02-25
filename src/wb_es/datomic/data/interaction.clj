@@ -45,20 +45,32 @@
            1 (format "Interaction involving %s" (first %))
            (clojure.string/join " : " %)))))
 
+(defn interaction-group-id [entity]
+  (->> entity
+       (:interaction/interactor-overlapping-gene)
+       (map :interaction.interactor-overlapping-gene/gene)
+       (map :db/id)
+       (sort)
+       (map str)
+       (clojure.string/join ":")))
+
 (deftype Interaction [entity]
   data-util/Document
   (metadata [this] (assoc (data-util/default-metadata entity)
                      :_type "interaction"
-                     :_parent (->> entity
-                                   (:interaction/interactor-overlapping-gene)
-                                   (map :interaction.interactor-overlapping-gene/gene)
-                                   (map :db/id)
-                                   (sort)
-                                   (map str)
-                                   (clojure.string/join ":"))))
+                     :_parent (interaction-group-id entity)))
   (data [this]
     {:wbid (:interaction/id entity)
      :label (get-label entity)
      :description (->> (:interaction/interaction-summary entity)
                        (first)
                        (:interaction.interaction-summary/text))}))
+
+(deftype Interaction-group [entity]
+  data-util/Document
+  (metadata [this] (assoc (data-util/default-metadata entity)
+                     :_type "interaction_group"
+                     :_id (interaction-group-id entity)))
+  (data [this]
+    {:page_type "interaction_group"
+     :label (get-label entity)}))

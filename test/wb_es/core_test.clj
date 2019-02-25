@@ -338,15 +338,21 @@
                             (map #(d/entity db %)))]
       (do
         (apply index-datomic-entity :interaction interactions)
+        (apply index-datomic-entity :interaction-group interactions)
         (testing "search for interactions"
-          (let [hits (-> (search "lin-7" {:type "interaction" :size (count interactions)})
-                         (get-in [:hits :hits]))]
+          (let [interaction-hits (-> (search "lin-7" {:type "interaction" :size (count interactions)})
+                                     (get-in [:hits :hits]))
+                interaction-group-hits (-> (search nil {:type "interaction_group" :size (count interactions)})
+                                           (get-in [:hits :hits]))]
             (testing "find some interaction"
               (is (some (fn [hit]
                           (= "WBInteraction000009401"
                              (get-in hit [:_source :wbid])))
-                        hits))
-              ))))
+                        interaction-hits))
+              (clojure.pprint/pprint interaction-group-hits)
+              )
+            (testing "fewer interaction groups than interactions"
+              (is (< (count interaction-group-hits) (count interaction-hits)))))))
       )))
 
 (deftest paper-type-test
