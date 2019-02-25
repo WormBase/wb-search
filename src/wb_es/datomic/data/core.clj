@@ -70,6 +70,7 @@
            :gene-cluster gene-cluster/->Gene-cluster
            :homology-group homology-group/->Homology-group
            :interaction interaction/->Interaction
+           :interaction-group interaction/->Interaction-group
            :laboratory laboratory/->Laboratory
            :life-stage life-stage/->Life-stage
            :molecule molecule/->Molecule
