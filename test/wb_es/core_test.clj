@@ -174,6 +174,21 @@
                         hits)))
 
             )))
+
+      (testing "search by some word from the full name"
+        (let [hits (-> (search "parkinson")
+                       (get-in [:hits :hits]))]
+          (is (some (fn [hit]
+                      (= "Parkinson's disease"
+                         (get-in hit [:_source :label])))
+                    hits)))
+        (let [hits (-> (search "early onset parkinson")
+                       (get-in [:hits :hits]))]
+          (is (some (fn [hit]
+                      (= "early-onset Parkinson's disease"
+                         (get-in hit [:_source :label])))
+                    hits))))
+
       (testing "search by do-term synonym"
         (apply index-datomic-entity disease-parks)
         (let [hits (-> (search "paralysis agitans")

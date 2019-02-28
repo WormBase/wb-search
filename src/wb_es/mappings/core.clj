@@ -5,51 +5,46 @@
 
 (defn ref-mapping []
   {:type "nested"
-   :properties {:id {:type "string"
-                     :analyzer "keyword"}
-                :label {:type "string"}
-                :class {:type "string"}}})
+   :properties {:id {:type "keyword"}
+                :label {:type "text"}
+                :class {:type "keyword"}}})
 
 (def generic-mapping
   {:properties
-   {:wbid {:type "string"
-           :analyzer "keyword_ignore_case"
-           :include_in_all false
-           :fields {:autocomplete_keyword {:type "string"
-                                           :analyzer "autocomplete"
-                                           :search_analyzer "keyword_ignore_case"}}}
+   {:wbid {:type "keyword"
+           :normalizer "lowercase_normalizer"
+           :fields {:autocomplete_keyword {:type "text"
+                                           :analyzer "autocomplete_keyword"
+                                           :search_analyzer "keyword_ignore_case"
+                                           }}
+           }
 
-    :label {:type "string"
-            :include_in_all false
-            :fields {:raw {:type "string"
-                           :analyzer "keyword_ignore_case"}
-                     :autocomplete {:type "string"
+    :label {:type "text"
+            :fields {:raw {:type "keyword"}
+                     :autocomplete {:type "text"
                                     :analyzer "autocomplete"
                                     :search_analyzer "standard"}
 
                      ;; autocomplete analyzer will handle gene name like unc-22 as phase search,
                      ;; seeems sufficient for now, no need for autocomplete_keyword analyzer
-                     :autocomplete_keyword {:type "string"
+                     :autocomplete_keyword {:type "text"
                                             :analyzer "autocomplete_keyword"
                                             :search_analyzer "keyword_ignore_case"}
                      }
             }
-    :other_unique_ids {:type "string"
-                       :analyzer "keyword_ignore_case"
-                       :include_in_all false}
-    :other_names {:type "string"
-                  :include_in_all false
-                  :analyzer "keyword_ignore_case"}
-    :page_type {:type "string"
-                :analyzer "keyword_ignore_case"}
-    :paper_type {:type "string"
-                 :analyzer "keyword_ignore_case"}
+    :other_unique_ids {:type "keyword"
+                       :normalizer "lowercase_normalizer"}
+    :other_names {:type "text"}
+    :page_type {:type "keyword"
+                :normalizer "lowercase_normalizer"}
+    :paper_type {:type "keyword"
+                 :normalizer "lowercase_normalizer"}
     :species {:properties
-              {:key {:type "string"
-                     :analyzer "keyword_ignore_case"}
-               :name {:type "string"}}}
+              {:key {:type "keyword"
+                     :normalizer "lowercase_normalizer"}
+               :name {:type "text"}}}
 
-    :genotype {:type "string"}
+    :genotype {:type "text"}
 
     ;; start of refs
     :allele (ref-mapping)
@@ -65,6 +60,9 @@
    {:analysis {:filter {"autocomplete_filter" {:type "edge_ngram"
                                                :min_gram 2
                                                :max_gram 20}}
+               :normalizer {"lowercase_normalizer" {:type "custom"
+                                                    :char_filter []
+                                                    :filter ["lowercase"]}}
                :analyzer {"autocomplete" {:type "custom"
                                           :tokenizer "standard"
                                           :filter ["lowercase" "autocomplete_filter"]}
@@ -74,7 +72,11 @@
                           "keyword_ignore_case" {:type "custom"
                                                  :tokenizer "keyword"
                                                  :filter ["lowercase"]}}}}
-   :mappings {:generic generic-mapping}})
+   :mappings {:_default_ default-mapping
+              :generic {}
+              ;; :interaction_group {}
+              ;; :interaction {:_parent {:type "interaction_group"}}
+              }})
 
 (defn create-index
   ([index & {:keys [default-index delete-existing]}]
