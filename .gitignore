@@ -14,3 +14,6 @@ pom.xml.asc
 **/.elasticbeanstalk/*
 !**/.elasticbeanstalk/*.cfg.yml
 !**/.elasticbeanstalk/*.global.yml
+
+# emacs
+*~
