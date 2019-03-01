@@ -54,6 +54,10 @@
     :strain (ref-mapping)
     ;; end of refs
 
+    ;; for interaction only
+    :method {:type "keyword"
+             :normalizer "lowercase_normalizer"}
+
     :join {:type "join"
            :relations {"interaction_group" "interaction"}}
     }})

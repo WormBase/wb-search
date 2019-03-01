@@ -239,7 +239,7 @@
         (apply index-datomic-entity :interaction-group interactions)
         (apply index-datomic-entity :interaction interactions)
         (testing "search for interactions"
-          (let [interaction-hits (-> (search "lin-7" {:type "interaction" :size (count interactions)})
+          (let [interaction-hits (-> (search nil {:type "interaction" :size (count interactions)})
                                      (get-in [:hits :hits]))
                 interaction-group-hits (-> (search nil {:type "interaction_group" :size (count interactions)})
                                            (get-in [:hits :hits]))]
@@ -247,8 +247,24 @@
               (is (some (fn [hit]
                           (= "WBInteraction000009401"
                              (get-in hit [:_source :wbid])))
-                        interaction-hits))
-              )
+                        interaction-hits)))
+            (->>
+             (try
+               (http/post (format "%s/%s/_search" es-base-url index-name)
+                        {:headers {:content-type "application/json"}
+                         :body (->> {:query {:term {:method :physical}}
+                                     :size 0
+                                     :aggs {:methods
+                                            {:terms {:field "method"}
+                                             :aggs {:to-interaction-groups
+                                                    {:parent {:type "interaction"}}}}}}
+                                    (json/generate-string))})
+               (catch clojure.lang.ExceptionInfo e
+                 (clojure.pprint/pprint (ex-data e))
+                 (throw e)))
+             (:body)
+             (json/parse-string)
+             (clojure.pprint/pprint))
             (testing "fewer interaction groups than interactions"
               (is (< (count interaction-group-hits) (count interaction-hits)))))))
       )))
