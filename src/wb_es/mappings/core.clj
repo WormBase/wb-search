@@ -72,11 +72,7 @@
                           "keyword_ignore_case" {:type "custom"
                                                  :tokenizer "keyword"
                                                  :filter ["lowercase"]}}}}
-   :mappings {:_default_ default-mapping
-              :generic {}
-              ;; :interaction_group {}
-              ;; :interaction {:_parent {:type "interaction_group"}}
-              }})
+   :mappings {:_doc default-mapping}})
 
 (defn create-index
   ([index & {:keys [default-index]}]
