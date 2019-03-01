@@ -53,6 +53,9 @@
     :phenotype (ref-mapping)
     :strain (ref-mapping)
     ;; end of refs
+
+    :join {:type "join"
+           :relations {"interaction_group" "interaction"}}
     }})
 
 (def index-settings
