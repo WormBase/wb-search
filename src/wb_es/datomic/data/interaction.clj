@@ -57,20 +57,22 @@
 (deftype Interaction [entity]
   data-util/Document
   (metadata [this] (assoc (data-util/default-metadata entity)
-                     :_type "interaction"
-                     :_parent (interaction-group-id entity)))
+                     :_routing (interaction-group-id entity)))
   (data [this]
     {:wbid (:interaction/id entity)
      :label (get-label entity)
      :description (->> (:interaction/interaction-summary entity)
                        (first)
-                       (:interaction.interaction-summary/text))}))
+                       (:interaction.interaction-summary/text))
+     :join {:name "interaction"
+            :parent (interaction-group-id entity)}
+     }))
 
 (deftype Interaction-group [entity]
   data-util/Document
   (metadata [this] (assoc (data-util/default-metadata entity)
-                     :_type "interaction_group"
                      :_id (interaction-group-id entity)))
   (data [this]
     {:page_type "interaction_group"
-     :label (get-label entity)}))
+     :label (get-label entity)
+     :join {:name "interaction_group"}}))
