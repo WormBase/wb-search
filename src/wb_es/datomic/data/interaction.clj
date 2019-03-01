@@ -60,10 +60,15 @@
                      :_routing (interaction-group-id entity)))
   (data [this]
     {:wbid (:interaction/id entity)
-     :label (get-label entity)
+;     :label (get-label entity)
      :description (->> (:interaction/interaction-summary entity)
                        (first)
                        (:interaction.interaction-summary/text))
+     :method (->> (:interaction/type entity)
+                  (map (fn [t]
+                         (-> (name t)
+                             (clojure.string/split #":")
+                             (first)))))
      :join {:name "interaction"
             :parent (interaction-group-id entity)}
      }))
