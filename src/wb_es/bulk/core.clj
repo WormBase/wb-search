@@ -11,6 +11,7 @@
             [wb-es.datomic.db :refer [datomic-conn]]
             [wb-es.env :refer [es-base-url release-id]]
             [wb-es.mappings.core :refer [create-index]]
+            [wb-es.web.setup :refer [es-connect]]
             [wb-es.snapshot.core :refer [connect-snapshot-repository save-snapshot get-next-snapshot-id]]))
 
 (defn format-bulk
@@ -353,6 +354,7 @@
   "I don't do a whole lot ... yet."
   [& args]
   (do
+    (es-connect)
     (println "Indexer starting!")
     (mount/start)
     (if-let [index-revision-number (first args)]
