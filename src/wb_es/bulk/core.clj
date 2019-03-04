@@ -109,7 +109,9 @@
                    index-id (format "%s_v%s" release-id index-revision-number)}}]
   (let []
     (do
-      (create-index index-id :default-index (= index-revision-number 0))
+      (create-index index-id
+                    :default-index (= index-revision-number 0)
+                    :delete-existing true)
       (let [n-threads 4
             scheduler (chan n-threads)
             logger (chan n-threads)]

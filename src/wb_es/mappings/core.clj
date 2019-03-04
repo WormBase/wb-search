@@ -82,14 +82,23 @@
    :mappings {:_doc default-mapping}})
 
 (defn create-index
-  ([index & {:keys [default-index]}]
+  ([index & {:keys [default-index delete-existing]}]
      (let [index-url (format "%s/%s " es-base-url index)
            settings (if default-index
                       (assoc-in index-settings [:aliases release-id] {})
                       index-settings)]
-       (try
-         (http/put index-url {:headers {:content-type "application/json"}
-                              :body (json/generate-string settings)})
-         (catch clojure.lang.ExceptionInfo e
-           (clojure.pprint/pprint (ex-data e))
-           (throw e))))))
+       (do
+         (if delete-existing
+           (try
+             (http/delete index-url)
+             (catch clojure.lang.ExceptionInfo e
+               (if-not (= (:status (ex-data e))
+                          404)
+                 (clojure.pprint/pprint (ex-data e))))))
+         (try
+           (http/put index-url {:headers {:content-type "application/json"}
+                                :body (json/generate-string settings)})
+           (catch clojure.lang.ExceptionInfo e
+             (clojure.pprint/pprint (ex-data e))
+             (throw e))))
+       )))
