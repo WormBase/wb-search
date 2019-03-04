@@ -83,9 +83,13 @@
 
 (defn create-index
   ([index & {:keys [default-index]}]
-   (let [index-url (format "%s/%s " es-base-url index)
-         settings (if default-index
-                    (assoc-in index-settings [:aliases release-id] {})
-                    index-settings)]
-     (http/put index-url {:headers {:content-type "application/json"}
-                          :body (json/generate-string settings)}))))
+     (let [index-url (format "%s/%s " es-base-url index)
+           settings (if default-index
+                      (assoc-in index-settings [:aliases release-id] {})
+                      index-settings)]
+       (try
+         (http/put index-url {:headers {:content-type "application/json"}
+                              :body (json/generate-string settings)})
+         (catch clojure.lang.ExceptionInfo e
+           (clojure.pprint/pprint (ex-data e))
+           (throw e))))))
