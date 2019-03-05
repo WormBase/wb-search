@@ -212,6 +212,10 @@
                 jobs (make-batches 1000 :interaction eids)]
             (doseq [job jobs]
               (>!! scheduler job)))
+          (let [eids (get-eids-by-type db :interaction/id)
+                jobs (make-batches 1000 :interaction-group eids)]
+            (doseq [job jobs]
+              (>!! scheduler job)))
           (let [eids (get-eids-by-type db :laboratory/id)
                 jobs (make-batches 1000 :laboratory eids)]
             (doseq [job jobs]
