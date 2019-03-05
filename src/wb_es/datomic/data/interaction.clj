@@ -73,11 +73,25 @@
             :parent (interaction-group-id entity)}
      }))
 
+(defn get-shared-slims [entity]
+  (let [db (d/entity-db entity)
+        genes (->> entity
+                   (:interaction/interactor-overlapping-gene)
+                   (map :interaction.interactor-overlapping-gene/gene)
+                   (map :db/id))]
+    (if (> (count genes) 1)
+      (->> genes
+           (map #(data-util/get-slims-for-gene db %))
+           (map set)
+           (apply clojure.set/intersection)
+           (data-util/group-slims-by-aspect db)))))
+
 (deftype Interaction-group [entity]
   data-util/Document
   (metadata [this] (assoc (data-util/default-metadata entity)
                      :_id (interaction-group-id entity)))
   (data [this]
-    {:page_type "interaction_group"
-     :label (get-label entity)
-     :join {:name "interaction_group"}}))
+    (assoc (get-shared-slims entity)
+      :page_type "interaction_group"
+      :label (get-label entity)
+      :join {:name "interaction_group"})))

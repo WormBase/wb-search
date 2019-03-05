@@ -219,7 +219,6 @@
         (let [hit (-> (search "WBGene00002996")
                       (get-in [:hits :hits])
                       (first))]
-          (clojure.pprint/pprint hit)
           (testing "gene has the go slim terms"
             (is
              (->> (get-in hit [:_source :cellular_component])
@@ -290,7 +289,15 @@
              (json/parse-string)
              (clojure.pprint/pprint))
             (testing "fewer interaction groups than interactions"
-              (is (< (count interaction-group-hits) (count interaction-hits)))))))
+              (is (< (count interaction-group-hits) (count interaction-hits))))))
+        (testing "shared go-slim is indexed"
+          (let [hit (-> (search "let-23 : lin-7" {:type "interaction_group"})
+                        (get-in [:hits :hits])
+                        (first))]
+            (testing "terms all genes have in common are indexed"
+              (is (some #{"regulation of biological process"} (get-in hit [:_source :biological_process]))))
+            (testing "terms only one gene has is not indexed"
+              (is (not (some #{"catalytic activity"} (get-in hit [:_source :molecular_function]))))))))
       )))
 
 (deftest paper-type-test

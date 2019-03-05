@@ -295,3 +295,102 @@
 ;;
 ;; END of a section lifted out of WormBase/datomic-to-cataly
 ;;
+
+
+;;
+;; Gene Ontology
+;;
+(def ^{:private true} slims
+  (memoize (fn [db]
+             (->>
+              ["GO:0003824" ;molecular function
+               ;; "GO:0004872"
+               "GO:0005102"
+               "GO:0005215"
+               "GO:0005198"
+               "GO:0008092"
+               "GO:0003677"
+               "GO:0003723"
+               ;; "GO:0001071"
+               "GO:0036094"
+               "GO:0046872"
+               "GO:0030246"
+               ;; "GO:0003674"
+               "GO:0008283" ;biological process
+               "GO:0071840"
+               "GO:0051179"
+               "GO:0032502"
+               "GO:0000003"
+               "GO:0002376"
+               "GO:0050877"
+               "GO:0050896"
+               "GO:0023052"
+               "GO:0010467"
+               "GO:0019538"
+               "GO:0006259"
+               "GO:0044281"
+               "GO:0050789"
+               "GO:0042592"
+               "GO:0007610"
+               ;; "GO:0008150"
+               "GO:0005576" ;cellular component
+               "GO:0005737"
+               "GO:0005856"
+               "GO:0005739"
+               "GO:0005634"
+               "GO:0005694"
+               "GO:0016020"
+               "GO:0031982"
+               "GO:0071944"
+               "GO:0030054"
+               "GO:0042995"
+               "GO:0032991"
+               "GO:0045202"
+               ;; "GO:0005575"
+               ]
+              (map vector (repeat :go-term/id))
+              (map #(d/entid db %))))))
+
+(def ^{:private true} aspects
+  (memoize (fn [db]
+             (->> ["GO:0008150" "GO:0003674" "GO:0005575"]
+                  (map vector (repeat :go-term/id))
+                  (map #(d/entid db %))))))
+
+(defn get-slims-for-gene [db gene]
+  (d/q '[:find [?slim ...]
+         :in $ ?gene [?slim ...]
+         :where
+         [?anno :go-annotation/gene ?gene]
+         (or-join [?anno ?slim]
+                  [?anno :go-annotation/go-term ?slim]
+                  (and
+                   [?anno :go-annotation/go-term ?term]
+                   [?term :go-term/ancestor ?slim]))]
+       db
+       gene
+       (slims db)))
+
+(def ^{:private true} process-slim
+  (memoize
+   (fn [db slim]
+     (let [term-entity (d/entity db slim)
+           aspect-name (d/q '[:find ?aspect-name .
+                              :in $ ?slim [?aspect ...]
+                              :where
+                              [?slim :go-term/ancestor ?aspect]
+                              [?aspect :go-term/name ?aspect-name]]
+                            db slim (aspects db))]
+       {:aspect (keyword aspect-name)
+        :label (first (:go-term/name term-entity))}))))
+
+(defn group-slims-by-aspect [db slims]
+  (reduce (fn [result slim]
+              (let [processed-slim (process-slim db slim)]
+                (update result (:aspect processed-slim) conj (:label processed-slim))))
+            {}
+            slims))
+
+;;
+;; End of Gene Ontology
+;;
