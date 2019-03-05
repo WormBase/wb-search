@@ -45,6 +45,12 @@
                :name {:type "text"}}}
 
     :genotype {:type "text"}
+    :biological_process {:type "keyword"
+                         :normalizer "lowercase_normalizer"}
+    :cellular_component {:type "keyword"
+                         :normalizer "lowercase_normalizer"}
+    :molecular_function {:type "keyword"
+                         :normalizer "lowercase_normalizer"}
 
     ;; start of refs
     :allele (ref-mapping)
