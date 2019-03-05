@@ -311,6 +311,31 @@
           (let [hit (has-hit (search "C. elegans" {:size 100}) "WBGene00015146")
                 ortholog-hit (has-hit (search "C. elegans" {:size 100}) "PRJNA248911_FL82_04596")]
             (is (> (:_score hit) (:_score ortholog-hit)))))))))
+          (is (has-gene-hit (search "CELE_Y54G11A.10") "WBGene00002996")))))))
+
+(deftest gene-type-test
+  (testing "go slim terms for genes"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity :gene (d/entity db [:gene/id "WBGene00002996"]))
+        (let [hit (-> (search "WBGene00002996")
+                      (get-in [:hits :hits])
+                      (first))]
+          (clojure.pprint/pprint hit)
+          (testing "gene has the go slim terms"
+            (is
+             (->> (get-in hit [:_source :cellular_component])
+                  (some #{"synapse"})))
+            (is
+             (->> (get-in hit [:_source :biological_process])
+                  (some #{"developmental process"}))))
+          (testing "annotated non-slim terms are not indexed"
+            (is
+             (->> (get-in hit [:_source :biological_process])
+                  (some #{"neurotransmitter secretion"})
+                  (not)))))
+        )
+      )))
 
 (deftest go-term-type-test
   (testing "go-term with creatine biosynthetic process as example"
