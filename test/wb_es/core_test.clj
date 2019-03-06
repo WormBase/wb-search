@@ -271,6 +271,7 @@
                           (= "WBInteraction000009401"
                              (get-in hit [:_source :wbid])))
                         interaction-hits)))
+            (clojure.pprint/pprint interaction-group-hits)
             (->>
              (try
                (http/post (format "%s/%s/_search" es-base-url index-name)
@@ -298,7 +299,13 @@
               (is (some #{"regulation of biological process"} (get-in hit [:_source :biological_process]))))
             (testing "terms only one gene has is not indexed"
               (is (not (some #{"catalytic activity"} (get-in hit [:_source :molecular_function]))))))))
-      )))
+      ))
+  (testing "interaction with other interactor"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity :interaction-group (d/entity db [:interaction/id "WBInteraction000525213"]))
+        ;(pprint (search "WBInteraction000525213"))
+        ))))
 
 (deftest paper-type-test
   (testing "paper with long title not captured by brief citation"
