@@ -46,13 +46,50 @@
            (clojure.string/join " : " %)))))
 
 (defn interaction-group-id [entity]
-  (->> entity
-       (:interaction/interactor-overlapping-gene)
-       (map :interaction.interactor-overlapping-gene/gene)
-       (map :db/id)
-       (sort)
-       (map str)
-       (clojure.string/join ":")))
+  (let [prefix (->> entity
+                    (:interaction/interactor-overlapping-gene)
+                    (map :interaction.interactor-overlapping-gene/gene)
+                    (map :db/id)
+                    (sort)
+                    (map str))]
+    (if (>= (count prefix) 2)
+      (clojure.string/join ":" prefix) ; ignore suffix in this case
+      (let [suffix (->> (concat (->> entity
+                                 (:interaction/interactor-overlapping-gene)
+                                 (map :interaction.interactor-overlapping-gene/gene)
+                                 (map :db/id))
+                            (->> entity
+                                 (:interaction/feature-interactor)
+                                 (map :interaction.feature-interactor/feature)
+                                 (map :db/id))
+                            (->> entity
+                                 (:interaction/other-interactor)
+                                 (map :interaction.other-interactor/text))
+                            (->> entity
+                                 (:interaction/molecule-interactor)
+                                 (map :interaction.molecule-interactor/molecule)
+                                 (map :db/id))
+                            (->> entity
+                                 (:interaction/pcr-interactor)
+                                 (map :interaction.pcr-interactor/pcr-product)
+                                 (map :db/id))
+                            (->> entity
+                                 (:interaction/sequence-interactor)
+                                 (map :interaction.sequence-interactor/sequence)
+                                 (map :db/id))
+                            ;; (->> entity
+                            ;;      (:interaction/variation-interactor)
+                            ;;      (map :interaction.variation-interactor/variation)
+                            ;;      (map :db/id))
+                            (->> entity
+                                 (:interaction/rearrangement)
+                                 (map :interaction.rearrangement/rearrangement)
+                                 (map :db/id))
+                            )
+                    (sort)
+                    (map str))]
+        (->> (concat prefix suffix)
+             (clojure.string/join ":"))))))
 
 (deftype Interaction [entity]
   data-util/Document
@@ -79,7 +116,7 @@
                    (:interaction/interactor-overlapping-gene)
                    (map :interaction.interactor-overlapping-gene/gene)
                    (map :db/id))]
-    (if (> (count genes) 1)
+    (if (= (count genes) 2)
       (->> genes
            (map #(data-util/get-slims-for-gene db %))
            (map set)
