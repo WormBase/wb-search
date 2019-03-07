@@ -373,14 +373,19 @@
                           (= "WBInteraction000009401"
                              (get-in hit [:_source :wbid])))
                         interaction-hits)))
-            (clojure.pprint/pprint interaction-hits)
+;            (clojure.pprint/pprint interaction-hits)
             (testing "aggregation"
               (println "before testing")
               (->>
                (try
                  (http/post (format "%s/%s/_search" es-base-url index-name)
                             {:headers {:content-type "application/json"}
-                             :body (->> {:query {:term {:page_type "interaction_group"}}
+                             :body (->> {:query {:bool {:must [{:term {:page_type "interaction_group"}}
+                                                               ;;{:match_phrase {:label "\"let-23 : lin-7\""}}
+                                                               {:match_phrase {:label "lin-7"}}
+                                                               ;; {:has_child {:type "interaction"
+                                                               ;;              :query {:exists {:field "interaction_type_physical"}}}}
+                                                               ]}}
                                          :size 0
                                          :aggs {:biological_process
                                                 {:terms {:field "biological_process"
@@ -388,16 +393,23 @@
                                                 :interaction_methods
                                                 {:children {:type "interaction"}
                                                  :aggs {:interaction_type_genetic
-                                                        {:terms {:field "interaction_type_genetic"
-                                                                 :missing "N/A"}
+                                                        {:terms {:field "interaction_type_genetic"}
                                                          :aggs {:to-interaction-groups
                                                                 {:parent {:type "interaction"}}}}
                                                         :interaction_type_physical
-                                                        {:terms {:field "interaction_type_physical"
-                                                                 :missing "Unknown"}
+                                                        {:terms {:field "interaction_type_physical"}
                                                          :aggs {:to-interaction-groups
-                                                                {:parent {:type "interaction"}}}}}}}}
-                                        (json/generate-string))})
+                                                                {:parent {:type "interaction"}}}}
+                                                        }}
+                                                :no_interaction_type_physical
+                                                {:filter {:bool {:must_not {:has_child {:type "interaction"
+                                                                                        :query {:exists {:field "interaction_type_physical"}}}}}}}
+                                                :no_interaction_type_genetic
+                                                {:filter {:bool {:must_not {:has_child {:type "interaction"
+                                                                                        :query {:exists {:field "interaction_type_genetic"}}}}}}}
+                                                }}
+                                        (json/generate-string)
+                                        (println))})
                  (catch clojure.lang.ExceptionInfo e
                    (clojure.pprint/pprint (ex-data e))
                    (throw e)))
