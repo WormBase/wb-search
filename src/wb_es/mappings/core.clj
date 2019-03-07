@@ -61,8 +61,22 @@
     ;; end of refs
 
     ;; for interaction only
-    :method {:type "keyword"
-             :normalizer "lowercase_normalizer"}
+
+    :interaction_type_physical {:type "keyword"
+                                :normalizer "lowercase_normalizer"}
+    :interaction_type_genetic {:type "keyword"
+                               :normalizer "lowercase_normalizer"}
+    :interaction_type_regulartory {:type "keyword"
+                                   :normalizer "lowercase_normalizer"}
+    :interaction_type_predicted {:type "keyword"
+                                 :normalizer "lowercase_normalizer"}
+    :interaction_type_gi-module-one {:type "keyword"
+                                     :normalizer "lowercase_normalizer"}
+    :interaction_type_gi-module-two {:type "keyword"
+                                     :normalizer "lowercase_normalizer"}
+    :interaction_type_gi-module-three {:type "keyword"
+                                       :normalizer "lowercase_normalizer"}
+
 
     :join {:type "join"
            :relations {"interaction_group" "interaction"}}

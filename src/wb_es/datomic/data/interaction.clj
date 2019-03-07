@@ -91,24 +91,30 @@
         (->> (concat prefix suffix)
              (clojure.string/join ":"))))))
 
+(defn get-interaction-type [entity]
+  (let [types (:interaction/type entity)]
+    (reduce (fn [result type]
+              (let [[type-category subtype]
+                    (-> (name type)
+                        (clojure.string/split #":"))]
+                (assoc result (format "interaction_type_%s" type-category) subtype)))
+            {} types)))
+
 (deftype Interaction [entity]
   data-util/Document
   (metadata [this] (assoc (data-util/default-metadata entity)
                      :_routing (interaction-group-id entity)))
   (data [this]
-    {:wbid (:interaction/id entity)
-;     :label (get-label entity)
-     :description (->> (:interaction/interaction-summary entity)
-                       (first)
-                       (:interaction.interaction-summary/text))
-     :method (->> (:interaction/type entity)
-                  (map (fn [t]
-                         (-> (name t)
-                             (clojure.string/split #":")
-                             (first)))))
-     :join {:name "interaction"
-            :parent (interaction-group-id entity)}
-     }))
+    (merge
+     (get-interaction-type entity)
+     {:wbid (:interaction/id entity)
+                                        ;     :label (get-label entity)
+      :description (->> (:interaction/interaction-summary entity)
+                        (first)
+                        (:interaction.interaction-summary/text))
+      :join {:name "interaction"
+             :parent (interaction-group-id entity)}
+      })))
 
 (defn get-shared-slims [entity]
   (let [db (d/entity-db entity)

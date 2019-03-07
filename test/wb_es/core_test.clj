@@ -271,24 +271,37 @@
                           (= "WBInteraction000009401"
                              (get-in hit [:_source :wbid])))
                         interaction-hits)))
-            (clojure.pprint/pprint interaction-group-hits)
-            (->>
-             (try
-               (http/post (format "%s/%s/_search" es-base-url index-name)
-                        {:headers {:content-type "application/json"}
-                         :body (->> {:query {:term {:method :physical}}
-                                     :size 0
-                                     :aggs {:methods
-                                            {:terms {:field "method"}
-                                             :aggs {:to-interaction-groups
-                                                    {:parent {:type "interaction"}}}}}}
-                                    (json/generate-string))})
-               (catch clojure.lang.ExceptionInfo e
-                 (clojure.pprint/pprint (ex-data e))
-                 (throw e)))
-             (:body)
-             (json/parse-string)
-             (clojure.pprint/pprint))
+            (clojure.pprint/pprint interaction-hits)
+            (testing "aggregation"
+              (println "before testing")
+              (->>
+               (try
+                 (http/post (format "%s/%s/_search" es-base-url index-name)
+                            {:headers {:content-type "application/json"}
+                             :body (->> {:query {:term {:page_type "interaction_group"}}
+                                         :size 0
+                                         :aggs {:biological_process
+                                                {:terms {:field "biological_process"
+                                                         :missing "N/A"}}
+                                                :interaction_methods
+                                                {:children {:type "interaction"}
+                                                 :aggs {:interaction_type_genetic
+                                                        {:terms {:field "interaction_type_genetic"
+                                                                 :missing "N/A"}
+                                                         :aggs {:to-interaction-groups
+                                                                {:parent {:type "interaction"}}}}
+                                                        :interaction_type_physical
+                                                        {:terms {:field "interaction_type_physical"
+                                                                 :missing "Unknown"}
+                                                         :aggs {:to-interaction-groups
+                                                                {:parent {:type "interaction"}}}}}}}}
+                                        (json/generate-string))})
+                 (catch clojure.lang.ExceptionInfo e
+                   (clojure.pprint/pprint (ex-data e))
+                   (throw e)))
+               (:body)
+               (json/parse-string)
+               (clojure.pprint/pprint)))
             (testing "fewer interaction groups than interactions"
               (is (< (count interaction-group-hits) (count interaction-hits))))))
         (testing "shared go-slim is indexed"
