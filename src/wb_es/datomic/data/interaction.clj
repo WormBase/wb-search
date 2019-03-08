@@ -123,11 +123,16 @@
                    (map :interaction.interactor-overlapping-gene/gene)
                    (map :db/id))]
     (if (= (count genes) 2)
-      (->> genes
-           (map #(data-util/get-slims-for-gene db %))
-           (map set)
-           (apply clojure.set/intersection)
-           (data-util/group-slims-by-aspect db)))))
+      (let [slims-by-aspect (->> genes
+                                 (map #(data-util/get-slims-for-gene db %))
+                                 (map set)
+                                 (apply clojure.set/intersection)
+                                 (data-util/group-slims-by-aspect db))]
+        (reduce (fn [result [aspect slims]]
+                  (let [key (format "count_%s" aspect)]
+                    (assoc result key (count slims))))
+                slims-by-aspect
+                slims-by-aspect)))))
 
 (deftype Interaction-group [entity]
   data-util/Document
