@@ -84,6 +84,9 @@
                          :normalizer "lowercase_normalizer"}
     :molecular_function {:type "keyword"
                          :normalizer "lowercase_normalizer"}
+    :count_biological_process {:type "integer"}
+    :count_cellular_component {:type "integer"}
+    :count_molecular_function {:type "integer"}
 
     ;; start of refs
     :allele (ref-mapping)
