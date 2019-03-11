@@ -79,6 +79,11 @@
                                      :normalizer "lowercase_normalizer"}
     :interaction_type_gi-module-three {:type "keyword"
                                        :normalizer "lowercase_normalizer"}
+    :detection_method {:type "keyword"
+                                   :normalizer "lowercase_normalizer"}
+    :throughput {:type "keyword"
+                             :normalizer "lowercase_normalizer"}
+
 
 
     :join {:type "join"

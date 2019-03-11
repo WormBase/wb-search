@@ -271,7 +271,7 @@
                           (= "WBInteraction000009401"
                              (get-in hit [:_source :wbid])))
                         interaction-hits)))
-;            (clojure.pprint/pprint interaction-hits)
+            ;;(clojure.pprint/pprint interaction-group-hits)
             (testing "aggregation"
               (println "before testing")
               (->>
@@ -283,8 +283,11 @@
                                                                {:match_phrase {:label "lin-7"}}
                                                                ;; {:has_child {:type "interaction"
                                                                ;;              :query {:exists {:field "interaction_type_physical"}}}}
+                                                               {:has_child {:type "interaction"
+                                                                            :query {:match_all {}}
+                                                                            :inner_hits {}}}
                                                                ]}}
-                                         :size 0
+                                         :size 1
                                          :aggs {:biological_process
                                                 {:terms {:field "biological_process"
                                                          :missing "N/A"}}
@@ -306,8 +309,7 @@
                                                 {:filter {:bool {:must_not {:has_child {:type "interaction"
                                                                                         :query {:exists {:field "interaction_type_genetic"}}}}}}}
                                                 }}
-                                        (json/generate-string)
-                                        (println))})
+                                        (json/generate-string))})
                  (catch clojure.lang.ExceptionInfo e
                    (clojure.pprint/pprint (ex-data e))
                    (throw e)))
