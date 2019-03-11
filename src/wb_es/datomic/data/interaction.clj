@@ -112,6 +112,20 @@
       :description (->> (:interaction/interaction-summary entity)
                         (first)
                         (:interaction.interaction-summary/text))
+      :throughput (if-let [throughput-raw (->> entity
+                                               (:interaction/throughput))]
+                    (-> throughput-raw
+                        (str)
+                        (clojure.string/split #"/")
+                        (last)))
+      :detection_method (if-let [method-raw (->> entity
+                                                 (:interaction/detection-method)
+                                                 (first)
+                                                 (:interaction.detection-method/value))]
+                          (-> method-raw
+                              (str)
+                              (clojure.string/split #"/")
+                              (last)))
       :join {:name "interaction"
              :parent (interaction-group-id entity)}
       })))
@@ -129,7 +143,7 @@
                                  (apply clojure.set/intersection)
                                  (data-util/group-slims-by-aspect db))]
         (reduce (fn [result [aspect slims]]
-                  (let [key (format "count_%s" aspect)]
+                  (let [key (format "count_%s" (name aspect))]
                     (assoc result key (count slims))))
                 slims-by-aspect
                 slims-by-aspect)))))
