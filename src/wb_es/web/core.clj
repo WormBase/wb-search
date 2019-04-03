@@ -146,3 +146,41 @@
                     {:content-type "application/json"
                      :body (json/generate-string query)})]
       (json/parse-string (:body response) true))))
+
+(defn facets [es-base-url index q options]
+  (let [query (if (and q (not= (clojure.string/trim q) ""))
+                {:dis_max
+                 {:queries [{:term {:wbid q}}
+                            {:match_phrase {:label {:query q}}}
+                            {:match_phrase {:other_names {:query q
+                                                          :boost 0.9}}}
+                            {:match_phrase {:_all {:query q
+                                                   :boost 0.1}}}]
+                  :tie_breaker 0.3}
+                 }
+                {:match_all {}})
+        categories-config [{:field :page_type
+                            :option :type}
+                           {:field :paper_type}
+                           {:field :species.key
+                            :option :species}
+                           {:field :biological_process}
+                           {:field :cellular_component}]
+        request-body {:query query
+                      :size 0
+                      :aggs (reduce (fn [result category]
+                                      (let [option (or (:option category) (:field category))
+                                            field (:field category)]
+                                        (assoc result option {:filter {:bool {:must (get-filter (dissoc options option))}}
+                                                              :aggs {:categories
+                                                                     {:terms {:field field}}}})))
+                                    {}
+                                    categories-config)}
+
+        response
+        (http/get (format "%s/%s/_search"
+                          es-base-url
+                          index)
+                  {:content-type "application/json"
+                   :body (json/generate-string request-body)})]
+    (json/parse-string (:body response) true)))
