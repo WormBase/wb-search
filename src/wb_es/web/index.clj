@@ -28,6 +28,11 @@
   (GET "/count" [q & options]
        (response (web-core/count es-base-url *index-id* q options))))
 
+(def facet-route
+  (GET "/facets" [q & options]
+       (response (web-core/facets es-base-url *index-id* q options))))
+
+
 (def random-route
   (GET "/random" [q & options]
        (response (web-core/random es-base-url *index-id* options))))
@@ -39,6 +44,7 @@
       autocomplete-route
       search-exact-route
       count-route
+      facet-route
       random-route)
     (wrap-routes web-core/wrap-query-lower-case)))
 
