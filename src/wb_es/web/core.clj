@@ -147,6 +147,21 @@
                      :body (json/generate-string query)})]
       (json/parse-string (:body response) true))))
 
+(defn- interaction-type-query [type-string]
+  (let [segments (clojure.string/split type-string #":")
+        musts (filter #(re-matches #"[^-].+" %) segments)
+        must-nots (keep (fn [segment]
+                          (let [[_ type] (re-matches #"-(.+)" segment)]
+                            type))
+                        segments)
+        get-rule (fn [interaction-type]
+                   {:has_child
+                    {:type "interaction"
+                     "query" {:exists {:field (format "interaction_type_%s" interaction-type)}}}})]
+    {:bool {:must (map get-rule musts)
+            :must_not (map get-rule must-nots)}}
+))
+
 (defn facets [es-base-url index q options]
   (let [query (if (and q (not= (clojure.string/trim q) ""))
                 {:dis_max
@@ -159,21 +174,56 @@
                   :tie_breaker 0.3}
                  }
                 {:match_all {}})
-        categories-config [{:field :page_type
-                            :option :type}
-                           {:field :paper_type}
-                           {:field :species.key
-                            :option :species}
-                           {:field :biological_process}
-                           {:field :cellular_component}]
+        categories-config (case (:type options)
+                            "paper"
+                            [{:field :paper_type}]
+
+                            "interaction_group"
+                            [{:field :biological_process}
+                             {:field :cellular_component}
+                             {:field :interaction_type_genetic
+                              :option :genetic_interaction_subtypes
+                              :child_type "interaction"}
+                             {:field :interaction_type_physical
+                              :option :physical_interaction_subtypes
+                              :child_type "interaction"}
+                             {:option :interaction_type
+                              :aggs {:categories
+                                     {:filters
+                                      {:filters
+                                       (->>
+                                        ["physical:genetic", "physical:-genetic", "-physical:genetic"]
+                                        (map (fn [type-string]
+                                               [type-string (interaction-type-query type-string)]))
+                                        (into {}))}}}}
+                             ]
+
+                            [{:field :page_type
+                              :option :type}
+                             {:field :species.key
+                              :option :species}])
         request-body {:query query
                       :size 0
                       :aggs (reduce (fn [result category]
                                       (let [option (or (:option category) (:field category))
-                                            field (:field category)]
+                                            field (:field category)
+                                            child-type (:child_type category)]
                                         (assoc result option {:filter {:bool {:must (get-filter (dissoc options option))}}
-                                                              :aggs {:categories
-                                                                     {:terms {:field field}}}})))
+                                                              :aggs (cond
+                                                                     (:aggs category)
+                                                                     (:aggs category)
+
+                                                                     child-type
+                                                                     {:children
+                                                                      {:children {:type child-type}
+                                                                       :aggs {:categories
+                                                                              {:terms {:field field}
+                                                                               :aggs {:parent
+                                                                                      {:parent {:type child-type}}}}}}}
+
+                                                                     :else
+                                                                     {:categories
+                                                                      {:terms {:field field}}})})))
                                     {}
                                     categories-config)}
 
