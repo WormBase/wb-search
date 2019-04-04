@@ -311,7 +311,6 @@
           (let [hit (has-hit (search "C. elegans" {:size 100}) "WBGene00015146")
                 ortholog-hit (has-hit (search "C. elegans" {:size 100}) "PRJNA248911_FL82_04596")]
             (is (> (:_score hit) (:_score ortholog-hit)))))))))
-          (is (has-gene-hit (search "CELE_Y54G11A.10") "WBGene00002996")))))))
 
 (deftest gene-type-test
   (testing "go slim terms for genes"
