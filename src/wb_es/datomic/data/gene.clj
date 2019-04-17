@@ -10,8 +10,9 @@
   (data [this]
     {:wbid (:gene/id entity)
      :label (:gene/public-name entity)
-     :other_names (->> (:gene/other-name entity)
-                       (map :gene.other-name/text)
+     :other_names (->> (concat (->> (:gene/other-name entity)
+                                    (map :gene.other-name/text))
+                               (:gene/molecular-name entity))
                        (cons (:gene/sequence-name entity)))
      :description (or
                    (->> entity

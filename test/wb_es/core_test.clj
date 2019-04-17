@@ -196,6 +196,28 @@
                  (get-in hits [:hits :hits 0 :_source :page_type]))))))
     ))
 
+(deftest gene-type-name-test
+  (testing "testing various identifiers for gene"
+    (let [db (d/db datomic-conn)
+          has-gene-hit (fn [result gene-id]
+                         (->> (get-in result [:hits :hits])
+                              (some (fn [hit]
+                                      (= gene-id
+                                         (get-in hit [:_source :wbid]))))))]
+      (do
+        (index-datomic-entity (d/entity db [:gene/id "WBGene00002996"]))
+        (testing "search for gene by CGC name"
+          (is (has-gene-hit (search "lin-7") "WBGene00002996")))
+        (testing "search for gene by molecular name"
+          (is (has-gene-hit (search "Y54G11A.10a.1") "WBGene00002996"))
+          (is (has-gene-hit (search "Y54G11A.10a") "WBGene00002996"))
+          (is (has-gene-hit (search "CE43589") "WBGene00002996")))
+        (testing "search for gene by sequence name"
+          (is (has-gene-hit (search "Y54G11A.10") "WBGene00002996")))
+        (testing "search for gene by other name"
+          (is (has-gene-hit (search "CELE_Y54G11A.10") "WBGene00002996"))))
+      )))
+
 (deftest go-term-type-test
   (testing "go-term with creatine biosynthetic process as example"
     (let [db (d/db datomic-conn)]
