@@ -63,6 +63,19 @@ To make a production-like environment locally, `(cd eb/default/ && make eb-local
 
 ## Development environment
 
+Filesystem
+
+Elasticsearch index takes up extra disk space. A volume is mounted to shared development server for this purpose.
+
+Here are the steps to make the volume available for elasticsearch:
+
+```
+# after mounting the volume to the server
+lsblk # to identify the available volume
+sudo mount /dev/xvdg /mnt/elasticsearch_data/   #replace xvdg with the correct volumn
+sudo ln -s /mnt/elasticsearch_data/elasticsearch/ elasticsearch
+```
+
 Start Elasticsearch:
 
 - refer to [Step 0: Start Elasticsearch](#step-0-start-elasticsearch)
