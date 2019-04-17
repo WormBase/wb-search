@@ -315,3 +315,17 @@
                       (get-in [:hits :hits 0 :_source]))]
           (= "sjj_ZK822.2" (:wbid hit))
           (= "pcr_oligo" (:page_type hit)))))))
+
+(deftest variation-type-name-test
+  (testing "testing various identifiers for variations"
+    (let [db (d/db datomic-conn)
+          has-hit (fn [result id]
+                    (->> (get-in result [:hits :hits])
+                         (some (fn [hit]
+                                 (= id
+                                    (get-in hit [:_source :wbid]))))))]
+      (do
+        (index-datomic-entity (d/entity db [:variation/id "WBVar00021239"]))
+        (testing "search for variation by other name"
+          (is (has-hit (search "cb19669") "WBVar00021239"))
+          (is (has-hit (search "cbs19669") "WBVar00021239")))))))

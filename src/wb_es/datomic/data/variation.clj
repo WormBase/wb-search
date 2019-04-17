@@ -11,6 +11,7 @@
   (data [this]
     {:wbid (:variation/id entity)
      :label (:variation/public-name entity)
+     :other_names (:variation/other-name entity)
      :species (data-util/format-entity-species :variation/species entity)
      :gene (if (:variation/allele entity)
              (->> entity
