@@ -30,7 +30,7 @@
                     (re-matches id-pattern (:id snapshot)))))
          (sort-by (fn [snapshot]
                     (let [[_ _ version-id] (re-matches id-pattern (:id snapshot))]
-                      version-id)))
+                      (Integer. version-id))))
          (last)
          (:id))))
 
