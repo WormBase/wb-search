@@ -44,6 +44,32 @@ You will need to set the following environment variables:
 
 ## Production environment
 
+Production environment runs docker containers in Elastic Beanstalk environment on AWS.
+
+We maintain two production environment,
+
+- one for the on-demand indexing process, that runs once per WB release, and
+- the other for the long-running Web API, that runs of a Elasticsearch snapshot.
+
+### Preparation for deployment
+
+**Build and upload containers**
+
+Build and upload containers (if and only if source code has changed) and verify Dockerrun.aws.json is updated to use the right tag for the containers.
+
+(_Note: Building containers isn't necessary for every WS release, if the source code hasn't changed._)
+
+```
+make aws-ecr-login
+lein release [$LEVEL]
+```
+
+- [Learn more about release levels](https://github.com/technomancy/leiningen/blob/master/doc/DEPLOY.md#releasing-simplified)
+- [Learn more about the custom release steps](https://github.com/WormBase/wb-search/blob/develop/project.clj)
+
+
+**Set environment variables**
+
 Ensure the environment variables above are set appropriately before preceeding.
 
 ### Deploy Indexer
@@ -94,19 +120,6 @@ Starting automated tests:
 ```
 lein trampoline test-refresh
 ```
-
-## Release containers
-
-_Note: a release of containers *may not* be necessary for every WS release. In general, we only need to release containers when source code changes._
-
-```
-make aws-ecr-login
-lein release [$LEVEL]
-```
-
-- [Learn more about release levels](https://github.com/technomancy/leiningen/blob/master/doc/DEPLOY.md#releasing-simplified)
-- [Learn more about the custom release steps](https://github.com/WormBase/wb-search/blob/develop/project.clj)
-
 
 ## (Optional) Build and depoloy search *manually*
 _Not recommended except for development and troubleshooting_
