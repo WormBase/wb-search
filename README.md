@@ -106,20 +106,25 @@ Start Elasticsearch:
 
 - refer to [Step 0: Start Elasticsearch](#step-0-start-elasticsearch)
 
-Run indexer if necessary:
+Test-driven development:
+- Testing the web api and indexer is made easier and more efficient with [test cases](test/wb_es/core_test.clj).
+- Run tests that re-run when code changes
+
+```
+lein trampoline test-refresh
+```
+
+
+(Optional) Run indexer:
 
 - refer to [Step 1: Build index](#step-1-build-index)
 
-Starting web API for development:
+(Optional) Starting web API for development:
 ```
 lein trampoline ring server-headless [port]
 ```
 - If no index of the appropriate version is found locally, it will attempt to restore the index from the snapshot repository on s3.
 
-Starting automated tests:
-```
-lein trampoline test-refresh
-```
 
 ## (Optional) Build and depoloy search *manually*
 _Not recommended except for development and troubleshooting_
