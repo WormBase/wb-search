@@ -16,13 +16,13 @@
                        (cons (:gene/sequence-name entity)))
      :description (or
                    (->> entity
-                        (:gene/concise-description)
-                        (first)
-                        (:gene.concise-description/text))
-                   (->> entity
                         (:gene/automated-description)
                         (first)
-                        (:gene.automated-description/text)))
+                        (:gene.automated-description/text))
+                   (->> entity
+                        (:gene/concise-description)
+                        (first)
+                        (:gene.concise-description/text)))
      :species (data-util/format-entity-species :gene/species entity)
      :allele (->> entity
                   (:variation.gene/_gene)
