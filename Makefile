@@ -40,7 +40,15 @@ docker-run-aws-es:
 		-e AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY} \
 		--ulimit nofile=65536:65536 \
 		-v /var/lib/elasticsearch/data:/usr/share/elasticsearch/data \
+		--network wb-network \
+		--name elasticsearch \
 		wormbase/aws-elasticsearch
+
+.PHONY: docker-run-kibana
+docker-run-kibana:
+	@docker run -p 5601:5601 \
+		--network=wb-network \
+		docker.elastic.co/kibana/kibana
 
 .PHONY: eb-local-run
 eb-local-run:
