@@ -35,6 +35,7 @@ docker-build-aws-es:
 
 .PHONY: docker-run-aws-es
 docker-run-aws-es:
+	@docker rm -f elasticsearch
 	@docker run -p 9200:9200 \
 		-e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
 		-e AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY} \
