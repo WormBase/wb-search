@@ -14,15 +14,14 @@
                                     (map :gene.other-name/text))
                                (:gene/molecular-name entity))
                        (cons (:gene/sequence-name entity)))
-     :description (or
-                   (->> entity
+     :description (->> entity
                         (:gene/automated-description)
                         (first)
                         (:gene.automated-description/text))
-                   (->> entity
+     :legacy_description (->> entity
                         (:gene/concise-description)
                         (first)
-                        (:gene.concise-description/text)))
+                        (:gene.concise-description/text))
      :species (data-util/format-entity-species :gene/species entity)
      :allele (->> entity
                   (:variation.gene/_gene)

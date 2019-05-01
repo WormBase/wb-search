@@ -245,8 +245,10 @@
       (do
         (index-datomic-entity (d/entity db [:gene/id "WBGene00006741"]))
         (testing "search automated description"
-          (is (has-hit (search "STOM") "WBGene00006741"))))
-      )))
+          (is (has-hit (search "STOM") "WBGene00006741")))
+        (testing "search legacy manual description"
+          (is (has-hit (search "SLPs") "WBGene00006741")))
+        ))))
 
 (deftest go-term-type-test
   (testing "go-term with creatine biosynthetic process as example"

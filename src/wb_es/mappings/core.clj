@@ -47,6 +47,8 @@
     :description_all {:type "text"}
     :description {:type "text"
                   :copy_to "description_all"}
+    :legacy_description {:type "text"
+                         :copy_to "description_all"}
 
     :genotype {:type "text"}
 
