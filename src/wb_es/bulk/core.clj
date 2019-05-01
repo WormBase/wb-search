@@ -11,6 +11,7 @@
             [wb-es.datomic.db :refer [datomic-conn]]
             [wb-es.env :refer [es-base-url release-id]]
             [wb-es.mappings.core :refer [create-index]]
+            [wb-es.web.setup :refer [es-connect]]
             [wb-es.snapshot.core :refer [connect-snapshot-repository save-snapshot get-next-snapshot-id]]))
 
 (defn format-bulk
@@ -108,7 +109,9 @@
                    index-id (format "%s_v%s" release-id index-revision-number)}}]
   (let []
     (do
-      (create-index index-id :default-index (= index-revision-number 0))
+      (create-index index-id
+                    :default-index (= index-revision-number 0)
+                    :delete-existing true)
       (let [n-threads 4
             scheduler (chan n-threads)
             logger (chan n-threads)]
@@ -353,6 +356,7 @@
   "I don't do a whole lot ... yet."
   [& args]
   (do
+    (es-connect)
     (println "Indexer starting!")
     (mount/start)
     (if-let [index-revision-number (first args)]
