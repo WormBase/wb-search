@@ -233,6 +233,21 @@
           (is (has-gene-hit (search "CELE_Y54G11A.10") "WBGene00002996"))))
       )))
 
+(defn- has-hit [result id]
+  (->> (get-in result [:hits :hits])
+       (some (fn [hit]
+               (= id
+                  (get-in hit [:_source :wbid]))))))
+
+(deftest gene-type-description-test
+  (testing "gene descriptions"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:gene/id "WBGene00006741"]))
+        (testing "search automated description"
+          (is (has-hit (search "STOM") "WBGene00006741"))))
+      )))
+
 (deftest go-term-type-test
   (testing "go-term with creatine biosynthetic process as example"
     (let [db (d/db datomic-conn)]
