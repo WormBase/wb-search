@@ -107,7 +107,6 @@
                   ["vcs" "tag" "v" "--no-sign"]
                   ["aws-ecr-publish"]
                   ["change" "version" "leiningen.release/bump-version"]
-                  ["eb-container-version-update"]
                   ["vcs" "commit"]
                   ["vcs" "push"]]
   :repl-options {:init (do
