@@ -39,9 +39,11 @@
 
 
     ;; start of copy_to fields
-    :description_all {:type "text"}
-    :other {:type "text"
-            :analyzer "split_underscore_analyzer"}
+    :categories_all {:type "text"
+                     :analyzer "split_underscore_analyzer"}
+    :description_all {:type "text"
+                      :store true}
+    :other {:type "text"}
     ;; end of copy to fields
 
 
@@ -51,17 +53,17 @@
                          :copy_to "description_all"}
 
     :page_type {:type "keyword"
-                :copy_to "other"
+                :copy_to "categories_all"
                 :normalizer "lowercase_normalizer"}
     :paper_type {:type "keyword"
-                 :copy_to "other"
+                 :copy_to "categories_all"
                  :normalizer "lowercase_normalizer"}
     :species {:properties
               {:key {:type "keyword"
-                     :copy_to "other"
+                     :copy_to "categories_all"
                      :normalizer "lowercase_normalizer"}
                :name {:type "text"
-                      :copy_to "other"}}}
+                      :copy_to "categories_all"}}}
 
     :genotype {:type "text"
                :copy_to "other"}
