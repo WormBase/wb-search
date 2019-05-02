@@ -40,7 +40,8 @@
 
     ;; start of copy_to fields
     :description_all {:type "text"}
-    :other {:type "text"}
+    :other {:type "text"
+            :analyzer "split_underscore_analyzer"}
     ;; end of copy to fields
 
 
@@ -95,7 +96,10 @@
                                                   :filter ["lowercase" "autocomplete_filter"]}
                           "keyword_ignore_case" {:type "custom"
                                                  :tokenizer "keyword"
-                                                 :filter ["lowercase"]}}}}
+                                                 :filter ["lowercase"]}
+                          "split_underscore_analyzer"
+                          {:char_filter ["replace_underscore"]
+                           :tokenizer "standard"}}}}
    :mappings {:_doc generic-mapping}})
 
 (defn create-index

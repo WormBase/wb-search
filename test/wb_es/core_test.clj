@@ -250,6 +250,14 @@
           (is (has-hit (search "SLPs") "WBGene00006741")))
         ))))
 
+(deftest gene-type-species-test
+  (testing "species of gene"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:gene/id "WBGene00030670"]))
+        (testing "species name in search string"
+          (is (has-hit (search "C. briggsae") "WBGene00030670")))))))
+
 (deftest go-term-type-test
   (testing "go-term with creatine biosynthetic process as example"
     (let [db (d/db datomic-conn)]

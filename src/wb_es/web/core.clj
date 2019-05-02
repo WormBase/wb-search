@@ -38,7 +38,7 @@
                                         {:match_phrase {:other_names {:query q
                                                                       :boost 0.9}}}
                                         {:match_phrase {:description_all {:query q
-                                                                          :boost 0.2}}}
+                                                                          :boost 0.1}}}
                                         {:match_phrase {:other {:query q
                                                                 :boost 0.1}}}
                                         ]
@@ -137,7 +137,7 @@
                                         {:match_phrase {:other_names {:query q
                                                                       :boost 0.9}}}
                                         {:match_phrase {:description_all {:query q
-                                                                          :boost 0.2}}}
+                                                                          :boost 0.1}}}
                                         {:match_phrase {:other {:query q
                                                                 :boost 0.1}}}]
                               :tie_breaker 0.3}
