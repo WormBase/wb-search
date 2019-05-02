@@ -5,51 +5,68 @@
 
 (defn ref-mapping []
   {:type "nested"
-   :properties {:id {:type "string"
-                     :analyzer "keyword"}
-                :label {:type "string"}
-                :class {:type "string"}}})
+   :properties {:id {:type "keyword"}
+                :label {:type "text"
+                        :copy_to "other"}
+                :class {:type "keyword"}}})
 
 (def generic-mapping
   {:properties
-   {:wbid {:type "string"
-           :analyzer "keyword_ignore_case"
-           :include_in_all false
-           :fields {:autocomplete_keyword {:type "string"
-                                           :analyzer "autocomplete"
-                                           :search_analyzer "keyword_ignore_case"}}}
+   {:wbid {:type "keyword"
+           :normalizer "lowercase_normalizer"
+           :fields {:autocomplete_keyword {:type "text"
+                                           :analyzer "autocomplete_keyword"
+                                           :search_analyzer "keyword_ignore_case"
+                                           }}
+           }
 
-    :label {:type "string"
-            :include_in_all false
-            :fields {:raw {:type "string"
-                           :analyzer "keyword_ignore_case"}
-                     :autocomplete {:type "string"
+    :label {:type "text"
+            :fields {:raw {:type "keyword"}
+                     :autocomplete {:type "text"
                                     :analyzer "autocomplete"
                                     :search_analyzer "standard"}
 
                      ;; autocomplete analyzer will handle gene name like unc-22 as phase search,
                      ;; seeems sufficient for now, no need for autocomplete_keyword analyzer
-                     :autocomplete_keyword {:type "string"
+                     :autocomplete_keyword {:type "text"
                                             :analyzer "autocomplete_keyword"
                                             :search_analyzer "keyword_ignore_case"}
                      }
             }
-    :other_unique_ids {:type "string"
-                       :analyzer "keyword_ignore_case"
-                       :include_in_all false}
-    :other_names {:type "string"
-                  :include_in_all false
-                  :analyzer "keyword_ignore_case"}
-    :page_type {:type "string"
-                :analyzer "keyword_ignore_case"}
-    :paper_type {:type "string"
-                 :analyzer "keyword_ignore_case"}
-    :species {:properties
-              {:key {:type "string"
-                     :analyzer "keyword_ignore_case"}
-               :name {:type "string"}}}
+    :other_unique_ids {:type "keyword"
+                       :normalizer "lowercase_normalizer"}
+    :other_names {:type "text"}
 
-    :genotype {:type "string"}
+
+    ;; start of copy_to fields
+    :categories_all {:type "text"
+                     :analyzer "split_underscore_analyzer"}
+    :description_all {:type "text"
+                      :store true}
+    :other {:type "text"}
+    ;; end of copy to fields
+
+
+    :description {:type "text"
+                  :copy_to "description_all"}
+    :legacy_description {:type "text"
+                         :copy_to "description_all"}
+
+    :page_type {:type "keyword"
+                :copy_to "categories_all"
+                :normalizer "lowercase_normalizer"}
+    :paper_type {:type "keyword"
+                 :copy_to "categories_all"
+                 :normalizer "lowercase_normalizer"}
+    :species {:properties
+              {:key {:type "keyword"
+                     :copy_to "categories_all"
+                     :normalizer "lowercase_normalizer"}
+               :name {:type "text"
+                      :copy_to "categories_all"}}}
+
+    :genotype {:type "text"
+               :copy_to "other"}
 
     ;; start of refs
     :allele (ref-mapping)
@@ -65,6 +82,14 @@
    {:analysis {:filter {"autocomplete_filter" {:type "edge_ngram"
                                                :min_gram 2
                                                :max_gram 20}}
+               :normalizer {"lowercase_normalizer" {:type "custom"
+                                                    :char_filter []
+                                                    :filter ["lowercase"]}}
+               :char_filter
+               {"replace_underscore"
+                {:type "mapping"
+                 :mappings ["_ => -"]}}
+
                :analyzer {"autocomplete" {:type "custom"
                                           :tokenizer "standard"
                                           :filter ["lowercase" "autocomplete_filter"]}
@@ -73,8 +98,11 @@
                                                   :filter ["lowercase" "autocomplete_filter"]}
                           "keyword_ignore_case" {:type "custom"
                                                  :tokenizer "keyword"
-                                                 :filter ["lowercase"]}}}}
-   :mappings {:generic generic-mapping}})
+                                                 :filter ["lowercase"]}
+                          "split_underscore_analyzer"
+                          {:char_filter ["replace_underscore"]
+                           :tokenizer "standard"}}}}
+   :mappings {:_doc generic-mapping}})
 
 (defn create-index
   ([index & {:keys [default-index delete-existing]}]

@@ -174,6 +174,21 @@
                         hits)))
 
             )))
+
+      (testing "search by some word from the full name"
+        (let [hits (-> (search "parkinson")
+                       (get-in [:hits :hits]))]
+          (is (some (fn [hit]
+                      (= "Parkinson's disease"
+                         (get-in hit [:_source :label])))
+                    hits)))
+        (let [hits (-> (search "early onset parkinson")
+                       (get-in [:hits :hits]))]
+          (is (some (fn [hit]
+                      (= "early-onset Parkinson's disease"
+                         (get-in hit [:_source :label])))
+                    hits))))
+
       (testing "search by do-term synonym"
         (apply index-datomic-entity disease-parks)
         (let [hits (-> (search "paralysis agitans")
@@ -217,6 +232,40 @@
         (testing "search for gene by other name"
           (is (has-gene-hit (search "CELE_Y54G11A.10") "WBGene00002996"))))
       )))
+
+(defn- has-hit [result id]
+  (->> (get-in result [:hits :hits])
+       (filter (fn [hit]
+                 (= id
+                    (get-in hit [:_source :wbid]))))
+       (first)))
+
+(deftest gene-type-description-test
+  (testing "gene descriptions"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:gene/id "WBGene00006741"]))
+        (testing "search automated description"
+          (is (has-hit (search "STOM") "WBGene00006741")))
+        (testing "search legacy manual description"
+          (is (has-hit (search "SLPs") "WBGene00006741")))
+        ))))
+
+(deftest gene-type-species-test
+  (testing "species of gene"
+    (let [db (d/db datomic-conn)]
+      (do
+        (testing "species name in search string"
+          (index-datomic-entity (d/entity db [:gene/id "WBGene00030670"]))
+          (is (has-hit (search "C. briggsae") "WBGene00030670")))
+        (testing "species name appear in :species ranked higher than appearing in descriptions"
+          (index-datomic-entity (d/entity db [:gene/id "PRJNA248911_FL82_04596"]))
+          (index-datomic-entity (d/entity db [:gene/id "WBGene00015146"]))
+          (let [hit (has-hit (search "C. elegans") "WBGene00015146")
+                ortholog-hit (has-hit (search "C. elegans") "PRJNA248911_FL82_04596")]
+            (clojure.pprint/pprint hit)
+            (clojure.pprint/pprint ortholog-hit)
+            (is (> (:_score hit) (:_score ortholog-hit)))))))))
 
 (deftest go-term-type-test
   (testing "go-term with creatine biosynthetic process as example"
