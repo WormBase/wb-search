@@ -6,7 +6,8 @@
 (defn ref-mapping []
   {:type "nested"
    :properties {:id {:type "keyword"}
-                :label {:type "text"}
+                :label {:type "text"
+                        :copy_to "other"}
                 :class {:type "keyword"}}})
 
 (def generic-mapping
@@ -35,22 +36,34 @@
     :other_unique_ids {:type "keyword"
                        :normalizer "lowercase_normalizer"}
     :other_names {:type "text"}
-    :page_type {:type "keyword"
-                :normalizer "lowercase_normalizer"}
-    :paper_type {:type "keyword"
-                 :normalizer "lowercase_normalizer"}
-    :species {:properties
-              {:key {:type "keyword"
-                     :normalizer "lowercase_normalizer"}
-               :name {:type "text"}}}
 
+
+    ;; start of copy_to fields
     :description_all {:type "text"}
+    :other {:type "text"}
+    ;; end of copy to fields
+
+
     :description {:type "text"
                   :copy_to "description_all"}
     :legacy_description {:type "text"
                          :copy_to "description_all"}
 
-    :genotype {:type "text"}
+    :page_type {:type "keyword"
+                :copy_to "other"
+                :normalizer "lowercase_normalizer"}
+    :paper_type {:type "keyword"
+                 :copy_to "other"
+                 :normalizer "lowercase_normalizer"}
+    :species {:properties
+              {:key {:type "keyword"
+                     :copy_to "other"
+                     :normalizer "lowercase_normalizer"}
+               :name {:type "text"
+                      :copy_to "other"}}}
+
+    :genotype {:type "text"
+               :copy_to "other"}
 
     ;; start of refs
     :allele (ref-mapping)
@@ -69,6 +82,11 @@
                :normalizer {"lowercase_normalizer" {:type "custom"
                                                     :char_filter []
                                                     :filter ["lowercase"]}}
+               :char_filter
+               {"replace_underscore"
+                {:type "mapping"
+                 :mappings ["_ => -"]}}
+
                :analyzer {"autocomplete" {:type "custom"
                                           :tokenizer "standard"
                                           :filter ["lowercase" "autocomplete_filter"]}
