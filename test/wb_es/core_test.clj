@@ -235,9 +235,10 @@
 
 (defn- has-hit [result id]
   (->> (get-in result [:hits :hits])
-       (some (fn [hit]
-               (= id
-                  (get-in hit [:_source :wbid]))))))
+       (filter (fn [hit]
+                 (= id
+                    (get-in hit [:_source :wbid]))))
+       (first)))
 
 (deftest gene-type-description-test
   (testing "gene descriptions"
@@ -254,9 +255,17 @@
   (testing "species of gene"
     (let [db (d/db datomic-conn)]
       (do
-        (index-datomic-entity (d/entity db [:gene/id "WBGene00030670"]))
         (testing "species name in search string"
-          (is (has-hit (search "C. briggsae") "WBGene00030670")))))))
+          (index-datomic-entity (d/entity db [:gene/id "WBGene00030670"]))
+          (is (has-hit (search "C. briggsae") "WBGene00030670")))
+        (testing "species name appear in :species ranked higher than appearing in descriptions"
+          (index-datomic-entity (d/entity db [:gene/id "PRJNA248911_FL82_04596"]))
+          (index-datomic-entity (d/entity db [:gene/id "WBGene00015146"]))
+          (let [hit (has-hit (search "C. elegans") "WBGene00015146")
+                ortholog-hit (has-hit (search "C. elegans") "PRJNA248911_FL82_04596")]
+            (clojure.pprint/pprint hit)
+            (clojure.pprint/pprint ortholog-hit)
+            (is (> (:_score hit) (:_score ortholog-hit)))))))))
 
 (deftest go-term-type-test
   (testing "go-term with creatine biosynthetic process as example"
