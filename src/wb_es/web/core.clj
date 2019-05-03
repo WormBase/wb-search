@@ -22,46 +22,50 @@
 
 (declare autocomplete)
 
+(defn- compose-search-query [q options]
+  (if (and q (not= (clojure.string/trim q) ""))
+    {:bool
+     {:must [{:bool {:filter (get-filter options)}}]
+      :should [{:dis_max
+                {:boost 2
+                 :queries [{:term {:wbid q}}
+                           {:match_phrase {:label {:query q}}}
+                           {:match_phrase {:other_names {:query q
+                                                         :boost 0.9}}}]
+                 }}
+               {:match_phrase {:categories_all {:query q}}}
+               {:match_phrase {:description_all {:query q
+                                                 :boost 0.2}}}
+               {:match_phrase {:other {:query q
+                                       :boost 0.1}}}
+               ]
+      :minimum_should_match 1}}
+    {:bool {:filter (get-filter options)}}))
+
 (defn search [es-base-url index q options]
   (if (:autocomplete options)
     (autocomplete es-base-url index q options)
-    (let [query (if (and q (not= (clojure.string/trim q) ""))
-                  {;:explain true
-                   :sort [:_score
-                          {:label.raw {:order :asc}}]
-                   :query
-                   {:bool
-                    {:must [{:bool {:filter (get-filter options)}}
-                            {:dis_max
-                             {:queries [{:term {:wbid q}}
-                                        {:match_phrase {:label {:query q}}}
-                                        {:match_phrase {:other_names {:query q
-                                                                      :boost 0.9}}}
-                                        {:match_phrase {:categories_all {:query q
-                                                                         :boost 0.9}}}
-                                        {:match_phrase {:description_all {:query q
-                                                                          :boost 0.2}}}
-                                        {:match_phrase {:other {:query q
-                                                                :boost 0.1}}}
-                                        ]
-                              :tie_breaker 0.3}}
-                            ]}}
-                   :highlight
-                   {:fields {:wbid {}
-                             :wbid_as_label {}
-                             :label {}
-                             :other_names {}
-                             :description {}}}
-                   }
-                  {:query {:bool {:filter (get-filter options)}}})
+    (let [query {;:explain true
+                 :sort [:_score
+                        {:label.raw {:order :asc}}]
+                 :query
+                 (compose-search-query q options)
+                 :highlight
+                 {:fields {:wbid {}
+                           :wbid_as_label {}
+                           :label {}
+                           :other_names {}
+                           :description {}}}
+                 }
 
           response
           (try
-            (http/get (format "%s/%s/_search?size=%s&from=%s"
+            (http/get (format "%s/%s/_search?size=%s&from=%s&explain=%s"
                               es-base-url
                               index
                               (get options :size 10)
-                              (get options :from 0))
+                              (get options :from 0)
+                              (get options :explain false))
                       {:content-type "application/json"
                        :body (json/generate-string query)})
             (catch clojure.lang.ExceptionInfo e
@@ -129,24 +133,8 @@
 (defn count [es-base-url index q options]
   (if (:autocomplete options)
     (autocomplete es-base-url index q options)
-    (let [query (if (and q (not= (clojure.string/trim q) ""))
-                  {:query
-                   {:bool
-                    {:must [{:bool {:filter (get-filter options)}}
-                            {:dis_max
-                             {:queries [{:term {:wbid q}}
-                                        {:match_phrase {:label {:query q}}}
-                                        {:match_phrase {:other_names {:query q
-                                                                      :boost 0.9}}}
-                                        {:match_phrase {:categories_all {:query q
-                                                                         :boost 0.9}}}
-                                        {:match_phrase {:description_all {:query q
-                                                                          :boost 0.2}}}
-                                        {:match_phrase {:other {:query q
-                                                                :boost 0.1}}}]
-                              :tie_breaker 0.3}
-                             }]}}}
-                  {:query {:bool {:filter (get-filter options)}}})
+    (let [query
+          {:query (compose-search-query q options)}
 
           response
           (http/get (format "%s/%s/_count"
