@@ -255,14 +255,20 @@
                    (:_score ortholog-hit))))))))
   (testing "autocompletion on gene name"
     (let [db (d/db datomic-conn)]
-      (do
-        (index-datomic-entity (d/entity db [:gene/id "ENSMUSG00000058835"])
-                              (d/entity db [:gene/id "WBGene00015146"]))
-        (testing "ranking c elegans gene higher than mouse gene"
+      (testing "ranking c elegans gene higher than mouse gene"
+        (do
+          (index-datomic-entity (d/entity db [:gene/id "ENSMUSG00000058835"])
+                                (d/entity db [:gene/id "WBGene00015146"]))
+
           (let [mouse-gene (has-hit (autocomplete "abi") "ENSMUSG00000058835")
                 gene (has-hit (autocomplete "abi") "WBGene00015146")]
             (is (> (:_score gene)
-                   (:_score mouse-gene))))))))
+                   (:_score mouse-gene))))))
+      (testing "prefix must match"
+        (do
+          (index-datomic-entity (d/entity db [:gene/id "WBGene00000912"]))
+          (is (has-hit (autocomplete "daf-16") "WBGene00000912"))
+          (is (not (has-hit (autocomplete "daf-16") "WBGene00050690")))))))
   )
 
 (deftest gene-type-description-test

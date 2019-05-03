@@ -77,19 +77,32 @@
   (let [query {:sort [:_score
                       {:label.raw {:order :asc}}]
                :query
-               {:bool
-                {:must [{:bool {:filter (get-filter options)}}
-                        {:bool
-                         {:should [{:match {:wbid.autocomplete_keyword q}}
-                                   {:bool {:should [{:match {:label.autocomplete_keyword q}}
-                                                    {:match {:label.autocomplete q}}]}}]}}]
-                 :should [{:constant_score {:filter {:term {:species.key {:value "c_elegans"}}}}}
-                          {:constant_score
-                           {:filter
-                            {:bool
-                             {:must_not
-                              {:exists
-                               {:field :species.key}}}}}}]}}}
+               {:function_score
+                {:query
+                 {:bool
+                  {:filter (get-filter options)
+                   :should [{:term {:wbid.autocomplete_keyword q}}
+                            {:term {:label.autocomplete_keyword q}}
+                            {:term {:label.autocomplete q}}]
+                   :minimum_should_match 1}}
+                 :boost_mode "replace"
+                 :score_mode "multiply"
+                 :functions
+                 [{:weight 1
+                   :filter
+                   {:match_all {}}}
+                  {:weight 2
+                   :filter
+                   {:term {:species.key {:value "c_elegans"}}}}
+                  {:weight 2
+                   :filter
+                   {:bool
+                    {:must_not
+                     {:exists
+                      {:field :species.key}}}}}
+                  {:weight 0.01
+                   :filter
+                   {:term {:label.autocomplete q}}}]}}}
 
         response
         (http/get (format "%s/%s/_search?size=%s&explain=%s"
