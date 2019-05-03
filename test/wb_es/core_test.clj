@@ -253,6 +253,16 @@
                    "Ppa-cyn-17.2"))
             (is (> (:_score gene-hit)
                    (:_score ortholog-hit))))))))
+  (testing "autocompletion on gene name"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:gene/id "ENSMUSG00000058835"])
+                              (d/entity db [:gene/id "WBGene00015146"]))
+        (testing "ranking c elegans gene higher than mouse gene"
+          (let [mouse-gene (has-hit (autocomplete "abi") "ENSMUSG00000058835")
+                gene (has-hit (autocomplete "abi") "WBGene00015146")]
+            (is (> (:_score gene)
+                   (:_score mouse-gene))))))))
   )
 
 (deftest gene-type-description-test
@@ -278,7 +288,6 @@
           (index-datomic-entity (d/entity db [:gene/id "WBGene00015146"]))
           (let [hit (has-hit (search "C. elegans" {:size 100}) "WBGene00015146")
                 ortholog-hit (has-hit (search "C. elegans" {:size 100}) "PRJNA248911_FL82_04596")]
-            (clojure.pprint/pprint ortholog-hit)
             (is (> (:_score hit) (:_score ortholog-hit)))))))))
 
 (deftest go-term-type-test

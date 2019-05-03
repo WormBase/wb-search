@@ -37,8 +37,7 @@
                {:match_phrase {:description_all {:query q
                                                  :boost 0.2}}}
                {:match_phrase {:other {:query q
-                                       :boost 0.1}}}
-               ]
+                                       :boost 0.1}}}]
       :minimum_should_match 1}}
     {:bool {:filter (get-filter options)}}))
 
@@ -83,13 +82,21 @@
                         {:bool
                          {:should [{:match {:wbid.autocomplete_keyword q}}
                                    {:bool {:should [{:match {:label.autocomplete_keyword q}}
-                                                    {:match {:label.autocomplete q}}]}}]}}]}}}
+                                                    {:match {:label.autocomplete q}}]}}]}}]
+                 :should [{:constant_score {:filter {:term {:species.key {:value "c_elegans"}}}}}
+                          {:constant_score
+                           {:filter
+                            {:bool
+                             {:must_not
+                              {:exists
+                               {:field :species.key}}}}}}]}}}
 
         response
-        (http/get (format "%s/%s/_search?size=%s"
+        (http/get (format "%s/%s/_search?size=%s&explain=%s"
                           es-base-url
                           index
-                          (get options :size 10))
+                          (get options :size 10)
+                          (get options :explain false))
                   {:content-type "application/json"
                    :body (json/generate-string query)})]
     (json/parse-string (:body response) true)))
