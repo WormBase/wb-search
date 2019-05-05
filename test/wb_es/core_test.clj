@@ -74,6 +74,13 @@
           response (http/get endpoint {:query-params (assoc options :q q)})]
       (json/parse-string (:body response) true))))
 
+(defn- has-hit [result id]
+  (->> (get-in result [:hits :hits])
+       (filter (fn [hit]
+                 (= id
+                    (get-in hit [:_source :wbid]))))
+       (first)))
+
 (def search (web-query "/search"))
 (def autocomplete (web-query "/autocomplete"))
 
@@ -231,14 +238,38 @@
           (is (has-gene-hit (search "Y54G11A.10") "WBGene00002996")))
         (testing "search for gene by other name"
           (is (has-gene-hit (search "CELE_Y54G11A.10") "WBGene00002996"))))
-      )))
+      ))
+  (testing "testing gene name match in different fields"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:gene/id "WBGene00000877"])
+                              (d/entity db [:gene/id "WBGene00102530"]))
+        (testing "match in label is scored higher than in descriptions and other names"
+          (let [gene-hit (has-hit (search "cyn-") "WBGene00000877")
+                ortholog-hit (has-hit (search "cyn-") "WBGene00102530")]
+            (is (= (get-in gene-hit [:_source :label])
+                   "cyn-1"))
+            (is (= (get-in ortholog-hit [:_source :label])
+                   "Ppa-cyn-17.2"))
+            (is (> (:_score gene-hit)
+                   (:_score ortholog-hit))))))))
+  (testing "autocompletion on gene name"
+    (let [db (d/db datomic-conn)]
+      (testing "ranking c elegans gene higher than mouse gene"
+        (do
+          (index-datomic-entity (d/entity db [:gene/id "ENSMUSG00000058835"])
+                                (d/entity db [:gene/id "WBGene00015146"]))
 
-(defn- has-hit [result id]
-  (->> (get-in result [:hits :hits])
-       (filter (fn [hit]
-                 (= id
-                    (get-in hit [:_source :wbid]))))
-       (first)))
+          (let [mouse-gene (has-hit (autocomplete "abi") "ENSMUSG00000058835")
+                gene (has-hit (autocomplete "abi") "WBGene00015146")]
+            (is (> (:_score gene)
+                   (:_score mouse-gene))))))
+      (testing "prefix must match"
+        (do
+          (index-datomic-entity (d/entity db [:gene/id "WBGene00000912"]))
+          (is (has-hit (autocomplete "daf-16") "WBGene00000912"))
+          (is (not (has-hit (autocomplete "daf-16") "WBGene00050690")))))))
+  )
 
 (deftest gene-type-description-test
   (testing "gene descriptions"
@@ -261,10 +292,8 @@
         (testing "species name appear in :species ranked higher than appearing in descriptions"
           (index-datomic-entity (d/entity db [:gene/id "PRJNA248911_FL82_04596"]))
           (index-datomic-entity (d/entity db [:gene/id "WBGene00015146"]))
-          (let [hit (has-hit (search "C. elegans") "WBGene00015146")
-                ortholog-hit (has-hit (search "C. elegans") "PRJNA248911_FL82_04596")]
-            (clojure.pprint/pprint hit)
-            (clojure.pprint/pprint ortholog-hit)
+          (let [hit (has-hit (search "C. elegans" {:size 100}) "WBGene00015146")
+                ortholog-hit (has-hit (search "C. elegans" {:size 100}) "PRJNA248911_FL82_04596")]
             (is (> (:_score hit) (:_score ortholog-hit)))))))))
 
 (deftest go-term-type-test
