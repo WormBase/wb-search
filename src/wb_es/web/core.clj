@@ -25,7 +25,7 @@
 (defn- compose-search-query [q options]
   (if (and q (not= (clojure.string/trim q) ""))
     {:bool
-     {:must [{:bool {:filter (get-filter options)}}]
+     {:filter (get-filter options)
       :should [{:dis_max
                 {:boost 2
                  :queries [{:term {:wbid q}}
@@ -39,7 +39,7 @@
                {:match_phrase {:other {:query q
                                        :boost 0.1}}}]
       :minimum_should_match 1}}
-    {:bool {:filter (get-filter options)}}))
+    {:bool {:must (get-filter options)}}))
 
 (defn search [es-base-url index q options]
   (if (:autocomplete options)
@@ -48,7 +48,14 @@
                  :sort [:_score
                         {:label.raw {:order :asc}}]
                  :query
-                 (compose-search-query q options)
+                 {:function_score
+                  {:query (compose-search-query q options)
+                   :boost_mode "multiply"
+                   :score_mode "multiply"
+                   :functions
+                   [{:weight 2
+                     :filter
+                     {:term {:species.key {:value "c_elegans"}}}}]}}
                  :highlight
                  {:fields {:wbid {}
                            :wbid_as_label {}
