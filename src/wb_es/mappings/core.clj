@@ -21,7 +21,10 @@
            }
 
     :label {:type "text"
-            :fields {:raw {:type "keyword"}
+            :fields {:raw {:type "keyword"
+                           :normalizer "lowercase_normalizer"}
+                     :english {:type "text"
+                               :analyzer "english"}
                      :autocomplete {:type "text"
                                     :analyzer "autocomplete"
                                     :search_analyzer "standard"}
@@ -46,6 +49,10 @@
     :categories_all {:type "text"
                      :analyzer "split_underscore_analyzer"}
     :description_all {:type "text"
+                      :fields
+                      {:english
+                       {:type "text"
+                        :analyzer "english"}}
                       :store true}
     :other {:type "text"}
     ;; end of copy to fields

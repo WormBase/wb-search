@@ -35,10 +35,13 @@
                            {:term {:other_names.raw {:value q
                                                      :boost 4}}}
                            {:match_phrase {:label {:query q}}}
+                           {:match_phrase {:label.english {:query q}}}
                            {:match_phrase {:other_names {:query q
                                                          :boost 0.8}}}
                            {:match_phrase {:description_all {:query q
                                                              :boost 0.2}}}
+                           {:match_phrase {:description_all.english {:query q
+                                                                     :boost 0.2}}}
                            ]
                  }}
                {:match_phrase {:categories_all {:query q}}}
