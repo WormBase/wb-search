@@ -49,6 +49,10 @@
     :categories_all {:type "text"
                      :analyzer "split_underscore_analyzer"}
     :description_all {:type "text"
+                      :fields
+                      {:english
+                       {:type "text"
+                        :analyzer "english"}}
                       :store true}
     :other {:type "text"}
     ;; end of copy to fields

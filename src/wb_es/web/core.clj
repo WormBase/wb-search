@@ -40,6 +40,8 @@
                                                          :boost 0.8}}}
                            {:match_phrase {:description_all {:query q
                                                              :boost 0.2}}}
+                           {:match_phrase {:description_all.english {:query q
+                                                                     :boost 0.2}}}
                            ]
                  }}
                {:match_phrase {:categories_all {:query q}}}
