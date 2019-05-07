@@ -35,7 +35,11 @@
             }
     :other_unique_ids {:type "keyword"
                        :normalizer "lowercase_normalizer"}
-    :other_names {:type "text"}
+    :other_names {:type "text"
+                  :fields
+                  {:raw
+                   {:type "keyword"
+                    :normalizer "lowercase_normalizer"}}}
 
 
     ;; start of copy_to fields

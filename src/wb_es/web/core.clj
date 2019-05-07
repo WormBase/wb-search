@@ -28,14 +28,20 @@
      {:filter (get-filter options)
       :should [{:dis_max
                 {:boost 2
-                 :queries [{:term {:wbid q}}
+                 :queries [{:term {:wbid {:value q
+                                          :boost 5} }}
+                           {:term {:label.raw {:value q
+                                               :boost 5}}}
+                           {:term {:other_names.raw {:value q
+                                                     :boost 4}}}
                            {:match_phrase {:label {:query q}}}
                            {:match_phrase {:other_names {:query q
-                                                         :boost 0.9}}}]
+                                                         :boost 0.8}}}
+                           {:match_phrase {:description_all {:query q
+                                                             :boost 0.2}}}
+                           ]
                  }}
                {:match_phrase {:categories_all {:query q}}}
-               {:match_phrase {:description_all {:query q
-                                                 :boost 0.2}}}
                {:match_phrase {:other {:query q
                                        :boost 0.1}}}]
       :minimum_should_match 1}}
@@ -55,7 +61,13 @@
                    :functions
                    [{:weight 2
                      :filter
-                     {:term {:species.key {:value "c_elegans"}}}}]}}
+                     {:term {:species.key {:value "c_elegans"}}}}
+                    {:weight 2
+                     :filter
+                     {:bool
+                      {:must_not
+                       {:exists
+                        {:field :species.key}}}}}]}}
                  :highlight
                  {:fields {:wbid {}
                            :wbid_as_label {}
