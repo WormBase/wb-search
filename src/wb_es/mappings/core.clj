@@ -21,7 +21,10 @@
            }
 
     :label {:type "text"
-            :fields {:raw {:type "keyword"}
+            :fields {:raw {:type "keyword"
+                           :normalizer "lowercase_normalizer"}
+                     :english {:type "text"
+                               :analyzer "english"}
                      :autocomplete {:type "text"
                                     :analyzer "autocomplete"
                                     :search_analyzer "standard"}
