@@ -58,3 +58,9 @@ eb-local-run:
 .PHONY: aws-ecr-login
 aws-ecr-login:
 	aws ecr get-login --no-include-email --region us-east-1 | sh
+
+
+.PHONY: release
+release: LEVEL ?= patch
+release: aws-ecr-login
+	lein release ${LEVEL}

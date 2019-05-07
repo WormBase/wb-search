@@ -60,8 +60,7 @@ Build and upload containers (if and only if source code has changed) and verify 
 (_Note: Building containers isn't necessary for every WS release, if the source code hasn't changed._)
 
 ```
-make aws-ecr-login
-lein release [$LEVEL]
+LEVEL=[major|minor|patch|rc|beta|alpha] make release
 ```
 
 - [Learn more about release levels](https://github.com/technomancy/leiningen/blob/master/doc/DEPLOY.md#releasing-simplified)
