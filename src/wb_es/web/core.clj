@@ -122,9 +122,18 @@
                     {:must_not
                      {:exists
                       {:field :species.key}}}}}
-                  {:weight 0.01
+                  {:weight 0.8
                    :filter
-                   {:term {:label.autocomplete q}}}]}}}
+                   {:bool
+                    {:must
+                     [{:term {:wbid.autocomplete_keyword q}}]}}}
+                  {:weight 0.1
+                   :filter
+                   {:bool
+                    {:must_not
+                     [{:term {:label.autocomplete_keyword q}}]
+                     :must
+                     [{:term {:label.autocomplete q}}]}}}]}}}
 
         response
         (http/get (format "%s/%s/_search?size=%s&explain=%s"

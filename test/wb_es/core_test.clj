@@ -274,7 +274,15 @@
         (do
           (index-datomic-entity (d/entity db [:gene/id "WBGene00000912"]))
           (is (has-hit (autocomplete "daf-16") "WBGene00000912"))
-          (is (not (has-hit (autocomplete "daf-16") "WBGene00050690")))))))
+          (is (not (has-hit (autocomplete "daf-16") "WBGene00050690")))))
+      (testing "matching at label prefix scores higher than matching middle term"
+        (do
+          (index-datomic-entity (d/entity db [:gene/id "WBGene00006760"])
+                                (d/entity db [:paper/id "WBPaper00023557"]))
+          (let [prefix-hit (has-hit (autocomplete "unc" ) "WBGene00006760")
+                middle-hit (has-hit (autocomplete "unc" ) "WBPaper00023557")]
+            (is (> (:_score prefix-hit)
+                   (:_score middle-hit))))))))
   )
 
 (deftest gene-type-description-test
