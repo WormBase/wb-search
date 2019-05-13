@@ -70,7 +70,13 @@
                      {:bool
                       {:must_not
                        {:exists
-                        {:field :species.key}}}}}]}}
+                        {:field :species.key}}}}}
+                    {:weight 0.1
+                     :filter
+                     {:bool
+                      {:must_not
+                       [{:exists
+                         {:field :label}}]}}}]}}
                  :highlight
                  {:fields {:wbid {}
                            :wbid_as_label {}

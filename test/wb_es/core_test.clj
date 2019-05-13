@@ -336,7 +336,15 @@
                         (= "WBPaper00004490"
                            (get-in hit [:_source :wbid])))
                       hits)))))
-      )))
+      ))
+  (testing "paper without title"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:paper/id "WBPaper00033431"]))
+        (let [paper-count (get-in (search nil {:type "paper"}) [:hits :total])
+              hits (get-in (search nil {:type "paper" :size paper-count}) [:hits :hits ])]
+          (is (= (get-in (last hits) [:_source :wbid])
+                 "WBPaper00033431")))))))
 
 (deftest phenotype-type-test
   (testing "phenotype with locomotion variant as example"
@@ -358,7 +366,7 @@
                                             hits)
                 [gene-class-unc-hit] (filter (fn [hit]
                                                (= "unc"
-                                                (get-in hit [:_source :wbid])))
+                                                  (get-in hit [:_source :wbid])))
                                              hits)]
             (is (> (:_score gene-class-unc-hit)
                    (:_score phenotype-unc-hit)))))))))
