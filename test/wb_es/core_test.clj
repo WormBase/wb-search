@@ -179,6 +179,12 @@
                           (= "X-linked dystonia-parkinsonism"
                              (get-in hit [:_source :label])))
                         hits)))
+            (testing "Parkinson's diease scores no worse than specific children terms"
+              (let [hits (autocomplete "parkinson" {:size (count disease-parks)})
+                    pd-term (has-hit hits "DOID:14330")
+                    child-term (has-hit hits "DOID:0060897")]
+                (is (>= (:_score pd-term)
+                        (:_score child-term)))))
 
             )))
 
