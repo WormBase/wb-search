@@ -20,9 +20,9 @@
                                    (if-let [match (re-matches #"^(?:doi[^/]*)?(10\.[^/]+.+)$" id)]
                                      (second match)
                                      id))))
-     :label (-> (:paper/brief-citation entity)
-                (str)
-                (clojure.string/replace #"\"(.+)\"$" (format "\"%s\"" (:paper/title entity))))
+     :label (some-> (:paper/brief-citation entity)
+                    (str)
+                    (clojure.string/replace #"\"(.+)\"$" (format "\"%s\"" (:paper/title entity))))
      :description (->> (:paper/abstract entity)
                        (map :longtext/text)
                        (clojure.string/join "\n"))

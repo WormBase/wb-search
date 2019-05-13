@@ -34,8 +34,8 @@
                                                :boost 5}}}
                            {:term {:other_names.raw {:value q
                                                      :boost 4}}}
-                           {:match_phrase {:label {:query q}}}
-                           {:match_phrase {:label.english {:query q}}}
+                           {:match_phrase {:label {:query q :slop 12}}}
+                           {:match_phrase {:label.english {:query q :slop 12}}}
                            {:match_phrase {:other_names {:query q
                                                          :boost 0.8}}}
                            {:match_phrase {:description_all {:query q
@@ -70,7 +70,13 @@
                      {:bool
                       {:must_not
                        {:exists
-                        {:field :species.key}}}}}]}}
+                        {:field :species.key}}}}}
+                    {:weight 0.1
+                     :filter
+                     {:bool
+                      {:must_not
+                       [{:exists
+                         {:field :label}}]}}}]}}
                  :highlight
                  {:fields {:wbid {}
                            :wbid_as_label {}
@@ -105,7 +111,8 @@
                   {:filter (get-filter options)
                    :should [{:term {:wbid.autocomplete_keyword q}}
                             {:term {:label.autocomplete_keyword q}}
-                            {:term {:label.autocomplete q}}]
+                            {:match_phrase {:label.autocomplete {:query q
+                                                                 :slop 12}}}]
                    :minimum_should_match 1}}
                  :boost_mode "replace"
                  :score_mode "multiply"
@@ -122,9 +129,19 @@
                     {:must_not
                      {:exists
                       {:field :species.key}}}}}
-                  {:weight 0.01
+                  {:weight 0.8
                    :filter
-                   {:term {:label.autocomplete q}}}]}}}
+                   {:bool
+                    {:must
+                     [{:term {:wbid.autocomplete_keyword q}}]}}}
+                  {:weight 0.1
+                   :filter
+                   {:bool
+                    {:must_not
+                     [{:term {:label.autocomplete_keyword q}}]
+                     :must
+                     [{:match_phrase {:label.autocomplete {:query q
+                                                           :slop 12}}}]}}}]}}}
 
         response
         (http/get (format "%s/%s/_search?size=%s&explain=%s"

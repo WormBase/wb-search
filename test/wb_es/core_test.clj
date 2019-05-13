@@ -161,7 +161,7 @@
       (testing "autocomplete by disease name"
         (do
           (apply index-datomic-entity disease-parks)
-          (let [hits (-> (autocomplete "park" {:size (count disease-parks)})
+          (let [hits (-> (autocomplete "park" {:size (count disease-parks) :type "disease"})
                          (get-in [:hits :hits]))]
 
             (testing "match Parkinson's disease"
@@ -179,6 +179,12 @@
                           (= "X-linked dystonia-parkinsonism"
                              (get-in hit [:_source :label])))
                         hits)))
+            (testing "Parkinson's diease scores no worse than specific children terms"
+              (let [hits (autocomplete "parkinson" {:size (count disease-parks)})
+                    pd-term (has-hit hits "DOID:14330")
+                    child-term (has-hit hits "DOID:0060897")]
+                (is (>= (:_score pd-term)
+                        (:_score child-term)))))
 
             )))
 
@@ -268,7 +274,15 @@
         (do
           (index-datomic-entity (d/entity db [:gene/id "WBGene00000912"]))
           (is (has-hit (autocomplete "daf-16") "WBGene00000912"))
-          (is (not (has-hit (autocomplete "daf-16") "WBGene00050690")))))))
+          (is (not (has-hit (autocomplete "daf-16") "WBGene00050690")))))
+      (testing "matching at label prefix scores higher than matching middle term"
+        (do
+          (index-datomic-entity (d/entity db [:gene/id "WBGene00006760"])
+                                (d/entity db [:paper/id "WBPaper00023557"]))
+          (let [prefix-hit (has-hit (autocomplete "unc" ) "WBGene00006760")
+                middle-hit (has-hit (autocomplete "unc" ) "WBPaper00023557")]
+            (is (> (:_score prefix-hit)
+                   (:_score middle-hit))))))))
   )
 
 (deftest gene-type-description-test
@@ -322,7 +336,22 @@
                         (= "WBPaper00004490"
                            (get-in hit [:_source :wbid])))
                       hits)))))
-      )))
+      ))
+  (testing "paper without title"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:paper/id "WBPaper00033431"]))
+        (let [paper-count (get-in (search nil {:type "paper"}) [:hits :total])
+              hits (get-in (search nil {:type "paper" :size paper-count}) [:hits :hits ])]
+          (is (= (get-in (last hits) [:_source :wbid])
+                 "WBPaper00033431"))))))
+
+  (testing "suggesting paper title with partial mathces"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:paper/id "WBPaper00051539"]))
+        (is (has-hit (autocomplete "parkinson genetic") "WBPaper00051539"))
+        (is (has-hit (search "parkinson genetic") "WBPaper00051539"))))))
 
 (deftest phenotype-type-test
   (testing "phenotype with locomotion variant as example"
@@ -344,7 +373,7 @@
                                             hits)
                 [gene-class-unc-hit] (filter (fn [hit]
                                                (= "unc"
-                                                (get-in hit [:_source :wbid])))
+                                                  (get-in hit [:_source :wbid])))
                                              hits)]
             (is (> (:_score gene-class-unc-hit)
                    (:_score phenotype-unc-hit)))))))))
