@@ -161,7 +161,7 @@
       (testing "autocomplete by disease name"
         (do
           (apply index-datomic-entity disease-parks)
-          (let [hits (-> (autocomplete "park" {:size (count disease-parks)})
+          (let [hits (-> (autocomplete "park" {:size (count disease-parks) :type "disease"})
                          (get-in [:hits :hits]))]
 
             (testing "match Parkinson's disease"
@@ -344,7 +344,14 @@
         (let [paper-count (get-in (search nil {:type "paper"}) [:hits :total])
               hits (get-in (search nil {:type "paper" :size paper-count}) [:hits :hits ])]
           (is (= (get-in (last hits) [:_source :wbid])
-                 "WBPaper00033431")))))))
+                 "WBPaper00033431"))))))
+
+  (testing "suggesting paper title with partial mathces"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:paper/id "WBPaper00051539"]))
+        (is (has-hit (autocomplete "parkinson genetic") "WBPaper00051539"))
+        (is (has-hit (search "parkinson genetic") "WBPaper00051539"))))))
 
 (deftest phenotype-type-test
   (testing "phenotype with locomotion variant as example"
