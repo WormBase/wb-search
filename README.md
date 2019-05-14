@@ -96,6 +96,8 @@ Applying a hotfix can be achieved by creating a production-like hotfix environme
 (cd eb/default/ && make eb-create-hotfix)
 ```
 
+Wait until the new environment responds to the old URL AND **the old DNS record has expired** before terminating the old environment.
+
 If re-indexing is required, deploy the indexer as [shown above](#deploy-indexer), **before** creating the hotfix environment.
 
 ## Development environment
