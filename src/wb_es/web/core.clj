@@ -219,18 +219,7 @@
 ))
 
 (defn facets [es-base-url index q options]
-  (let [query (if (and q (not= (clojure.string/trim q) ""))
-                {:dis_max
-                 {:queries [{:term {:wbid q}}
-                            {:match_phrase {:label {:query q}}}
-                            {:match_phrase {:other_names {:query q
-                                                          :boost 0.9}}}
-                            {:match_phrase {:_all {:query q
-                                                   :boost 0.1}}}]
-                  :tie_breaker 0.3}
-                 }
-                {:match_all {}})
-        categories-config (case (:type options)
+  (let [categories-config (case (:type options)
                             "paper"
                             [{:field :paper_type}]
 
@@ -258,13 +247,21 @@
                               :option :type}
                              {:field :species.key
                               :option :species}])
-        request-body {:query query
+
+        get-category-option (fn [category-config]
+                              (or (:option category-config)
+                                  (:field category-config)))
+        ;; options that do not interfere with the facet categories
+        non-category-options (->> categories-config
+                                  (keep get-category-option)
+                                  (apply dissoc options))
+        request-body {:query (compose-search-query q non-category-options)
                       :size 0
                       :aggs (reduce (fn [result category]
-                                      (let [option (or (:option category) (:field category))
+                                      (let [option (get-category-option category)
                                             field (:field category)
                                             child-type (:child_type category)]
-                                        (assoc result option {:filter {:bool {:must (get-filter (dissoc options option))}}
+                                        (assoc result option {:filter {:bool {:filter (get-filter (dissoc options option))}}
                                                               :aggs (cond
                                                                      (:aggs category)
                                                                      (:aggs category)
