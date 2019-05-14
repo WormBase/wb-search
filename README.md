@@ -86,6 +86,18 @@ Ensure the environment variables above are set appropriately before preceeding.
 
 To make a production-like environment locally, `(cd eb/default/ && make eb-local-run)`.
 
+### Deploy Hotfix
+
+Critical bug fixes are sometimes applied outside of the schedule releases to the production environment.
+
+Applying a hotfix can be achieved by creating a production-like hotfix environment of the web API and swapping its URL with the current production environment.
+
+```
+(cd eb/default/ && make eb-create-hotfix)
+```
+
+If re-indexing is required, deploy the indexer as [shown above](#deploy-indexer), **before** creating the hotfix environment.
+
 ## Development environment
 
 Filesystem
