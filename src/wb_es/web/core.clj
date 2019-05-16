@@ -6,19 +6,33 @@
   (fn [request]
     (handler (update-in request [:params :q] #(some-> % clojure.string/lower-case)))))
 
+(def ^:private non-filter-parameters
+  #{:size
+    :from
+    :explain
+    })
 
 (defn get-filter [options]
-  (->> []
-       (cons (when-let [type-value (:type options)]
-               {:term {:page_type type-value}}))
-       (cons (when-let [species-value (some->> (:species options)
-                                               (clojure.string/lower-case))]
-               {:term {:species.key species-value}}))
-       (cons (when-let [species-value (some->> (:paper_type options)
-                                               (clojure.string/lower-case))]
-               {:term {:paper_type species-value}}))
-       (filter identity)))
+  (->> options
+       (remove (fn [[key _]]
+                 (non-filter-parameters key)))
+       (map (fn [[key value]]
+              (let [normalized-value (some->> value
+                                              (clojure.string/lower-case))
+                    term-or-terms-key (if (sequential? value)
+                                        :terms
+                                        :term)]
+                (case key
 
+                  :type
+                  {term-or-terms-key {:page_type value}}
+
+                  :species
+                  {term-or-terms-key {:species.key value}}
+
+                  {term-or-terms-key {key value}}
+                  ))))
+       ))
 
 (declare autocomplete)
 
