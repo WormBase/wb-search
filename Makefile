@@ -49,7 +49,7 @@ docker-run-aws-es:
 docker-run-kibana:
 	@docker run -p 5601:5601 \
 		--network=wb-network \
-		docker.elastic.co/kibana/kibana
+		docker.elastic.co/kibana/kibana:6.6.1
 
 .PHONY: eb-local-run
 eb-local-run:
