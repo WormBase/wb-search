@@ -6,40 +6,8 @@
   (fn [request]
     (handler (update-in request [:params :q] #(some-> % clojure.string/lower-case)))))
 
-;; TODO use whitelist instead of blacklist
-(def ^:private non-filter-parameters
-  #{:size
-    :from
-    :explain
-    :page
-    :query
-    :q
-    :autocomplete
-    :raw
-    })
 
-(defn get-filter [options]
-  (->> options
-       (remove (fn [[key value]]
-                 (or (non-filter-parameters key)
-                     (not value))))
-       (map (fn [[key value]]
-              (let [normalized-value (some->> value
-                                              (clojure.string/lower-case))
-                    term-or-terms-key (if (sequential? value)
-                                        :terms
-                                        :term)]
-                (case key
-
-                  :type
-                  {term-or-terms-key {:page_type value}}
-
-                  :species
-                  {term-or-terms-key {:species.key value}}
-
-                  {term-or-terms-key {key value}}
-                  ))))
-       ))
+(declare get-filter)
 
 (declare autocomplete)
 
@@ -238,41 +206,73 @@
                      "query" {:exists {:field (format "interaction_type_%s" interaction-type)}}}})]
     {:bool {:must (map get-rule musts)
             :must_not (map get-rule must-nots)}}
-))
+    ))
+
+(defn page-categories [page-type]
+  (->>
+   (case page-type
+     "paper"
+     [{:field :paper_type}]
+
+     "interaction_group"
+     [{:field :biological_process}
+      {:field :cellular_component}
+      {:field :interaction_type_genetic
+       :option :genetic_interaction_subtypes
+       :child_type "interaction"}
+      {:field :interaction_type_physical
+       :option :physical_interaction_subtypes
+       :child_type "interaction"}
+      {:option :interaction_type
+       :aggs {:categories
+              {:filters
+               {:filters
+                (->>
+                 ["physical:genetic", "physical:-genetic", "-physical:genetic"]
+                 (map (fn [type-string]
+                        [type-string (interaction-type-query type-string)]))
+                 (into {}))}}}}
+      ]
+
+     nil)
+   (concat [{:field :page_type
+             :option :type}
+            {:field :species.key
+             :option :species}])
+   ))
+
+(defn get-category-option [category-config]
+  (or (:option category-config)
+      (:field category-config)))
+
+(defn get-filter [options]
+  (let [valid-filter-options (->> (page-categories (:type options))
+                                  (map get-category-option)
+                                  (set))]
+    (->> options
+         (filter (fn [[key value]]
+                   (and (valid-filter-options key)
+                        (identity value))))
+         (map (fn [[key value]]
+                (let [normalized-value (some->> value
+                                                (clojure.string/lower-case))
+                      term-or-terms-key (if (sequential? value)
+                                          :terms
+                                          :term)]
+                  (case key
+
+                    :type
+                    {term-or-terms-key {:page_type value}}
+
+                    :species
+                    {term-or-terms-key {:species.key value}}
+
+                    {term-or-terms-key {key value}}
+                    ))))
+         )))
 
 (defn facets [es-base-url index q options]
-  (let [categories-config (case (:type options)
-                            "paper"
-                            [{:field :paper_type}]
-
-                            "interaction_group"
-                            [{:field :biological_process}
-                             {:field :cellular_component}
-                             {:field :interaction_type_genetic
-                              :option :genetic_interaction_subtypes
-                              :child_type "interaction"}
-                             {:field :interaction_type_physical
-                              :option :physical_interaction_subtypes
-                              :child_type "interaction"}
-                             {:option :interaction_type
-                              :aggs {:categories
-                                     {:filters
-                                      {:filters
-                                       (->>
-                                        ["physical:genetic", "physical:-genetic", "-physical:genetic"]
-                                        (map (fn [type-string]
-                                               [type-string (interaction-type-query type-string)]))
-                                        (into {}))}}}}
-                             ]
-
-                            [{:field :page_type
-                              :option :type}
-                             {:field :species.key
-                              :option :species}])
-
-        get-category-option (fn [category-config]
-                              (or (:option category-config)
-                                  (:field category-config)))
+  (let [categories-config (page-categories (:type options))
         ;; options that do not interfere with the facet categories
         non-category-options (->> categories-config
                                   (keep get-category-option)
