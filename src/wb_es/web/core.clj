@@ -6,16 +6,23 @@
   (fn [request]
     (handler (update-in request [:params :q] #(some-> % clojure.string/lower-case)))))
 
+;; TODO use whitelist instead of blacklist
 (def ^:private non-filter-parameters
   #{:size
     :from
     :explain
+    :page
+    :query
+    :q
+    :autocomplete
+    :raw
     })
 
 (defn get-filter [options]
   (->> options
-       (remove (fn [[key _]]
-                 (non-filter-parameters key)))
+       (remove (fn [[key value]]
+                 (or (non-filter-parameters key)
+                     (not value))))
        (map (fn [[key value]]
               (let [normalized-value (some->> value
                                               (clojure.string/lower-case))
@@ -110,6 +117,7 @@
                       {:content-type "application/json"
                        :body (json/generate-string query)})
             (catch clojure.lang.ExceptionInfo e
+              (clojure.pprint/pprint query)
               (clojure.pprint/pprint (ex-data e))
               (throw e)))]
       (json/parse-string (:body response) true))))
