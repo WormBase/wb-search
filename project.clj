@@ -17,6 +17,8 @@
    [ring/ring-defaults "0.3.0"]
    [ring/ring-core "1.6.2"]
    [ring/ring-json "0.4.0"]
+   [ring-cors "0.1.13"]
+
    ;; use jetty in tests
    [ring/ring-jetty-adapter "1.6.3"]
 

@@ -1,6 +1,7 @@
 (ns wb-es.web.index
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
+            [ring.middleware.cors :refer [wrap-cors]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.json :refer [wrap-json-response]]
             [ring.middleware.resource :refer [wrap-resource]]
@@ -88,6 +89,8 @@
     (binding [*index-id* index-id]
       (let [enhanced-handler
             (-> app
+                (wrap-cors :access-control-allow-origin [#"https?://(.*\.)?wormbase.org(:\d+)?"]
+                           :access-control-allow-methods [:get :put :post :delete])
                 (wrap-resource "public")
                 (wrap-json-response {:pretty true})
                 (wrap-defaults api-defaults))]
