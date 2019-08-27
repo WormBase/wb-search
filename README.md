@@ -92,6 +92,9 @@ Ensure the environment variables above are set appropriately before preceeding.
 
 To make a production-like environment locally, `(cd eb/default/ && make eb-local-run)`.
 
+**Troubleshooot tip:**
+- If `ERROR: InvalidProfileError - The config profile (eb-cli) could not be found` occurs while running on the development server instance, running `eb init` in the appropriate directory, ie. `eb/indexer/` or `eb/default`, seems to fix that. Remember that instance profile rather than user profile is used on the development server instance.
+
 ### Deploy Hotfix
 
 Critical bug fixes are sometimes applied outside of the schedule releases to the production environment.
