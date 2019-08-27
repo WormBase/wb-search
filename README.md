@@ -30,17 +30,23 @@ You will need to **install**:
 - AWS CLI
 - Elastic Beanstalk CLI
 
-You will need to obtain various **AWS permissions** for:
+You will need to set the following environment variables:
+
+- WB_DB_URI (required)
+
+Optional environment variables:
+- AWS_ACCESS_KEY_ID (for local/Non-AWS dev environment only)
+- AWS_SECRET_ACCESS_KEY (for local/Non-AWS dev environment only)
+
+For development, appropriate AWS permission is setup on the development server instance through an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html). The permissions are granted to the role `wb-web-team-dev-instance-role` that is attached to the development server instance.
+
+For production, the instance profile role `wb-search-beanstalk-ec2-role` is used by instances created by Beanstalk.
+
+The permissions being granted include:
 - S3 bucket wormbase-elasticsearch-snapshots
 - WormBase Datomic/DynamoDB database
 - Elastic Beanstalk / Starting and stopping EC2
 
-Sensitive info are communicated to the programs through **environment variables**.
-You will need to set the following environment variables:
-
-- AWS_ACCESS_KEY_ID
-- AWS_SECRET_ACCESS_KEY
-- WB_DB_URI
 
 ## Production environment
 
@@ -85,6 +91,9 @@ Ensure the environment variables above are set appropriately before preceeding.
 ```
 
 To make a production-like environment locally, `(cd eb/default/ && make eb-local-run)`.
+
+**Troubleshooot tip:**
+- If `ERROR: InvalidProfileError - The config profile (eb-cli) could not be found` occurs while running on the development server instance, running `eb init` in the appropriate directory, ie. `eb/indexer/` or `eb/default`, seems to fix that. Remember that instance profile rather than user profile is used on the development server instance.
 
 ### Deploy Hotfix
 

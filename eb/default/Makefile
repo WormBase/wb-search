@@ -9,12 +9,12 @@ eb-local-run:
 
 .PHONY: eb-setenv
 eb-setenv:
-	@eb setenv AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY} WB_DB_URI=${WB_DB_URI} RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
+	@eb setenv WB_DB_URI=${WB_DB_URI} RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
 
 .PHONY: eb-create
 eb-create:
-	@eb create wormbase-search-${LOWER_WS_VERSION}-${ENV_NAME_SUFFIX} --cfg v0.2.14 --cname wormbase-search-${LOWER_WS_VERSION} --envvars AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID},AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY},WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
+	@eb create wormbase-search-${LOWER_WS_VERSION}-${ENV_NAME_SUFFIX} --cfg v1.0.0 --cname wormbase-search-${LOWER_WS_VERSION} --envvars WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
 
 .PHONY: eb-create-hotfix
 eb-create-hotfix:
-	@eb create wormbase-search-${LOWER_WS_VERSION}-${ENV_NAME_SUFFIX} --cfg v0.2.14 --cname wormbase-search-hotfix --envvars AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID},AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY},WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
+	@eb create wormbase-search-${LOWER_WS_VERSION}-${ENV_NAME_SUFFIX} --cfg v1.0.0 --cname wormbase-search-hotfix --envvars WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
