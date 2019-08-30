@@ -12,6 +12,9 @@
      :label (->> entity
                  (:anatomy-term/term)
                  (:anatomy-term.term/text))
+     :other_names (->> entity
+                       (:anatomy-term/synonym)
+                       (map :anatomy-term.synonym/text))
      :description (->> entity
                        (:anatomy-term/definition)
                        (:anatomy-term.definition/text))}))

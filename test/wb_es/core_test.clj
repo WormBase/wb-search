@@ -124,7 +124,14 @@
                            (get-in hit [:_source :label])))
                       hits))
             )))
-      )))
+      ))
+  (testing "anatomy term synonymns"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:anatomy-term/id "WBbt:0006973"]))
+        (testing "search by synonymns"
+          (is (has-hit (search "rnb") "WBbt:0006973"))))))
+  )
 
 
 (deftest clone-type-test
