@@ -62,6 +62,12 @@
                   :copy_to "description_all"}
     :legacy_description {:type "text"
                          :copy_to "description_all"}
+    :remarks {:type "text"
+              :copy_to "description_all"}
+    :method {:type "text"
+             :copy_to "description_all"} ; for locatable
+
+
 
     :page_type {:type "keyword"
                 :copy_to "categories_all"

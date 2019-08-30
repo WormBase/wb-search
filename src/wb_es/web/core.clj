@@ -42,7 +42,9 @@
                                                              :boost 0.2}}}
                            {:match_phrase {:description_all.english {:query q
                                                                      :boost 0.2}}}
-                           ]
+                           {:multi_match {:fields [:description_all]
+                                          :query q
+                                          :boost 0.1}}]
                  }}
                {:match_phrase {:categories_all {:query q}}}
                {:match_phrase {:other {:query q
@@ -82,7 +84,8 @@
                            :wbid_as_label {}
                            :label {}
                            :other_names {}
-                           :description {}}}
+                           :description {}
+                           :description_all {}}}
                  }
 
           response

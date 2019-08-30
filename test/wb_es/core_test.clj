@@ -386,6 +386,14 @@
             (is (> (:_score gene-class-unc-hit)
                    (:_score phenotype-unc-hit)))))))))
 
+(deftest transcript-type-test
+  (testing "snoRNA db remark search"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:transcript/id "C18A3.12"]))
+        (is (has-hit (search "snoRNA u18") "C18A3.12"))
+        (is (has-hit (search "small nucleolar RNA U18") "C18A3.12"))))))
+
 (deftest transgene-type-test
   (testing "transgene using syis1 as example"
     (let [db (d/db datomic-conn)
