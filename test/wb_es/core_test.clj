@@ -133,6 +133,12 @@
           (is (has-hit (search "rnb") "WBbt:0006973"))))))
   )
 
+(deftest cds-type-test
+  (let [db (d/db datomic-conn)]
+    (testing "searching for db-remark on cds"
+      (index-datomic-entity (d/entity db [:cds/id "B0336.6"]))
+      (is (has-hit (search "abi-1") "B0336.6")))))
+
 
 (deftest clone-type-test
   (let [db (d/db datomic-conn)]

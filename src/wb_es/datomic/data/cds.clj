@@ -11,4 +11,6 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:cds/id entity)
+     :remarks (->> (:cds/db-remark entity)
+                   (map :cds.db-remark/text))
      :species (data-util/format-entity-species :cds/species entity)}))
