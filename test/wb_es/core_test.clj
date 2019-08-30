@@ -308,7 +308,8 @@
           (index-datomic-entity (d/entity db [:gene/id "WBGene00015146"]))
           (let [hit (has-hit (search "C. elegans" {:size 100}) "WBGene00015146")
                 ortholog-hit (has-hit (search "C. elegans" {:size 100}) "PRJNA248911_FL82_04596")]
-            (is (> (:_score hit) (:_score ortholog-hit)))))))))
+            (is (or (not ortholog-hit)
+                    (> (:_score hit) (:_score ortholog-hit))))))))))
 
 (deftest go-term-type-test
   (testing "go-term with creatine biosynthetic process as example"
