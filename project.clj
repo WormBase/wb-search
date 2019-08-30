@@ -1,4 +1,4 @@
-(defproject wb-es "2.0.0-alpha3"
+(defproject wb-es "2.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.7.0"
