@@ -4,6 +4,7 @@
             [clojure.core.async :refer [>! <! >!! <!! go chan buffer close!]]
             [cheshire.core :as json]
             [datomic.api :as d]
+            [durable-queue :as dq]
             [mount.core :as mount]
             [wb-es.datomic.data.core :refer [create-document]]
             [wb-es.datomic.data.gene :as gene]
@@ -92,16 +93,24 @@
   "index data of a batch of datomic entity ids"
   [db index batch]
   (->> batch
-       (map (fn [param]
-              (if (sequential? param)
-                (let [[eid & other-params] param]
-                  (apply create-document (d/entity db eid) other-params))
-                (create-document (d/entity db param)))))
+       (map (fn [eid & other-params]
+              (apply create-document (d/entity db eid) other-params)))
        (format-bulk (:action (meta batch)))
        ((fn [formatted-bulk]
           (submit formatted-bulk :index index)))
        )
   )
+
+(def ^{:private true} q (dq/queues "/tmp/indexer-queue" {}))
+
+(defn scheduler-put! [& args] (apply dq/put! q :indexing-jobs args))
+
+(defn- scheduler-take! [& args] (apply dq/take! q :indexing-jobs args))
+
+(defn- scheduler-complete! [& args] (apply dq/complete! args))
+
+(defn- scheduler-retry! [& args] (apply dq/retry! args))
+
 
 (defn run [& {:keys [db index-revision-number index-id]
               :or {db (d/db datomic-conn)
@@ -113,7 +122,6 @@
                     :default-index (= index-revision-number 0)
                     :delete-existing true)
       (let [n-threads 4
-            scheduler (chan n-threads)
             logger (chan n-threads)]
 
         ;; logging
@@ -125,20 +133,23 @@
                ;; only get nil when channel is closed
                (do
                  (prn entry)
-                 (recur))))))
+                 (recur))
+               (println "Done!")))))
 
 
         ;; multiple independent workers to execute jobs
         (dotimes [i n-threads]
           (go
             (loop []
-              (if-let [job (<! scheduler)]
+              (if-let [job-ref (scheduler-take! 600000 nil)]
                 ;; normal batches won't be nil
                 ;; only get nil when channel is closed
-                (do
-                  (>! logger (or (meta job) :no_metadata))
-                  (run-index-batch db release-id job)
-                  (recur))
+                (let [job (deref job-ref)]
+                  (do
+                    (>! logger (or (meta job) :no_metadata))
+                    (run-index-batch db release-id job)
+                    (scheduler-complete! job-ref)
+                    (recur)))
                 (close! logger)))))
 
         (do
@@ -147,201 +158,177 @@
           (let [eids (get-eids-by-type db :gene/id)
                 jobs (make-batches 100 :gene eids)]  ; smaller batch for slower ones
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :analysis/id)
                 jobs (make-batches 1000 :analysis eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+               (scheduler-put! job)))
           (let [eids (get-eids-by-type db :anatomy-term/id)
                 jobs (make-batches 1000 :anatomy-term eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :antibody/id)
                 jobs (make-batches 1000 :antibody eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :cds/id)
                 jobs (make-batches 1000 :cds eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :clone/id)
                 jobs (make-batches 1000 :clone eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :construct/id)
                 jobs (make-batches 1000 :construct eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :expression-cluster/id)
                 jobs (make-batches 1000 :expression-cluster eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :expr-pattern/id)
                 jobs (make-batches 1000 :expr-pattern eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :expr-profile/id)
                 jobs (make-batches 1000 :expr-profile eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :do-term/id)
                 jobs (make-batches 1000 :do-term eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :feature/id)
                 jobs (make-batches 1000 :feature eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :gene-class/id)
                 jobs (make-batches 1000 :gene-class eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :gene-cluster/id)
                 jobs (make-batches 1000 :gene-cluster eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :go-term/id)
                 jobs (make-batches 1000 :go-term eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :homology-group/id)
                 jobs (make-batches 1000 :homology-group eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :interaction/id)
                 jobs (make-batches 1000 :interaction eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :laboratory/id)
                 jobs (make-batches 1000 :laboratory eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :life-stage/id)
                 jobs (make-batches 1000 :life-stage eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :molecule/id)
                 jobs (make-batches 1000 :molecule eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :microarray-results/id)
                 jobs (make-batches 1000 :microarray-results eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :motif/id)
                 jobs (make-batches 1000 :motif eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :oligo/id)
                 jobs (make-batches 1000 :oligo eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :operon/id)
                 jobs (make-batches 1000 :operon eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :paper/id)
                 jobs (make-batches 1000 :paper eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :person/id)
                 jobs (make-batches 1000 :person eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :pcr-product/id)
                 jobs (make-batches 1000 :pcr-product eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :phenotype/id)
                 jobs (make-batches 1000 :phenotype eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :picture/id)
                 jobs (make-batches 1000 :picture eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :position-matrix/id)
                 jobs (make-batches 1000 :position-matrix eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :protein/id)
                 jobs (make-batches 1000 :protein eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :pseudogene/id)
                 jobs (make-batches 1000 :pseudogene eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :rearrangement/id)
                 jobs (make-batches 1000 :rearrangement eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :rnai/id)
                 jobs (make-batches 1000 :rnai eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :sequence/id)
                 jobs (make-batches 1000 :sequence eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :strain/id)
                 jobs (make-batches 1000 :strain eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :structure-data/id)
                 jobs (make-batches 1000 :structure-data eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :transcript/id)
                 jobs (make-batches 1000 :transcript eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :transgene/id)
                 jobs (make-batches 1000 :transgene eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :transposon/id)
                 jobs (make-batches 1000 :transposon eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :transposon-family/id)
                 jobs (make-batches 1000 :transposon-family eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :wbprocess/id)
                 jobs (make-batches 1000 :wbprocess eids)]
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
           (let [eids (get-eids-by-type db :variation/id)
                 jobs (make-batches 100 :variation eids)] ; smaller batch for slower ones
             (doseq [job jobs]
-              (>!! scheduler job)))
+              (scheduler-put! job)))
 
-          ;; now handled within indexing of genes and variations
-          ;; ;; get index gene by variation
-          ;; (let [v-g (d/q '[:find ?v ?g
-          ;;                  :where
-          ;;                  [?v :variation/allele true]
-          ;;                  [?v :variation/gene ?gh]
-          ;;                  [?gh :variation.gene/gene ?g]]
-          ;;                db)]
-          ;;   (let [jobs (->> (map (fn [[v g]]
-          ;;                          [v gene/->Variation g]) v-g)
-          ;;                   (make-batches 1000 :gene->variation "update"))]
-          ;;     (doseq [job jobs]
-          ;;       (>!! scheduler job)))
-          ;;   (let [jobs (->> (map (fn [[v g]]
-          ;;                          [g variation/->Gene v]) v-g)
-          ;;                   (make-batches 1000 :variation->gene "update"))]
-          ;;     (doseq [job jobs]
-          ;;       (>!! scheduler job)))
-          ;;   )
-
-
-          ;; close the channel to indicate no more input
-          ;; existing jobs on the channel will remain available for consumers
-          ;; https://clojure.github.io/core.async/#clojure.core.async/close!
-          (close! scheduler))
+          )
         )
 
       (let [repository-name "s3_repository"]

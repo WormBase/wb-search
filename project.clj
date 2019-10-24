@@ -11,6 +11,7 @@
    [environ "1.1.0"]
    [mount "0.1.11"]
    [org.clojure/clojure "1.8.0"]
+   [factual/durable-queue "0.1.5"]
 
    ;; the following dependecies are only needed for web
    [compojure "1.6.0"]
