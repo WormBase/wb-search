@@ -147,8 +147,12 @@
                 (let [job (deref job-ref)]
                   (do
                     (>! logger (or (meta job) :no_metadata))
-                    (run-index-batch db release-id job)
-                    (scheduler-complete! job-ref)
+                    (try
+                      (run-index-batch db release-id job)
+                      (scheduler-complete! job-ref)
+                      (catch Exception e
+                        ; retried items are added at the end of the queue
+                        (scheduler-retry! job-ref)))
                     (recur)))
                 (close! logger)))))
 
