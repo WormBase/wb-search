@@ -112,7 +112,7 @@
 (defn- scheduler-retry! [& args] (apply dq/retry! args))
 
 
-(defn run [& {:keys [db index-revision-number index-id]
+(defn run [& {:keys [db index-revision-number index-id skip-create-snapshot]
               :or {db (d/db datomic-conn)
                    index-revision-number 0
                    index-id (format "%s_v%s" release-id index-revision-number)}}]
@@ -335,11 +335,12 @@
           )
         )
 
-      (let [repository-name "s3_repository"]
-        (do
-          (connect-snapshot-repository repository-name)
-          (let [snapshot-id (get-next-snapshot-id repository-name release-id)]
-            (save-snapshot index-id repository-name snapshot-id))))
+      (if-not skip-create-snapshot
+        (let [repository-name "s3_repository"]
+          (do
+            (connect-snapshot-repository repository-name)
+            (let [snapshot-id (get-next-snapshot-id repository-name release-id)]
+              (save-snapshot index-id repository-name snapshot-id)))))
       )))
 
 
