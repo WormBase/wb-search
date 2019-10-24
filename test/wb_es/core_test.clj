@@ -74,11 +74,13 @@
           response (http/get endpoint {:query-params (assoc options :q q)})]
       (json/parse-string (:body response) true))))
 
-(defn- has-hit [result id]
+(defn- has-hit [result id-or-predicate]
   (->> (get-in result [:hits :hits])
        (filter (fn [hit]
-                 (= id
-                    (get-in hit [:_source :wbid]))))
+                 (if (ifn? id-or-predicate)
+                   (id-or-predicate hit)
+                   (= id-or-predicate
+                      (get-in hit [:_source :wbid])))))
        (first)))
 
 (def search (web-query "/search"))
@@ -444,6 +446,15 @@
                       (get-in [:hits :hits 0 :_source]))]
           (= "sjj_ZK822.2" (:wbid hit))
           (= "pcr_oligo" (:page_type hit)))))))
+
+(deftest strain-type-name-test
+  (testing "testing strains"
+    (let [db (d/db datomic-conn)]
+      (index-datomic-entity (d/entity db [:strain/id "AA120"]))
+      (is (has-hit (search "AA120") (fn [hit]
+                                      (= (get-in hit [:_source :label])
+                                         "AA120")))))))
+
 
 (deftest variation-type-name-test
   (testing "testing various identifiers for variations"
