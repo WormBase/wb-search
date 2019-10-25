@@ -6,6 +6,7 @@
             [datomic.api :as d]
             [durable-queue :as dq]
             [mount.core :as mount]
+            [taoensso.timbre :refer [info debug warn error]]
             [wb-es.datomic.data.core :refer [create-document]]
             [wb-es.datomic.data.gene :as gene]
             [wb-es.datomic.data.variation :as variation]
@@ -303,47 +304,33 @@
 
 
 (defn run [db]
-  (let []
-    (do
-      (let [n-threads 4
-            logger (chan n-threads)]
+  (let [n-threads 4]
 
-        ;; logging
-        (go
-          (time
-           (loop []
-             (if-let [entry (<! logger)]
-               ;; normal batches won't be nil
-               ;; only get nil when channel is closed
-               (do
-                 (prn entry)
-                 (recur))
-               (println "Done!")))))
+    ;; multiple independent workers to execute jobs
+    (dotimes [i n-threads]
+      (go
+       (loop []
+         (debug "Stats" (scheduler-stats))
+         (if-let [job-ref (scheduler-take! 600000 nil)]
+           ;; normal batches won't be nil
+           ;; only get nil when no more jobs are added to the queue for a period of time
+           (let [job (deref job-ref)]
+             (do
+               (try
+                 (run-index-batch db release-id job)
+                 (scheduler-complete! job-ref)
+                 (debug "Indexed" (or (meta job) :no_metadata))
+                 (catch Exception e
+                   (do
+                     (scheduler-retry! job-ref) ; retried items are added at the end of the queue
+                     (warn "Failed to index and scheduled to retry" (or (meta job) :no_metadata)))
+                   ))
+               (recur)))
+           (info "Done!")
+           ))))
 
-
-        ;; multiple independent workers to execute jobs
-        (dotimes [i n-threads]
-          (go
-            (loop []
-              (>! logger (scheduler-stats))
-              (if-let [job-ref (scheduler-take! 600000 nil)]
-                ;; normal batches won't be nil
-                ;; only get nil when channel is closed
-                (let [job (deref job-ref)]
-                  (do
-                    (>! logger (or (meta job) :no_metadata))
-                    (try
-                      (run-index-batch db release-id job)
-                      (scheduler-complete! job-ref)
-                      (catch Exception e
-                        ; retried items are added at the end of the queue
-                        (scheduler-retry! job-ref)))
-                    (recur)))
-                (close! logger)))))
-
-        )
-
-      )))
+    )
+  )
 
 
 (defn -main
@@ -353,7 +340,7 @@
         index-id (format "%s_v%s" release-id index-revision-number)
         repository-name "s3_repository"]
     (do
-      (println "Indexer starting!")
+      (info "Indexer starting!")
       (mount/start)
       (es-connect)
       (create-index index-id

@@ -12,6 +12,7 @@
    [mount "0.1.11"]
    [org.clojure/clojure "1.8.0"]
    [factual/durable-queue "0.1.5"]
+   [com.taoensso/timbre "4.10.0"]
 
    ;; the following dependecies are only needed for web
    [compojure "1.6.0"]
