@@ -7,6 +7,12 @@
 		"sourcePath": "/var/lib/elasticsearch/data"
 	    }
 	},
+	{
+	    "name": "indexing-job-queue-volume",
+	    "host": {
+		"sourcePath": "/tmp/indexer-queue"
+	    }
+	},
         {
             "name": "nginx-proxy-conf",
             "host": {
@@ -94,6 +100,12 @@
 		    "value": "-Xms8000m -Xmx11264m"
 		}
 	    ],
+            "mountPoints": [
+                {
+                    "sourceVolume": "indexing-job-queue-volume",
+                    "containerPath": "/tmp/indexer-queue"
+                }
+            ],
 	    "memory": 12288
         },
         {
