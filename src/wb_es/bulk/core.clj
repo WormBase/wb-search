@@ -114,7 +114,7 @@
 (defn- scheduler-stats [] (dq/stats q))
 
 
-(defn run-index-sample [db]
+(defn schedule-jobs-sample [db]
   ;; schedule something for testing
   (let [eids (get-eids-by-type db :analysis/id)
         jobs (make-batches 1000 :analysis eids)]
@@ -122,7 +122,7 @@
       (scheduler-put! job)))
   )
 
-(defn run-index-all [db]
+(defn schedule-jobs-all [db]
   (do
     ;; add jobs to scheduler in sequence
 
@@ -302,15 +302,9 @@
     ))
 
 
-(defn run [& {:keys [db index-revision-number index-id skip-create-snapshot]
-              :or {db (d/db datomic-conn)
-                   index-revision-number 0
-                   index-id (format "%s_v%s" release-id index-revision-number)}}]
+(defn run [db]
   (let []
     (do
-      (create-index index-id
-                    :default-index (= index-revision-number 0)
-                    :delete-existing true)
       (let [n-threads 4
             logger (chan n-threads)]
 
@@ -347,30 +341,30 @@
                     (recur)))
                 (close! logger)))))
 
-        (run-index-all db)
-        ;;(run-index-sample db)
-        (prn (scheduler-stats))
-
         )
 
-      (if-not skip-create-snapshot
-        (let [repository-name "s3_repository"]
-          (do
-            (connect-snapshot-repository repository-name)
-            (let [snapshot-id (get-next-snapshot-id repository-name release-id)]
-              (save-snapshot index-id repository-name snapshot-id)))))
       )))
 
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (do
-    (es-connect)
-    (println "Indexer starting!")
-    (mount/start)
-    (if-let [index-revision-number (first args)]
-      (run :index-revision-number index-revision-number)
-      (run))
-    (mount/stop))
+  (let [index-revision-number (or (first args) 0)
+        index-id (format "%s_v%s" release-id index-revision-number)
+        repository-name "s3_repository"]
+    (do
+      (println "Indexer starting!")
+      (mount/start)
+      (es-connect)
+      (create-index index-id
+                    :default-index (= index-revision-number 0)
+                    :delete-existing true)
+      (let [db (d/db datomic-conn)]
+        (do
+          (run db)
+          (schedule-jobs-all db)))
+      (connect-snapshot-repository repository-name)
+      (let [snapshot-id (get-next-snapshot-id repository-name release-id)]
+        (save-snapshot index-id repository-name snapshot-id))
+      (mount/stop)))
   )
