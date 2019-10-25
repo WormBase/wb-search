@@ -112,7 +112,7 @@
 
 (defn- scheduler-retry! [& args] (apply dq/retry! args))
 
-(defn- scheduler-stats [] (dq/stats q))
+(defn- scheduler-stats [] (get (dq/stats q) "indexing_jobs"))
 
 
 (defn schedule-jobs-sample [db]
@@ -311,22 +311,30 @@
       (go
        (loop []
          (debug "Stats" (scheduler-stats))
-         (if-let [job-ref (scheduler-take! 600000 nil)]
+         (if-let [job-ref (scheduler-take! 60000 nil)]
            ;; normal batches won't be nil
            ;; only get nil when no more jobs are added to the queue for a period of time
-           (let [job (deref job-ref)]
-             (do
-               (try
-                 (run-index-batch db release-id job)
-                 (scheduler-complete! job-ref)
-                 (debug "Indexed" (or (meta job) :no_metadata))
-                 (catch Exception e
-                   (do
+           (do
+             (try
+               (let [job (deref job-ref)]
+                 (try
+                   (run-index-batch db release-id job)
+                   (scheduler-complete! job-ref)
+                   (debug "Indexed" (or (meta job) :no_metadata))
+                   (catch Exception e
+                     (warn "Failed to index and scheduled to retry" (or (meta job) :no_metadata))
                      (scheduler-retry! job-ref) ; retried items are added at the end of the queue
-                     (warn "Failed to index and scheduled to retry" (or (meta job) :no_metadata)))
-                   ))
-               (recur)))
-           (info "Done!")
+                     )))
+               (catch java.io.IOException e
+                 (error "Corrupted reference" job-ref)
+                 (scheduler-complete! job-ref)))
+             (recur))
+
+           (if (= (:in-progress (scheduler-stats))
+                  0)
+             (do
+               (info "Done!" (scheduler-stats))
+               (mount/stop)))
            ))))
 
     )
@@ -353,5 +361,5 @@
       (connect-snapshot-repository repository-name)
       (let [snapshot-id (get-next-snapshot-id repository-name release-id)]
         (save-snapshot index-id repository-name snapshot-id))
-      (mount/stop)))
+      ))
   )
