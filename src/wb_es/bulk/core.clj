@@ -115,7 +115,12 @@
 
 (def ^{:private true} q (dq/queues "/tmp/indexer-queue" {}))
 
-(defn scheduler-put! [& args] (apply dq/put! q :indexing-jobs args))
+(def ^{:private true} item-counts (atom 0))
+
+(defn scheduler-put! [job & args]
+  (do
+    (swap! item-counts + (or (:size (meta job)) 0))
+    (apply dq/put! q :indexing-jobs job args)))
 
 (defn- scheduler-take! [& args] (apply dq/take! q :indexing-jobs args))
 
@@ -123,7 +128,10 @@
 
 (defn- scheduler-retry! [& args] (apply dq/retry! args))
 
-(defn- scheduler-stats [] (get (dq/stats q) "indexing_jobs"))
+(defn- scheduler-stats []
+  (->> {:expected-item-counts (deref item-counts)}
+       (into (get (dq/stats q) "indexing_jobs"))
+       ))
 
 
 (defn schedule-jobs-sample [db]
