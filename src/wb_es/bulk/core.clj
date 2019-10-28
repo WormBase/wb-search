@@ -63,13 +63,12 @@
       (->> (json/parse-string (:body response) true)
            (:items)
            (mapcat vals)
-           (map (fn [result]
-                     (let [status (:status result)]
-                       (if (>= status 300)
-                         (throw (Exception. "Item failed during indexing"))
-                         nil))))
-           (seq)
-           (doall)
+           (reduce (fn [result body]
+                     (let [status (:status body)]
+                       (cond
+                        (< status 300) (update result :success inc)
+                        :else (update result :error inc))))
+                   {:success 0 :error 0})
            ))))
 
 (defn get-eids-by-type
@@ -345,9 +344,12 @@
                                (debug "Snapshot resumed")
                                (save-snapshot index-id repository-name snapshot-id)
                                (debug "Snapshot created" job-meta))
-                  (do
-                    (run-index-batch db release-id job)
-                    (debug "Indexed" job-meta)))
+                  (let [job-report (run-index-batch db release-id job)]
+                    (do
+                      (debug "Indexed" (into job-meta job-report))
+                      (if (> (:error job-report) 0)
+                        (throw (Exception. "Batch contains failed items"))))
+                    ))
 
                 (scheduler-complete! job-ref)
 
