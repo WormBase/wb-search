@@ -303,48 +303,42 @@
     ))
 
 
-(defn run [db]
-  (let [n-threads 4]
+(defn worker [db]
+  (future
+    (loop []
+      (debug "Stats" (scheduler-stats))
+      (if-let [job-ref (scheduler-take!)]
+        ;; normal batches won't be nil
+        ;; only get nil when no more jobs are added to the queue for a period of time
+        (do
+          (try
+            (let [job (deref job-ref)
+                  job-meta (meta job)]
+              (try
+                (debug "Starting" job-meta)
+                (case (:action job-meta)
+                  "snapshot" (let [index-id (:index job-meta)
+                                   repository-name (:repository job-meta)
+                                   snapshot-id (get-next-snapshot-id repository-name release-id)]
+                               (save-snapshot index-id repository-name snapshot-id)
+                               (debug "Snapshot created" job-meta))
+                  (do
+                    (run-index-batch db release-id job)
+                    (debug "Indexed" job-meta)))
 
-    ;; multiple independent workers to execute jobs
-    (dotimes [i n-threads]
-      (go
-       (loop []
-         (debug "Stats" (scheduler-stats))
-         (if-let [job-ref (scheduler-take!)]
-           ;; normal batches won't be nil
-           ;; only get nil when no more jobs are added to the queue for a period of time
-           (do
-             (try
-               (let [job (deref job-ref)
-                     job-meta (meta job)]
-                 (try
-                   (debug "Starting" job-meta)
-                   (case (:action job-meta)
-                     "snapshot" (let [index-id (:index job-meta)
-                                      repository-name (:repository job-meta)
-                                      snapshot-id (get-next-snapshot-id repository-name release-id)]
-                                  (save-snapshot index-id repository-name snapshot-id)
-                                  (debug "Snapshot created" job-meta))
-                     (do
-                       (run-index-batch db release-id job)
-                       (debug "Indexed" job-meta)))
+                (scheduler-complete! job-ref)
 
-                   (scheduler-complete! job-ref)
+                (catch Exception e
+                  (error e)
+                  (warn "Failed and scheduled to retry" job-meta)
+                  (scheduler-retry! job-ref) ; retried items are added at the end of the queue
+                  )))
+            (catch java.io.IOException e
+              (error "Corrupted reference" job-ref)
+              (scheduler-complete! job-ref)))
+          (recur))
 
-                   (catch Exception e
-                     (error e)
-                     (warn "Failed and scheduled to retry" job-meta)
-                     (scheduler-retry! job-ref) ; retried items are added at the end of the queue
-                     )))
-               (catch java.io.IOException e
-                 (error "Corrupted reference" job-ref)
-                 (scheduler-complete! job-ref)))
-             (recur))
-
-           ))))
-
-    )
+        )))
   )
 
 
@@ -363,12 +357,20 @@
                     :delete-existing true)
       (let [db (d/db datomic-conn)]
         (do
-          (run db)
           (schedule-jobs-all db)
           (connect-snapshot-repository repository-name)
           (scheduler-put! (with-meta {} {:action "snapshot"
                                          :index index-id
-                                         :repository repository-name}))))
+                                         :repository repository-name}))
+          (->> (partial worker db)
+               (repeatedly 4)
+               (map deref) ; wait for the futures to return
+               (doall) ; force the side effects
+               )
+
+          (info "Stopping!" (scheduler-stats))
+
+          ))
 
       ))
   )
