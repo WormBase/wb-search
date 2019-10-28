@@ -311,18 +311,30 @@
       (go
        (loop []
          (debug "Stats" (scheduler-stats))
-         (if-let [job-ref (scheduler-take! 60000 nil)]
+         (if-let [job-ref (scheduler-take!)]
            ;; normal batches won't be nil
            ;; only get nil when no more jobs are added to the queue for a period of time
            (do
              (try
-               (let [job (deref job-ref)]
+               (let [job (deref job-ref)
+                     job-meta (meta job)]
                  (try
-                   (run-index-batch db release-id job)
+                   (debug "Starting" (:action job-meta))
+                   (case (:action job-meta)
+                     "snapshot" (let [index-id (:index job-meta)
+                                      repository-name (:repository job-meta)
+                                      snapshot-id (get-next-snapshot-id repository-name release-id)]
+                                  (save-snapshot index-id repository-name snapshot-id)
+                                  (debug "Snapshot created" job-meta))
+                     (do
+                       (run-index-batch db release-id job)
+                       (debug "Indexed" job-meta)))
+
                    (scheduler-complete! job-ref)
-                   (debug "Indexed" (or (meta job) :no_metadata))
+
                    (catch Exception e
-                     (warn "Failed to index and scheduled to retry" (or (meta job) :no_metadata))
+                     (error e)
+                     (warn "Failed and scheduled to retry" job-meta)
                      (scheduler-retry! job-ref) ; retried items are added at the end of the queue
                      )))
                (catch java.io.IOException e
@@ -330,11 +342,6 @@
                  (scheduler-complete! job-ref)))
              (recur))
 
-           (if (= (:in-progress (scheduler-stats))
-                  0)
-             (do
-               (info "Done!" (scheduler-stats))
-               (mount/stop)))
            ))))
 
     )
@@ -357,9 +364,11 @@
       (let [db (d/db datomic-conn)]
         (do
           (run db)
-          (schedule-jobs-all db)))
-      (connect-snapshot-repository repository-name)
-      (let [snapshot-id (get-next-snapshot-id repository-name release-id)]
-        (save-snapshot index-id repository-name snapshot-id))
+          (schedule-jobs-all db)
+          (connect-snapshot-repository repository-name)
+          (scheduler-put! (with-meta {} {:action "snapshot"
+                                         :index index-id
+                                         :repository repository-name}))))
+
       ))
   )
