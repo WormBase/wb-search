@@ -364,7 +364,7 @@
                                          :repository repository-name}))
           (->> (partial worker db)
                (repeatedly 4)
-               (map deref) ; wait for the futures to return
+               (pmap deref) ; wait for the futures to return
                (doall) ; force the side effects
                )
 
