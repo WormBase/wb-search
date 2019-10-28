@@ -319,7 +319,7 @@
                (let [job (deref job-ref)
                      job-meta (meta job)]
                  (try
-                   (debug "Starting" (:action job-meta))
+                   (debug "Starting" job-meta)
                    (case (:action job-meta)
                      "snapshot" (let [index-id (:index job-meta)
                                       repository-name (:repository job-meta)
