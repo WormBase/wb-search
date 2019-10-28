@@ -319,7 +319,11 @@
                 (case (:action job-meta)
                   "snapshot" (let [index-id (:index job-meta)
                                    repository-name (:repository job-meta)
-                                   snapshot-id (get-next-snapshot-id repository-name release-id)]
+                                   snapshot-id (get-next-snapshot-id repository-name release-id)
+                                   timeout 60000]
+                               (debug (format "Snapshot paused for %s ms for jobs to finish..." timeout))
+                               (Thread/sleep timeout) ; hack to allow other jobs to finish.
+                               (debug "Snapshot resumed")
                                (save-snapshot index-id repository-name snapshot-id)
                                (debug "Snapshot created" job-meta))
                   (do
