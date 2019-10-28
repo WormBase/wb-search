@@ -57,9 +57,20 @@
   (let [url-prefix (if index
                      (format "%s/%s" es-base-url index)
                      es-base-url)]
-    (http/post (format "%s/_bulk?refresh=%s" url-prefix (or refresh "false"))
-               {:headers {:content-type "application/x-ndjson"}
-                :body formatted-docs})))
+    (let [response (http/post (format "%s/_bulk?refresh=%s" url-prefix (or refresh "false"))
+                              {:headers {:content-type "application/x-ndjson"}
+                               :body formatted-docs})]
+      (->> (json/parse-string (:body response) true)
+           (:items)
+           (mapcat vals)
+           (map (fn [result]
+                     (let [status (:status result)]
+                       (if (>= status 300)
+                         (throw (Exception. "Item failed during indexing"))
+                         nil))))
+           (seq)
+           (doall)
+           ))))
 
 (defn get-eids-by-type
   "get all datomic entity ids of a given type
