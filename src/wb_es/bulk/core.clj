@@ -67,7 +67,9 @@
                      (let [status (:status body)]
                        (cond
                         (< status 300) (update result :success inc)
-                        :else (update result :error inc))))
+                        :else (do
+                                (error body)
+                                (update result :error inc)))))
                    {:success 0 :error 0})
            ))))
 
