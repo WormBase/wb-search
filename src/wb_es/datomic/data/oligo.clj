@@ -6,7 +6,8 @@
 
 (deftype Oligo [entity]
   data-util/Document
-  (metadata [this] (assoc (data-util/default-metadata entity) :_type "pcr-oligo"))
+  (metadata [this] (data-util/default-metadata entity))
   (data [this]
-    {:wbid (:oligo/id entity)
+    {:page_type "pcr-oligo"
+     :wbid (:oligo/id entity)
      :label (:oligo/id entity)}))
