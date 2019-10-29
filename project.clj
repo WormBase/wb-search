@@ -1,4 +1,4 @@
-(defproject wb-es "2.1.1-SNAPSHOT"
+(defproject wb-es "2.3.7-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.7.0"
@@ -11,6 +11,8 @@
    [environ "1.1.0"]
    [mount "0.1.11"]
    [org.clojure/clojure "1.8.0"]
+   [factual/durable-queue "0.1.5"]
+   [com.taoensso/timbre "4.10.0"]
 
    ;; the following dependecies are only needed for web
    [compojure "1.6.0"]

@@ -7,6 +7,12 @@
 		"sourcePath": "/var/lib/elasticsearch/data"
 	    }
 	},
+	{
+	    "name": "indexing-job-queue-volume",
+	    "host": {
+		"sourcePath": "/tmp/indexer-queue"
+	    }
+	},
         {
             "name": "nginx-proxy-conf",
             "host": {
@@ -17,7 +23,7 @@
     "containerDefinitions": [
         {
             "name": "search-web-api",
-            "image": "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-web-api:2.1.0",
+            "image": "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-web-api:2.3.6",
             "essential": true,
             "portMappings": [
                 {
@@ -36,7 +42,7 @@
         },
 	{
 	    "name": "elasticsearch",
-	    "image": "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch:2.1.0",
+	    "image": "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch:2.3.6",
 	    "essential": true,
 	    "portMappings": [
 		{
@@ -81,7 +87,7 @@
         },
         {
             "name": "search-indexer",
-            "image": "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-indexer:2.1.0",
+            "image": "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-indexer:2.3.6",
             "essential": false,
 	    "links": ["elasticsearch"],
 	    "environment": [
@@ -94,6 +100,12 @@
 		    "value": "-Xms8000m -Xmx11264m"
 		}
 	    ],
+            "mountPoints": [
+                {
+                    "sourceVolume": "indexing-job-queue-volume",
+                    "containerPath": "/tmp/indexer-queue"
+                }
+            ],
 	    "memory": 12288
         },
         {
