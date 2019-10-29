@@ -316,7 +316,7 @@
       (doseq [job jobs]
         (scheduler-put! job)))
     (let [eids (get-eids-by-type db :variation/id)
-          jobs (make-batches 100 :variation eids)] ; smaller batch for slower ones
+          jobs (make-batches 1000 :variation eids)]
       (doseq [job jobs]
         (scheduler-put! job)))
 
@@ -390,7 +390,7 @@
                                          :index index-id
                                          :repository repository-name}))
           (->> (partial worker db)
-               (repeatedly 4)
+               (repeatedly 5)
                (pmap deref) ; wait for the futures to return
                (doall) ; force the side effects
                )
