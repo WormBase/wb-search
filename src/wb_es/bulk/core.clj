@@ -137,15 +137,10 @@
 
 (defn schedule-jobs-sample [db]
   ;; schedule something for testing
-  ;; (let [eids (get-eids-by-type db :analysis/id)
-  ;;       jobs (make-batches 1000 :analysis eids)]
-  ;;   (doseq [job jobs]
-  ;;     (scheduler-put! job)))
-  (let [eids (get-eids-by-type db :variation/id)
-        jobs (make-batches 1000 :variation eids)]
+  (let [eids (get-eids-by-type db :analysis/id)
+        jobs (make-batches 1000 :analysis eids)]
     (doseq [job jobs]
       (scheduler-put! job)))
-
   )
 
 (defn schedule-jobs-all [db]
@@ -389,7 +384,7 @@
                     :delete-existing true)
       (let [db (d/db datomic-conn)]
         (do
-          (schedule-jobs-sample db)
+          (schedule-jobs-all db)
           (connect-snapshot-repository repository-name)
           (scheduler-put! (with-meta {} {:action "snapshot"
                                          :index index-id
