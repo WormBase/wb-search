@@ -6,6 +6,7 @@
      :class (clojure.string/replace (get-in doc [:_source :page_type]) "-" "_")
      :label (or (:label doc-source)
                 (:wbid doc-source))
+     :other_names (:other_names doc-source)
      :taxonomy (get-in doc-source [:species :key])}))
 
 (defn- pack-species [species-name]
