@@ -7,17 +7,21 @@
     (handler (update-in request [:params :q] #(some-> % clojure.string/lower-case)))))
 
 
-(defn get-filter [options]
-  (->> []
-       (cons (when-let [type-value (:type options)]
-               {:term {:page_type type-value}}))
-       (cons (when-let [species-value (some->> (:species options)
-                                               (clojure.string/lower-case))]
-               {:term {:species.key species-value}}))
-       (cons (when-let [species-value (some->> (:paper_type options)
-                                               (clojure.string/lower-case))]
-               {:term {:paper_type species-value}}))
-       (filter identity)))
+(defn get-filter [options-raw]
+  (let [options (->> options-raw
+                     (filter (fn [[key value]]
+                               (not= value "all")))
+                     (into {}))]
+    (->> []
+         (cons (when-let [type-value (:type options)]
+                 {:term {:page_type type-value}}))
+         (cons (when-let [species-value (some->> (:species options)
+                                                 (clojure.string/lower-case))]
+                 {:term {:species.key species-value}}))
+         (cons (when-let [species-value (some->> (:paper_type options)
+                                                 (clojure.string/lower-case))]
+                 {:term {:paper_type species-value}}))
+         (filter identity))))
 
 
 (declare autocomplete)
