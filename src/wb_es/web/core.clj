@@ -107,48 +107,50 @@
               (throw e)))]
       (json/parse-string (:body response) true))))
 
+(defn- compose-autocomplete-query [q options]
+  {:function_score
+   {:query
+    {:bool
+     {:filter (get-filter options)
+      :should [{:term {:wbid.autocomplete_keyword q}}
+               {:term {:label.autocomplete_keyword q}}
+               {:match_phrase {:label.autocomplete {:query q
+                                                    :slop 12}}}]
+      :minimum_should_match 1}}
+    :boost_mode "replace"
+    :score_mode "multiply"
+    :functions
+    [{:weight 1
+      :filter
+      {:match_all {}}}
+     {:weight 2
+      :filter
+      {:term {:species.key {:value "c_elegans"}}}}
+     {:weight 2
+      :filter
+      {:bool
+       {:must_not
+        {:exists
+         {:field :species.key}}}}}
+     {:weight 0.8
+      :filter
+      {:bool
+       {:must
+        [{:term {:wbid.autocomplete_keyword q}}]}}}
+     {:weight 0.1
+      :filter
+      {:bool
+       {:must_not
+        [{:term {:label.autocomplete_keyword q}}]
+        :must
+        [{:match_phrase {:label.autocomplete {:query q
+                                              :slop 12}}}]}}}]}})
+
 
 (defn autocomplete [es-base-url index q options]
   (let [query {:sort [:_score
                       {:label.raw {:order :asc}}]
-               :query
-               {:function_score
-                {:query
-                 {:bool
-                  {:filter (get-filter options)
-                   :should [{:term {:wbid.autocomplete_keyword q}}
-                            {:term {:label.autocomplete_keyword q}}
-                            {:match_phrase {:label.autocomplete {:query q
-                                                                 :slop 12}}}]
-                   :minimum_should_match 1}}
-                 :boost_mode "replace"
-                 :score_mode "multiply"
-                 :functions
-                 [{:weight 1
-                   :filter
-                   {:match_all {}}}
-                  {:weight 2
-                   :filter
-                   {:term {:species.key {:value "c_elegans"}}}}
-                  {:weight 2
-                   :filter
-                   {:bool
-                    {:must_not
-                     {:exists
-                      {:field :species.key}}}}}
-                  {:weight 0.8
-                   :filter
-                   {:bool
-                    {:must
-                     [{:term {:wbid.autocomplete_keyword q}}]}}}
-                  {:weight 0.1
-                   :filter
-                   {:bool
-                    {:must_not
-                     [{:term {:label.autocomplete_keyword q}}]
-                     :must
-                     [{:match_phrase {:label.autocomplete {:query q
-                                                           :slop 12}}}]}}}]}}}
+               :query (compose-autocomplete-query q options)}
 
         response
         (http/get (format "%s/%s/_search?size=%s&explain=%s"
@@ -197,15 +199,15 @@
 
 
 (defn count [es-base-url index q options]
-  (if (:autocomplete options)
-    (autocomplete es-base-url index q options)
-    (let [query
-          {:query (compose-search-query q options)}
+  (let [query
+        {:query (if (:autocomplete options)
+                  (compose-autocomplete-query q options)
+                  (compose-search-query q options))}
 
-          response
-          (http/get (format "%s/%s/_count"
-                            es-base-url
-                            index)
-                    {:content-type "application/json"
-                     :body (json/generate-string query)})]
-      (json/parse-string (:body response) true))))
+        response
+        (http/get (format "%s/%s/_count"
+                          es-base-url
+                          index)
+                  {:content-type "application/json"
+                   :body (json/generate-string query)})]
+    (json/parse-string (:body response) true)))
