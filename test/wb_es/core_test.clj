@@ -164,6 +164,18 @@
           )))
     ))
 
+(deftest construct-type-test
+  (let [db (d/db datomic-conn)]
+    (testing "testing construct"
+      (do
+        (index-datomic-entity (d/entity db [:construct/id "WBCnstr00023113"]))
+        (testing "search by construct public name"
+          (is (has-hit (search "pCL179") "WBCnstr00023113")))
+        (testing "search by summary"
+          (is (has-hit (search "Ptbb-6::GFP") "WBCnstr00023113")))
+        ))
+    ))
+
 (deftest disease-type-test
   (testing "disease type using \"park\" as an example"
     (let [db (d/db datomic-conn)

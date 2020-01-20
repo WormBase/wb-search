@@ -10,5 +10,14 @@
   (data [this]
     {:wbid (:construct/id entity)
      :label (->> entity
-                 (:construct/summary)
-                 (:construct.summary/text))}))
+                 (:construct/public-name)
+                 (first))
+     :other_names (->> entity
+                       (:construct/other-name)
+                       (cons (->> entity
+                                  (:construct/summary)
+                                  (:construct.summary/text))))
+
+     :description (->> entity
+                       (:construct/construction-summary)
+                       (first))}))
