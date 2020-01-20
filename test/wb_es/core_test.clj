@@ -465,7 +465,10 @@
       (index-datomic-entity (d/entity db [:strain/id "WBStrain00000018"]))
       (is (has-hit (search "AA120") (fn [hit]
                                       (= (get-in hit [:_source :label])
-                                         "AA120")))))))
+                                         "AA120"))))
+      (is (has-hit (search "daf-12a::GFP ") (fn [hit]
+                                              (= (get-in hit [:_source :label])
+                                                 "AA120")))))))
 
 
 (deftest variation-type-name-test

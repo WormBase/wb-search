@@ -12,4 +12,7 @@
      :label (or (:strain/public-name entity)
                 (:strain/id entity))
      :description (:strain/genotype entity)
-     :species (data-util/format-entity-species :strain/species entity)}))
+     :species (data-util/format-entity-species :strain/species entity)
+     :remarks (->> entity
+                   (:strain/remark)
+                   (map :strain.remark/text))}))
