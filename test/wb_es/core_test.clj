@@ -450,7 +450,7 @@
 (deftest strain-type-name-test
   (testing "testing strains"
     (let [db (d/db datomic-conn)]
-      (index-datomic-entity (d/entity db [:strain/id "AA120"]))
+      (index-datomic-entity (d/entity db [:strain/id "WBStrain00000018"]))
       (is (has-hit (search "AA120") (fn [hit]
                                       (= (get-in hit [:_source :label])
                                          "AA120")))))))
