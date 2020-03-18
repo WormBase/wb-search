@@ -310,6 +310,17 @@
                 middle-hit (has-hit (autocomplete "unc" ) "WBPaper00023557")]
             (is (> (:_score prefix-hit)
                    (:_score middle-hit))))))))
+
+  (testing "autocompletion on gene id"
+    (let [db (d/db datomic-conn)]
+      (testing "prefix must match"
+        (do
+          (index-datomic-entity (d/entity db [:gene/id "WBGene00017071"])
+                                (d/entity db [:gene/id "WBGene00017879"]))
+          (is (has-hit (autocomplete "WBGene00017" {:from 0 :size 1}) "WBGene00017071"))
+          (is (not (has-hit (autocomplete "WBGene00017" {:from 1}) "WBGene00017071")))
+          ))
+      ))
   )
 
 (deftest gene-type-description-test

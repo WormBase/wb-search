@@ -153,10 +153,11 @@
                :query (compose-autocomplete-query q options)}
 
         response
-        (http/get (format "%s/%s/_search?size=%s&explain=%s"
+        (http/get (format "%s/%s/_search?size=%s&from=%s&explain=%s"
                           es-base-url
                           index
                           (get options :size 10)
+                          (get options :from 0)
                           (get options :explain false))
                   {:content-type "application/json"
                    :body (json/generate-string query)})]
