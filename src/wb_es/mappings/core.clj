@@ -88,6 +88,7 @@
     ;; start of refs
     :allele (ref-mapping)
     :author (ref-mapping)
+    :lab_representative (ref-mapping)
     :gene (ref-mapping)
     :phenotype (ref-mapping)
     :strain (ref-mapping)

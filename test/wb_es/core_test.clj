@@ -362,6 +362,19 @@
                         (get-in [:hits :hits]))))))
       )))
 
+(deftest laboratory-type-test
+  (testing "anatomy term synonymns"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:laboratory/id "AGK"]))
+        (testing "search by lab rep"
+          (is (has-hit (search "AGK") "AGK"))
+          (is (has-hit (search "Alla Grishok") "AGK"))
+          (is (has-hit (search "Grishok") "AGK"))
+          (is (has-hit (search "Grishok") "AGK"))
+          ))))
+)
+
 (deftest paper-type-test
   (testing "paper with long title not captured by brief citation"
     (let [db (d/db datomic-conn)]

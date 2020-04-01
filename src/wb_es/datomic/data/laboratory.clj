@@ -8,4 +8,7 @@
   (metadata [this] (data-util/default-metadata entity))
   (data [this]
     {:wbid (:laboratory/id entity)
-     :label (:laboratory/id entity)}))
+     :label (:laboratory/id entity)
+     :lab_representative (->> entity
+                              (:laboratory/representative)
+                              (map data-util/pack-obj))}))
