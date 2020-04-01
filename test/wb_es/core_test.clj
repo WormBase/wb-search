@@ -371,7 +371,7 @@
           (is (has-hit (search "AGK") "AGK"))
           (is (has-hit (search "Alla Grishok") "AGK"))
           (is (has-hit (search "Grishok") "AGK"))
-          (is (has-hit (search "Grishok") "AGK"))
+          (is (has-hit (search "Boston University School of Medicine") "AGK"))
           ))))
 )
 

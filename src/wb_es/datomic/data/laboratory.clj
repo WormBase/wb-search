@@ -9,6 +9,9 @@
   (data [this]
     {:wbid (:laboratory/id entity)
      :label (:laboratory/id entity)
+     :description (->> entity
+                       (:laboratory/mail)
+                       (first))
      :lab_representative (->> entity
                               (:laboratory/representative)
                               (map data-util/pack-obj))}))
