@@ -375,6 +375,17 @@
           ))))
 )
 
+(deftest motif-type-test
+  (testing "motif"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:motif/id "INTERPRO:IPR001067"]))
+        (testing "search by ID"
+          (is (has-hit (search "INTERPRO:IPR001067") "INTERPRO:IPR001067")))
+        (testing "search by ID without prefix"
+          (is (has-hit (search "IPR001067") "INTERPRO:IPR001067")))
+        ))))
+
 (deftest paper-type-test
   (testing "paper with long title not captured by brief citation"
     (let [db (d/db datomic-conn)]

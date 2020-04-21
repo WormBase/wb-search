@@ -12,8 +12,8 @@
 
 (def generic-mapping
   {:properties
-   {:wbid {:type "keyword"
-           :normalizer "lowercase_normalizer"
+   {:wbid {:type "text"
+           :analyzer "identifier"
            :fields {:autocomplete_keyword {:type "text"
                                            :analyzer "autocomplete_keyword"
                                            :search_analyzer "keyword_ignore_case"
@@ -99,7 +99,10 @@
   {:settings
    {:analysis {:filter {"autocomplete_filter" {:type "edge_ngram"
                                                :min_gram 2
-                                               :max_gram 20}}
+                                               :max_gram 20}
+                        "unprefix_filter" {:type "pattern_capture"
+                                           :preserve_original true
+                                           :patterns [":(.+)"]}}
                :normalizer {"lowercase_normalizer" {:type "custom"
                                                     :char_filter []
                                                     :filter ["lowercase"]}}
@@ -119,7 +122,10 @@
                                                  :filter ["lowercase"]}
                           "split_underscore_analyzer"
                           {:char_filter ["replace_underscore"]
-                           :tokenizer "standard"}}}}
+                           :tokenizer "standard"}
+
+                          "identifier" {:tokenizer "keyword"
+                                        :filter ["lowercase" "unprefix_filter"]}}}}
    :mappings {:_doc generic-mapping}})
 
 (defn create-index
