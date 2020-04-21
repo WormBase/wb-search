@@ -309,7 +309,13 @@
           (let [prefix-hit (has-hit (autocomplete "unc" ) "WBGene00006760")
                 middle-hit (has-hit (autocomplete "unc" ) "WBPaper00023557")]
             (is (> (:_score prefix-hit)
-                   (:_score middle-hit))))))))
+                   (:_score middle-hit))))))
+      (testing "matching by gene sequence name"
+        (index-datomic-entity (d/entity db [:gene/id "WBGene00195378"])
+                              (d/entity db [:gene/id "WBGene00004804"]))
+        (is (has-hit (autocomplete "T19E7.2") "WBGene00195378"))
+        (is (has-hit (autocomplete "T19E7.2") "WBGene00004804")))
+      ))
 
   (testing "autocompletion on gene id"
     (let [db (d/db datomic-conn)]

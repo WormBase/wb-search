@@ -112,8 +112,7 @@
    {:query
     {:bool
      {:filter (get-filter options)
-      :should [{:term {:wbid.autocomplete_keyword q}}
-               {:term {:label.autocomplete_keyword q}}
+      :should [{:term {:autocomplete_keyword_all q}}
                {:match_phrase {:label.autocomplete {:query q
                                                     :slop 12}}}]
       :minimum_should_match 1}}
@@ -132,16 +131,11 @@
        {:must_not
         {:exists
          {:field :species.key}}}}}
-     {:weight 0.8
-      :filter
-      {:bool
-       {:must
-        [{:term {:wbid.autocomplete_keyword q}}]}}}
      {:weight 0.1
       :filter
       {:bool
        {:must_not
-        [{:term {:label.autocomplete_keyword q}}]
+        [{:term {:autocomplete_keyword_all q}}]
         :must
         [{:match_phrase {:label.autocomplete {:query q
                                               :slop 12}}}]}}}]}})
