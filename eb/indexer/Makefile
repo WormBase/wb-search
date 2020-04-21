@@ -4,4 +4,4 @@ eb-setenv:
 
 .PHONY: eb-create
 eb-create:
-	@eb create wormbase-search-indexer --cfg v2-indexer --cname wormbase-search-indexer --envvars WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=
+	@eb create wormbase-search-indexer --cfg v2 --cname wormbase-search-indexer --envvars WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=
