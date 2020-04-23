@@ -19,14 +19,16 @@
        (throw (Exception. "Cannot connect to elasticsearch snapshot repository"))))))
 
 (defn get-lateset-snapshot-id
-  [repository-name release-id]
+  [repository-name release-id & {:keys [partial?]
+                                 :or {partial? false}}]
   (let [response (http/get (format "%s/_cat/snapshots/%s?format=json" es-base-url repository-name))
         all-snapshots (json/parse-string (:body response) true)
         id-pattern (re-pattern (format "snapshot_%s(_v(\\d+))?" release-id))]
     (->> all-snapshots
          (filter (fn [snapshot]
                    (and
-                    (= "SUCCESS" (:status snapshot))
+                    (or partial?
+                        (= "SUCCESS" (:status snapshot)))
                     (re-matches id-pattern (:id snapshot)))))
          (sort-by (fn [snapshot]
                     (let [[_ _ version-id] (re-matches id-pattern (:id snapshot))]
@@ -37,7 +39,7 @@
 (defn get-next-snapshot-id
   [repository-name release-id]
   (let [pattern (re-pattern (format "snapshot_%s(_v(\\d+))?" release-id))
-        current-id (get-lateset-snapshot-id repository-name release-id)
+        current-id (get-lateset-snapshot-id repository-name release-id :partial? true)
         next-version-id (if current-id
                           (->> (re-matches pattern current-id)
                                (last)
