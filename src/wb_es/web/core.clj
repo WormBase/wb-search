@@ -131,6 +131,9 @@
        {:must_not
         {:exists
          {:field :species.key}}}}}
+     {:weight 2
+      :filter
+      {:term {:keyword_all q}}}
      {:weight 0.1
       :filter
       {:bool

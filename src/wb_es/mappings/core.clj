@@ -14,7 +14,7 @@
   {:properties
    {:wbid {:type "text"
            :analyzer "identifier"
-           :copy_to "autocomplete_keyword_all"
+           :copy_to ["keyword_all" "autocomplete_keyword_all"]
            :fields {:autocomplete_keyword {:type "text"
                                            :analyzer "autocomplete_keyword"
                                            :search_analyzer "keyword_ignore_case"
@@ -22,7 +22,7 @@
            }
 
     :label {:type "text"
-            :copy_to "autocomplete_keyword_all"
+            :copy_to ["keyword_all" "autocomplete_keyword_all"]
             :fields {:raw {:type "keyword"
                            :normalizer "lowercase_normalizer"}
                      :english {:type "text"
@@ -42,9 +42,9 @@
 
     :other_unique_ids {:type "keyword"
                        :normalizer "lowercase_normalizer"
-                       :copy_to "autocomplete_keyword_all"}
+                       :copy_to ["keyword_all" "autocomplete_keyword_all"]}
     :other_names {:type "text"
-                  :copy_to "autocomplete_keyword_all"
+                  :copy_to ["keyword_all" "autocomplete_keyword_all"]
                   :fields
                   {:raw
                    {:type "keyword"
@@ -52,6 +52,8 @@
 
 
     ;; start of copy_to fields
+    :keyword_all {:type "keyword"
+                  :normalizer "lowercase_normalizer"}
     :autocomplete_keyword_all {:type "text"
                                :analyzer "autocomplete_keyword"
                                :search_analyzer "keyword_ignore_case"}

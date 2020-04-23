@@ -313,8 +313,12 @@
       (testing "matching by gene sequence name"
         (index-datomic-entity (d/entity db [:gene/id "WBGene00195378"])
                               (d/entity db [:gene/id "WBGene00004804"]))
-        (is (has-hit (autocomplete "T19E7.2") "WBGene00195378"))
-        (is (has-hit (autocomplete "T19E7.2") "WBGene00004804")))
+        (let [exact-sequence-name-match (has-hit (autocomplete "T19E7.2") "WBGene00004804")
+              prefix-sequence-name-match (has-hit (autocomplete "T19E7.2") "WBGene00195378")]
+          (is prefix-sequence-name-match)
+          (is exact-sequence-name-match)
+          (is (> (:_score exact-sequence-name-match)
+                 (:_score prefix-sequence-name-match)))))
       ))
 
   (testing "autocompletion on gene id"
