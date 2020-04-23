@@ -55,13 +55,13 @@
     :keyword_all {:type "keyword"
                   :normalizer "lowercase_normalizer"}
     :id_all {:type "text"
-             :analyzer "simple"}
+             :analyzer "classic"}
     :autocomplete_keyword_all {:type "text"
                                :analyzer "autocomplete_keyword"
                                :search_analyzer "keyword_ignore_case"}
     :autocomplete_all {:type "text"
                        :analyzer "autocomplete"
-                       :search_analyzer "simple"}
+                       :search_analyzer "standard"}
     :categories_all {:type "text"
                      :analyzer "split_underscore_analyzer"}
     :description_all {:type "text"
@@ -118,7 +118,11 @@
                                                :max_gram 20}
                         "unprefix_filter" {:type "pattern_capture"
                                            :preserve_original true
-                                           :patterns [":(.+)"]}}
+                                           :patterns [":(.+)"]}
+                        "delimited_filter" {:type "word_delimiter_graph"
+                                            :preserve_original true
+                                            :split_on_case_change false
+                                            :split_on_numerics false}}
                :tokenizer {:autocomplete_keyword_tokenizer {:type "edge_ngram"
                                                             :min_gram 2
                                                             :max_gram 20}
@@ -126,7 +130,8 @@
                                                     :min_gram 2
                                                     :max_gram 20
                                                     :token_chars [:letter
-                                                                  :digit]}}
+                                                                  :digit
+                                                                  :dash_punctuation]}}
                :normalizer {"lowercase_normalizer" {:type "custom"
                                                     :char_filter []
                                                     :filter ["lowercase"]}}
@@ -137,7 +142,7 @@
 
                :analyzer {"autocomplete" {:type "custom"
                                           :tokenizer "autocomplete_tokenizer"
-                                          :filter ["lowercase"]}
+                                          :filter ["lowercase" "delimited_filter"]}
                           "autocomplete_keyword" {:type "custom"
                                                   :tokenizer "autocomplete_keyword_tokenizer"
                                                   :filter ["lowercase"]}

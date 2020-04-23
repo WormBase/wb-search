@@ -253,12 +253,14 @@
 
 (deftest expression-cluster-type-test
   (let [db (d/db datomic-conn)]
-    (index-datomic-entity (d/entity db [:expression-cluster/id "WBPaper00044616:alg-3-4_upregulated_gene"]))
+    (index-datomic-entity (d/entity db [:expression-cluster/id "WBPaper00044616:alg-3-4_upregulated_gene"])
+                          (d/entity db [:expression-cluster/id "WBPaper00029359_1194"]))
     (testing "testing autocompletion of expression cluster id"
       (is (has-hit (autocomplete "WBPaper00044616") "WBPaper00044616:alg-3-4_upregulated_gene"))
       (is (has-hit (autocomplete "alg-3") "WBPaper00044616:alg-3-4_upregulated_gene")))
     (testing "testing search by partial ID of expression cluster"
       (is (has-hit (search "WBPaper00044616") "WBPaper00044616:alg-3-4_upregulated_gene"))
+      (is (not (has-hit (search "WBPaper00044616") "WBPaper00029359_1194")))
       (is (has-hit (search "alg-3") "WBPaper00044616:alg-3-4_upregulated_gene")))
     ))
 
