@@ -257,6 +257,9 @@
     (testing "testing autocompletion of expression cluster id"
       (is (has-hit (autocomplete "WBPaper00044616") "WBPaper00044616:alg-3-4_upregulated_gene"))
       (is (has-hit (autocomplete "alg-3") "WBPaper00044616:alg-3-4_upregulated_gene")))
+    (testing "testing search by partial ID of expression cluster"
+      (is (has-hit (search "WBPaper00044616") "WBPaper00044616:alg-3-4_upregulated_gene"))
+      (is (has-hit (search "alg-3") "WBPaper00044616:alg-3-4_upregulated_gene")))
     ))
 
 (deftest gene-type-name-test

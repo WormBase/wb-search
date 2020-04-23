@@ -39,6 +39,7 @@
                            {:term {:other_names.raw {:value q
                                                      :boost 4}}}
                            {:match_phrase {:label {:query q :slop 12}}}
+                           {:match_phrase {:id_all {:query q :slop 12}}}
                            {:match_phrase {:label.english {:query q :slop 12}}}
                            {:match_phrase {:other_names {:query q
                                                          :boost 0.8}}}
