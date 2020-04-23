@@ -14,7 +14,7 @@
   {:properties
    {:wbid {:type "text"
            :analyzer "identifier"
-           :copy_to ["keyword_all" "autocomplete_keyword_all"]
+           :copy_to ["keyword_all" "autocomplete_keyword_all" "autocomplete_all"]
            :fields {:autocomplete_keyword {:type "text"
                                            :analyzer "autocomplete_keyword"
                                            :search_analyzer "keyword_ignore_case"
@@ -22,7 +22,7 @@
            }
 
     :label {:type "text"
-            :copy_to ["keyword_all" "autocomplete_keyword_all"]
+            :copy_to ["keyword_all" "autocomplete_keyword_all" "autocomplete_all"]
             :fields {:raw {:type "keyword"
                            :normalizer "lowercase_normalizer"}
                      :english {:type "text"
@@ -42,9 +42,9 @@
 
     :other_unique_ids {:type "keyword"
                        :normalizer "lowercase_normalizer"
-                       :copy_to ["keyword_all" "autocomplete_keyword_all"]}
+                       :copy_to ["keyword_all" "autocomplete_keyword_all" "autocomplete_all"]}
     :other_names {:type "text"
-                  :copy_to ["keyword_all" "autocomplete_keyword_all"]
+                  :copy_to ["keyword_all" "autocomplete_keyword_all" "autocomplete_all"]
                   :fields
                   {:raw
                    {:type "keyword"
@@ -57,6 +57,9 @@
     :autocomplete_keyword_all {:type "text"
                                :analyzer "autocomplete_keyword"
                                :search_analyzer "keyword_ignore_case"}
+    :autocomplete_all {:type "text"
+                       :analyzer "autocomplete"
+                       :search_analyzer "autocomplete_search"}
     :categories_all {:type "text"
                      :analyzer "split_underscore_analyzer"}
     :description_all {:type "text"
@@ -133,6 +136,9 @@
                :analyzer {"autocomplete" {:type "custom"
                                           :tokenizer "autocomplete_tokenizer"
                                           :filter ["lowercase"]}
+                          "autocomplete_search" {:type "custom"
+                                                 :tokenizer "letter"
+                                                 :filter ["lowercase"]}
                           "autocomplete_keyword" {:type "custom"
                                                   :tokenizer "autocomplete_keyword_tokenizer"
                                                   :filter ["lowercase"]}

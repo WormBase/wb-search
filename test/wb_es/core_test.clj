@@ -251,6 +251,14 @@
                  (get-in hits [:hits :hits 0 :_source :page_type]))))))
     ))
 
+(deftest expression-cluster-type-test
+  (let [db (d/db datomic-conn)]
+    (index-datomic-entity (d/entity db [:expression-cluster/id "WBPaper00044616:alg-3-4_upregulated_gene"]))
+    (testing "testing autocompletion of expression cluster id"
+      (is (has-hit (autocomplete "WBPaper00044616") "WBPaper00044616:alg-3-4_upregulated_gene"))
+      (is (has-hit (autocomplete "alg-3") "WBPaper00044616:alg-3-4_upregulated_gene")))
+    ))
+
 (deftest gene-type-name-test
   (testing "testing various identifiers for gene"
     (let [db (d/db datomic-conn)
@@ -394,6 +402,10 @@
           (is (has-hit (search "INTERPRO:IPR001067") "INTERPRO:IPR001067")))
         (testing "search by ID without prefix"
           (is (has-hit (search "IPR001067") "INTERPRO:IPR001067")))
+        (testing "autocomplete ID"
+          (is (has-hit (autocomplete "INTERPRO:IPR001067") "INTERPRO:IPR001067")))
+        (testing "autocomplete ID without prefix"
+          (is (has-hit (autocomplete "IPR001067") "INTERPRO:IPR001067")))
         ))))
 
 (deftest paper-type-test

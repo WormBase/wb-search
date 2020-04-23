@@ -113,7 +113,7 @@
     {:bool
      {:filter (get-filter options)
       :should [{:term {:autocomplete_keyword_all q}}
-               {:match_phrase {:label.autocomplete {:query q
+               {:match_phrase {:autocomplete_all {:query q
                                                     :slop 12}}}]
       :minimum_should_match 1}}
     :boost_mode "replace"
@@ -140,8 +140,8 @@
        {:must_not
         [{:term {:autocomplete_keyword_all q}}]
         :must
-        [{:match_phrase {:label.autocomplete {:query q
-                                              :slop 12}}}]}}}]}})
+        [{:match_phrase {:autocomplete_all {:query q
+                                            :slop 12}}}]}}}]}})
 
 
 (defn autocomplete [es-base-url index q options]
