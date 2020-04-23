@@ -7,7 +7,8 @@
      :label (or (:label doc-source)
                 (:wbid doc-source))
      :other_names (:other_names doc-source)
-     :taxonomy (get-in doc-source [:species :key])}))
+     :taxonomy (get-in doc-source [:species :key])
+     :highlight (:highlight doc)}))
 
 (defn- pack-species [species-name]
   (if species-name
