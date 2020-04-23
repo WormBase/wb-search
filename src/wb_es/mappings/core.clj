@@ -114,6 +114,14 @@
                         "unprefix_filter" {:type "pattern_capture"
                                            :preserve_original true
                                            :patterns [":(.+)"]}}
+               :tokenizer {:autocomplete_keyword_tokenizer {:type "edge_ngram"
+                                                            :min_gram 2
+                                                            :max_gram 20}
+                           :autocomplete_tokenizer {:type "edge_ngram"
+                                                    :min_gram 2
+                                                    :max_gram 20
+                                                    :token_chars [:letter
+                                                                  :digit]}}
                :normalizer {"lowercase_normalizer" {:type "custom"
                                                     :char_filter []
                                                     :filter ["lowercase"]}}
@@ -123,11 +131,11 @@
                  :mappings ["_ => -"]}}
 
                :analyzer {"autocomplete" {:type "custom"
-                                          :tokenizer "standard"
-                                          :filter ["lowercase" "autocomplete_filter"]}
+                                          :tokenizer "autocomplete_tokenizer"
+                                          :filter ["lowercase"]}
                           "autocomplete_keyword" {:type "custom"
-                                                  :tokenizer "keyword"
-                                                  :filter ["lowercase" "autocomplete_filter"]}
+                                                  :tokenizer "autocomplete_keyword_tokenizer"
+                                                  :filter ["lowercase"]}
                           "keyword_ignore_case" {:type "custom"
                                                  :tokenizer "keyword"
                                                  :filter ["lowercase"]}
