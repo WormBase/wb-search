@@ -149,7 +149,13 @@
   (let [query {:sort [:_score
 
                       {:label.raw {:order :asc}}]
-               :query (compose-autocomplete-query q options)}
+
+               :query (compose-autocomplete-query q options)
+
+               :highlight
+               {:fields
+                {:autocomplete_keyword_all {}
+                 :autocomplete_all {}}}}
 
         response
         (try

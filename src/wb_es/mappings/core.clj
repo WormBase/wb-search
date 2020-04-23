@@ -58,10 +58,12 @@
              :analyzer "classic"}
     :autocomplete_keyword_all {:type "text"
                                :analyzer "autocomplete_keyword"
-                               :search_analyzer "keyword_ignore_case"}
+                               :search_analyzer "keyword_ignore_case"
+                               :store true}
     :autocomplete_all {:type "text"
                        :analyzer "autocomplete"
-                       :search_analyzer "standard"}
+                       :search_analyzer "standard"
+                       :store true}
     :categories_all {:type "text"
                      :analyzer "split_underscore_analyzer"}
     :description_all {:type "text"

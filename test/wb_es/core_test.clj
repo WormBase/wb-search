@@ -411,6 +411,13 @@
           (is (has-hit (autocomplete "INTERPRO:IPR001067") "INTERPRO:IPR001067")))
         (testing "autocomplete ID without prefix"
           (is (has-hit (autocomplete "IPR001067") "INTERPRO:IPR001067")))
+        (testing "autocomplete highlight"
+          (let [hit (has-hit (autocomplete "IPR001067") "INTERPRO:IPR001067")]
+            (is (= (->> hit
+                        (:highlight)
+                        (:autocomplete_all)
+                        (first))
+                   "INTERPRO:<em>IPR001067</em>"))))
         ))))
 
 (deftest paper-type-test
