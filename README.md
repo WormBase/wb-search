@@ -19,10 +19,13 @@ which are hosted in this repository.
 
 ## Setting up
 
-**For initial setup, it might be easiest to do so at the rest-dev server,
-where everything other than Datomic-pro has been installed**
+### Software Dependencies
 
-You will need to **install**:
+**To get started with developing or deploying the search service, 
+it is recommanded to do so on the shared development server,
+where everything other than Datomic-pro has been installed.**
+
+If installing everything from scratch, here is the software dependencies:
 - Java 8
 - Leiningen 2.x
 - Datomic-pro
@@ -30,13 +33,18 @@ You will need to **install**:
 - AWS CLI
 - Elastic Beanstalk CLI
 
-You will need to set the following environment variables:
 
-- WB_DB_URI (required)
+### Environment Variables
+
+You will need to set the following environment variables, and keep them up to date with a WS release:
+
+- **WB_DB_URI** (required)
 
 Optional environment variables:
 - AWS_ACCESS_KEY_ID (for local/Non-AWS dev environment only)
 - AWS_SECRET_ACCESS_KEY (for local/Non-AWS dev environment only)
+
+### Permission
 
 For development, appropriate AWS permission is setup on the development server instance through an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html). The permissions are granted to the role `wb-web-team-dev-instance-role` that is attached to the development server instance.
 
