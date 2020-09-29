@@ -372,6 +372,19 @@
             (is (or (not ortholog-hit)
                     (> (:_score hit) (:_score ortholog-hit))))))))))
 
+(deftest genotype-type-test
+  (testing "genotype"
+    (let [db (d/db datomic-conn)]
+      (do
+        (index-datomic-entity (d/entity db [:genotype/id "WBGenotype00000021"]))
+        (testing "search for genotype by name"
+          (is (has-hit (search "mks-3(tm2547) II; mks-1(tm2705) III") "WBGenotype00000021")))
+        (testing "search for genotype by gene involved"
+          (is (has-hit (search "mks-1") "WBGenotype00000021")))
+        (testing "search for genotype by variation"
+          (is (has-hit (search "tm2547") "WBGenotype00000021"))))
+      )))
+
 (deftest go-term-type-test
   (testing "go-term with creatine biosynthetic process as example"
     (let [db (d/db datomic-conn)]
