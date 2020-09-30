@@ -147,6 +147,10 @@
   (do
     ;; add jobs to scheduler in sequence
 
+    (let [eids (get-eids-by-type db :genotype/id)
+          jobs (make-batches 1000 :genotype eids)]
+      (doseq [job jobs]
+        (scheduler-put! job)))
     (let [eids (get-eids-by-type db :gene/id)
           jobs (make-batches 100 :gene eids)]  ; smaller batch for slower ones
       (doseq [job jobs]
