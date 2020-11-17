@@ -13,8 +13,8 @@ eb-setenv:
 
 .PHONY: eb-create
 eb-create:
-	@eb create wormbase-search-${LOWER_WS_VERSION}-${ENV_NAME_SUFFIX} --cfg v2 --cname wormbase-search-${LOWER_WS_VERSION} --envvars WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
+	@eb create wormbase-search-${LOWER_WS_VERSION}-${ENV_NAME_SUFFIX} --cfg v2-1 --cname wormbase-search-${LOWER_WS_VERSION} --envvars WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
 
 .PHONY: eb-create-hotfix
 eb-create-hotfix:
-	@eb create wormbase-search-${LOWER_WS_VERSION}-${ENV_NAME_SUFFIX} --cfg v2 --cname wormbase-search-hotfix --envvars WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
+	@eb create wormbase-search-${LOWER_WS_VERSION}-${ENV_NAME_SUFFIX} --cfg v2-1 --cname wormbase-search-hotfix --envvars WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
