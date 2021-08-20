@@ -52,7 +52,7 @@ Optional environment variables for local/Non-AWS development environments only)
 - AWS_ACCESS_KEY_ID
 - AWS_SECRET_ACCESS_KEY
 
-### Permission
+### Permissions
 
 For development, appropriate AWS permission is setup on the development server instance through an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html). The permissions are granted to the role `wb-web-team-dev-instance-role` that is attached to the development server instance.
 
