@@ -100,11 +100,14 @@ Ensure the environment variables above are set appropriately before preceeding. 
 
 Since running the indexer requires reading from the Datomic database, which uses DynamoDB as its storage layer, the DynamoDB read capacity needs to be increased. 400 units for read should be a good value to try.  You can do this in the AWS console under `Services > DynamoDB > Tables`. Select the appropriate database, and under the `Capacity` tab, set the Provisioned Capacity read units to `400`.
 
+**Run the Indexer**
+
 ```
+cd wb-search
 (cd eb/indexer/ && make eb-create)
 ```
-- Indexer is programmed to save a snapshot of the index to the snapshot repository on S3 when it finishes indexing. [Read more](#step-2-create-index-snapshot)
-- Remember to manually shut down beanstalk instance after the indexer finishes running and a snapshot is saved.
+- The Indexer is programmed to save a snapshot of the index to the snapshot repository on S3 when it finishes indexing. [Read more](#step-2-create-index-snapshot)
+- Remember to manually shut down the beanstalk instance after the indexer finishes running and a snapshot is saved.
 
 
 ### Deploy Web API
