@@ -40,15 +40,15 @@ If installing everything from scratch, here is the software dependencies:
 
 ### Environment Variables
 
-You will need to set the following environment variables, and keep them up to date with a WS release:
+You will need to set the following environment variables, and keep them up to date with a WS release. Consider placing them in your `.bash_profile`.
 
-*The Datomic transactor. It looks something like `datomic:ddb://us-east-1/WSXXX/wormbase`
+*The Datomic transactor. It looks something like `datomic:ddb://us-east-1/WSXXX/wormbase`*
 
 - **WB_DB_URI** (required)
 
-Optional environment variables:
-- AWS_ACCESS_KEY_ID (for local/Non-AWS dev environment only)
-- AWS_SECRET_ACCESS_KEY (for local/Non-AWS dev environment only)
+Optional environment variables for local/Non-AWS development environments only)
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
 
 ### Permission
 
