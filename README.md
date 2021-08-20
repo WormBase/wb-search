@@ -92,13 +92,12 @@ LEVEL=[major|minor|patch|rc|beta|alpha] make release
 
 Ensure the environment variables above are set appropriately before preceeding.  You might consider adding them to your `.bash_profile`.
 
-** DynamoDB read capacity**
+### Deploy Indexer
+
+**DynamoDB read capacity**
 
 Since running the indexer requires reading from the Datomic database, which uses DynamoDB as its storage layer, the DynamoDB read capacity needs to be increased. 400 units for read should be a good value to try.
 
-
-
-### Deploy Indexer
 ```
 (cd eb/indexer/ && make eb-create)
 ```
