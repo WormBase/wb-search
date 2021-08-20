@@ -37,7 +37,9 @@ For more info on installing Datomic Pro, please refer to [the Datomic site](http
 - Datomic-pro
 - Docker
 - AWS CLI
-- Elastic Beanstalk CLI
+- Elastic Beanstalk CLI (see: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-install.html)
+
+
 
 
 ### Environment Variables
