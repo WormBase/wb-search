@@ -103,6 +103,7 @@ Since running the indexer requires reading from the Datomic database, which uses
 **Run the Indexer**
 
 ```
+screen -S search // recommended, but optional
 cd wb-search
 (cd eb/indexer/ && make eb-create)
 ```
