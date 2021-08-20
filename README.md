@@ -113,7 +113,7 @@ cd wb-search
 *It will take several minutes for the indexer environment to launch.*
 
 - You can confirm that the indexer is running by pinging the API.
---  SIBYL PLEASE INSERT HERE
+--  http://wormbase-search-indexer.us-east-1.elasticbeanstalk.com/count
 
 *Indexing requires 1-2 hours*
 
@@ -127,8 +127,6 @@ Deploy the web API to confirm the indexer has worked.
 ```
 (cd eb/default/ && make eb-create)
 ```
-
-
 
 To make a production-like environment locally, `(cd eb/default/ && make eb-local-run)`.
 
