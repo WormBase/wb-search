@@ -111,6 +111,9 @@ cd wb-search
 
 
 ### Deploy Web API
+
+Deploy the web API to confirm the indexer has worked.
+
 ```
 (cd eb/default/ && make eb-create)
 ```
