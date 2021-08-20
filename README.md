@@ -29,7 +29,9 @@ Setting up
 it is recommanded to do so on the shared development server,
 where everything other than Datomic-pro has been installed.**
 
-If installing everything from scratch, here is the software dependencies:
+For more info on installing Datomic Pro, please refer to [the Datomic site](https://docs.datomic.com/on-prem/getting-started/get-datomic.html). The version of Datomic Pro installed should match the version of Datomic Pro specified in [project.clj(project.clj).
+
+**If installing everything from scratch**, here is the software dependencies:
 - Java 8
 - Leiningen 2.x
 - Datomic-pro
