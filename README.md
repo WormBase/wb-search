@@ -107,6 +107,9 @@ cd wb-search
 (cd eb/indexer/ && make eb-create)
 ```
 - The Indexer is programmed to save a snapshot of the index to the snapshot repository on S3 when it finishes indexing. [Read more](#step-2-create-index-snapshot)
+
+*It will take several minutes for the indexer environment to launch.*
+
 - Remember to manually shut down the beanstalk instance after the indexer finishes running and a snapshot is saved.
 
 
