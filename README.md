@@ -29,7 +29,7 @@ Setting up
 it is recommanded to do so on the shared development server,
 where everything other than Datomic-pro has been installed.**
 
-For more info on installing Datomic Pro, please refer to [the Datomic site](https://docs.datomic.com/on-prem/getting-started/get-datomic.html). The version of Datomic Pro installed should match the version of Datomic Pro specified in [project.clj](project.clj).
+For more info on installing Datomic Pro, please refer to [the Datomic site](https://docs.datomic.com/on-prem/getting-started/get-datomic.html). The version of Datomic Pro installed should match the version of Datomic Pro specified in [project.clj(project.clj).
 
 **If installing everything from scratch**, here is the software dependencies:
 - Java 8
@@ -96,9 +96,9 @@ Ensure the environment variables above are set appropriately before preceeding. 
 
 ### Deploy Indexer
 
-**DynamoDB read capacity**
+**Adjust DynamoDB read capacity**
 
-Since running the indexer requires reading from the Datomic database, which uses DynamoDB as its storage layer, the DynamoDB read capacity needs to be increased. 400 units for read should be a good value to try.
+Since running the indexer requires reading from the Datomic database, which uses DynamoDB as its storage layer, the DynamoDB read capacity needs to be increased. 400 units for read should be a good value to try.  You can do this in the AWS console under `Services > DynamoDB > Tables`. Select the appropriate database, and under the `Capacity` tab, set the Provisioned Capacity read units to `400`.
 
 ```
 (cd eb/indexer/ && make eb-create)
