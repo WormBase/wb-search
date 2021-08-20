@@ -1,10 +1,13 @@
-# WormBase search service
+WormBase Search Service
+====================================================
 
 **This repository is intended for WormBase developers**,
 who would like to build and deploy services that power the search functionality
 on the WormBase webiste.
 
-## Architecture overview
+Architecture overview
+---------------------------------------------------
+
 The search service stack consists of:
 - A search database (or index) along with the data
 - A Web API
@@ -17,7 +20,8 @@ This process involves multiple steps along with multiple tools and configuration
 which are hosted in this repository.
 
 
-## Setting up
+Setting up
+---------------------------------------------------
 
 ### Software Dependencies
 
@@ -38,6 +42,8 @@ If installing everything from scratch, here is the software dependencies:
 
 You will need to set the following environment variables, and keep them up to date with a WS release:
 
+*The Datomic transactor. It looks something like `datomic:ddb://us-east-1/WSXXX/wormbase`
+
 - **WB_DB_URI** (required)
 
 Optional environment variables:
@@ -56,7 +62,8 @@ The permissions being granted include:
 - Elastic Beanstalk / Starting and stopping EC2
 
 
-## Production environment
+Production environment
+---------------------------------------------------
 
 Production environment runs docker containers in Elastic Beanstalk environment on AWS.
 
@@ -83,11 +90,13 @@ LEVEL=[major|minor|patch|rc|beta|alpha] make release
 
 **Set environment variables**
 
-Ensure the environment variables above are set appropriately before preceeding.
+Ensure the environment variables above are set appropriately before preceeding.  You might consider adding them to your `.bash_profile`.
 
 ** DynamoDB read capacity**
 
 Since running the indexer requires reading from the Datomic database, which uses DynamoDB as its storage layer, the DynamoDB read capacity needs to be increased. 400 units for read should be a good value to try.
+
+
 
 ### Deploy Indexer
 ```
