@@ -124,6 +124,8 @@ cd wb-search
 
 Deploy the web API to confirm the indexer has worked.
 
+It may be necessary to `eb-init` to switch your environment from `search-indexer` to `search`.
+
 ```
 (cd eb/default/ && make eb-create)
 ```
