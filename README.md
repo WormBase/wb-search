@@ -1,7 +1,7 @@
 WormBase Search Service
 ====================================================
 
-**This repository is intended for WormBase developers**,
+**This repository is intended for WormBase developers**
 who would like to build and deploy services that power the search functionality
 on the WormBase webiste.
 
@@ -313,7 +313,7 @@ You can moniter the health and metrics of the Beanstalk environment on AWS web c
 
 ## License
 
-Copyright © 2017 WormBase
+Copyright © 2021 WormBase
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
