@@ -3,6 +3,9 @@ LOWER_WS_VERSION ?= $(shell echo ${WS_VERSION} | tr A-Z a-z)
 RESTORE_FROM_SNAPSHOT ?= latest
 ENV_NAME_SUFFIX ?= $(shell git rev-parse --short HEAD)
 
+
+
+
 .PHONY: eb-local-run
 eb-local-run:
 	@eb local run --envvars AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID},AWS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY},WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
@@ -13,6 +16,11 @@ eb-setenv:
 
 .PHONY: eb-create
 eb-create:
+
+#echo ${WS_VERSION}
+#echo ${LOWER_WS_VERSION}
+#echo ${RESTORE_FROM_SNAPSHOT}
+#echo ${ENV_NAME_SUFFIX}
 	@eb create wormbase-search-${LOWER_WS_VERSION}-${ENV_NAME_SUFFIX} --cfg v2-1 --cname wormbase-search-${LOWER_WS_VERSION} --envvars WB_DB_URI=${WB_DB_URI},RESTORE_FROM_SNAPSHOT=${RESTORE_FROM_SNAPSHOT}
 
 .PHONY: eb-create-hotfix
