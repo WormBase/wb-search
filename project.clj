@@ -27,7 +27,7 @@
   :plugins [[lein-environ "1.1.0"]
             [lein-pprint "1.1.1"]]
   :main ^:skip-aot wb-es.core
-  :resource-paths ["resources" "datomic-repository/datomic-pro"]
+  :resource-paths ["resources" "file:datomic-repository/datomic-pro"]
   :target-path "target/%s"
   :javac-options ["-target" "1.8" "-source" "1.8"]
   :license "GPLv2"
@@ -38,10 +38,10 @@
              "-Ddatomic.txTimeoutMsec=1000000"]
   :profiles
   {:datomic-free
-   {:dependencies [[com.datomic/datomic-free "datomic-pro-0.9.5703"
+   {:dependencies [[com.datomic/datomic-free "0.9.5561.56"
                     :exclusions [joda-time]]]}
    :datomic-pro
-   {:dependencies [[com.datomic/datomic-pro "datomic-pro-0.9.5703"
+   {:dependencies [[com.datomic/datomic-pro "0.9.5703"
                     :exclusions [joda-time]]]}
    :ddb
    {:dependencies
