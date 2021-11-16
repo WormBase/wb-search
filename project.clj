@@ -27,7 +27,7 @@
   :plugins [[lein-environ "1.1.0"]
             [lein-pprint "1.1.1"]]
   :main ^:skip-aot wb-es.core
-  :resource-paths ["resources"]
+  :resource-paths ["resources" "/home/tharris/.m2/repository/com/datomic/datomic-pro/0.9.5703"]
   :target-path "target/%s"
   :javac-options ["-target" "1.8" "-source" "1.8"]
   :license "GPLv2"
