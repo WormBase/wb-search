@@ -188,12 +188,13 @@ lein trampoline ring server-headless [port]
 - If no index of the appropriate version is found locally, it will attempt to restore the index from the snapshot repository on s3.
 
 
-## (Optional) Build and depoloy search *manually*
+## (Optional) Build and deploy search *manually*
 _Not recommended except for development and troubleshooting_
 
 ### Step 0: Start Elasticsearch
 #### Start Elasticsearch from our custom Docker image for Elasticsearch
 ```
+cd wb-search/
 make docker-build-aws-es
 make docker-run-aws-es
 ```
@@ -212,7 +213,7 @@ lein trampoline run -m wb-es.bulk.core
 It creates an index named wsXXX_v0 with an alias wsXXX.
 
 #### Or, to create an index from existing database (or to re-index)
-such as when the Elasticsearch mapping is changed
+such as when the Elasticsearch mapping has changed.
 ```
 lein trampoline run -m wb-es.bulk.reindex [SOURCE_INDEX_NAME] [TARGET_INDEX_NAME] --steal-alias
 ```
@@ -221,17 +222,17 @@ It creates a new index by the name [TARGET_INDEX_NAME]. Please follow the conven
 
 ### Step 2: Create index snapshot
 
-A snapshot of an index needs to be stored on S3 and will later be restored into Elasticsearch.
+A snapshot of the index needs to be stored on S3. Later, it will be restored into Elasticsearch.
 
-#### First, with Elasticsearch running, connect to the S3:
+#### With Elasticsearch running, connect to S3:
 ```
 lein trampoline run -m wb-es.web.setup
 ```
 
 The script would also attempts to restore into Elasticsearch the latest snapshot matching the release (as per WB_DB_URI).
-And it might fail when such a snapshot doesn't exist. This needs to be fixed in the future.
+It might fail if such a snapshot doesn't exist. This needs to be fixed in the future.
 
-#### Second, create and post a snapshot to S3:
+#### Create and post the snapshot to S3:
 
 ```
 curl -XPUT 'localhost:9200/_snapshot/s3_repository/snapshot_wsXXX_vX?pretty' -H 'Content-Type: application/json' -d'
@@ -241,7 +242,7 @@ curl -XPUT 'localhost:9200/_snapshot/s3_repository/snapshot_wsXXX_vX?pretty' -H 
 '
 ```
 
-- Folling the snapshot id convention snapshot_wsXXX_vX is necessary here.
+- Be sure to follow the snapshot naming convention: snapshot_wsXXX_vX
 - The index to include is referred by either is alias wsXXX or id wsXXX_vX
 - A new snapshot takes sometime before becoming available. Its progress can be tracked with:
 `curl -XGET localhost:9200/_cat/snapshots/s3_repository`
@@ -252,7 +253,7 @@ For more details about snapshot and restore: https://www.elastic.co/guide/en/ela
 
 #### Build and commit deployable containers
 
-Containers run by Beanstalk are first build, tagged, and commited to AWS Container Registery.
+Containers run by Beanstalk are first built, tagged, and commited to the AWS Container Registry (ECR).
 Two containers needs to be prepared: Elasticsearch and the Web API.
 
 ```
@@ -282,7 +283,7 @@ docker push 357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-web-api
 #### Update Dockerrun.aws.json
 
 Dockerrun.aws.json describes how various containers are put together to form a system.
-It's the Beanstalk equivelent of Docker Compose's compose file.
+It's the Beanstalk equivalent of Docker Compose's compose file.
 
 The versions for docker images needs to be updated to matching the containers created above.
 
