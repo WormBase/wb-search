@@ -38,10 +38,10 @@
              "-Ddatomic.txTimeoutMsec=1000000"]
   :profiles
   {:datomic-free
-   {:dependencies [[com.datomic/datomic-free "0.9.5561.56"
+   {:dependencies [[com.datomic/datomic-free "datomic-pro-0.9.5703"
                     :exclusions [joda-time]]]}
    :datomic-pro
-   {:dependencies [[com.datomic/datomic-pro "0.9.5561.56"
+   {:dependencies [[com.datomic/datomic-pro "datomic-pro-0.9.5703"
                     :exclusions [joda-time]]]}
    :ddb
    {:dependencies
