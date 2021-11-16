@@ -37,12 +37,11 @@
              ;;"-Ddatomic.objectCacheMax=1000000000" ; when commented out, the default 50% RAM takes effect
              "-Ddatomic.txTimeoutMsec=1000000"]
   :profiles
-  {
-;;:datomic-free
-;;   {:dependencies [[com.datomic/datomic-free "datomic-pro-0.9.5703"
-;;                    :exclusions [joda-time]]]}
-;;   :datomic-pro
-;;   {:dependencies [[com.datomic/datomic-pro "datomic-pro-0.9.5703"
+  {:datomic-free
+   {:dependencies [[com/datomic/datomic-free "datomic-pro-0.9.5703"
+                    :exclusions [joda-time]]]}
+   :datomic-pro
+   {:dependencies [[com/datomic/datomic-pro "datomic-pro-0.9.5703"
                     :exclusions [joda-time]]]}
    :ddb
    {:dependencies
