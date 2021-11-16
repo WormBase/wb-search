@@ -1,4 +1,4 @@
-(defproject wb-es "2.9.3"
+(defproject wb-es "2.9.4"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.7.0"
@@ -63,7 +63,7 @@
           :docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-web-api"
                    :dockerfile "docker/Dockerfile.web"}}]
    :web-dev {:dependencies [[ring/ring-devel "1.5.1"]]
-             :plugins [[lein-ring "0.12.0"]]}
+             :plugins [[lein-ring "0.12.5"]]}
    :dev [:indexer
          :web
          :web-dev
