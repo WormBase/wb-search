@@ -189,14 +189,14 @@ lein trampoline ring server-headless [port]
 
 
 ## (Optional) Build and deploy search *manually*
-_Not recommended except for development and troubleshooting_
+_This is not recommended but can be useful for development and troubleshooting_
 
 ### Step 0: Start Elasticsearch
 #### Start Elasticsearch from our custom Docker image for Elasticsearch
 ```
-cd wb-search/
-make docker-build-aws-es
-make docker-run-aws-es
+$ cd wb-search/
+$ make docker-build-aws-es
+$ make docker-run-aws-es
 ```
 An Elasticsearch will be started at http://localhost:9200
 
@@ -206,18 +206,18 @@ Building indexing creates a new search database (index) from either
 1) the primary database (such as Datomic) or
 2) an existing index
 
-#### To create an index from primary database:
+#### To create an index from a primary database:
 ```
 lein trampoline run -m wb-es.bulk.core
 ```
-It creates an index named wsXXX_v0 with an alias wsXXX.
+This will create an index named wsXXX_v0 with an alias wsXXX.
 
-#### Or, to create an index from existing database (or to re-index)
+#### ALternatively, create an index from an existing database (or to re-index)
 such as when the Elasticsearch mapping has changed.
 ```
 lein trampoline run -m wb-es.bulk.reindex [SOURCE_INDEX_NAME] [TARGET_INDEX_NAME] --steal-alias
 ```
-It creates a new index by the name [TARGET_INDEX_NAME]. Please follow the convention wsXXX_v[number] for naming an index.
+This creates a new index by the name [TARGET_INDEX_NAME]. Please follow the convention wsXXX_v[number] for naming an index.
 --steal-alias or -s reassigns the alias of the source index to the new index.
 
 ### Step 2: Create index snapshot
