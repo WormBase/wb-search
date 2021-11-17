@@ -298,22 +298,26 @@ The easiest way to create a Beanstalk environment for search is to clone and mod
 Cloning can be done through the AWS web console or via `eb clone`.
 
 Check the new environment is created:
+
     `$ eb list`
 
 Switch to the newly created environment:
+
     `$ eb use [environment_name]`
 
 Subsequent `eb` commands such as `eb deploy` and `eb setenv` will operate on the new environment.
 
 Set the environment variables for the Beanstalk environment:
+
     `$ make eb-setenv`
 
 #### Deploy and monitor
 
 Deploy containers to the Beanstalk environemnt:     
-       `$ eb deploy` 
+
+     `$ eb deploy` 
        
-       _Note: the web API will attempt to restore the latest index of a particular release. This will take a few minutes before the web API finishes restarting._
+     _Note: the web API will attempt to restore the latest index of a particular release. This will take a few minutes before the web API finishes restarting._
 
 You can moniter the health and metrics of the Beanstalk environment on AWS web console under Beanstalk and CloudWatch.
 
