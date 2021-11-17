@@ -282,17 +282,18 @@ docker push 357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-web-api
 
 #### Update Dockerrun.aws.json
 
-Dockerrun.aws.json describes how various containers are put together to form a system.
+`Dockerrun.aws.json` describes how various containers are put together to form a system.
 It's the Beanstalk equivalent of Docker Compose's compose file.
 
-The versions for docker images needs to be updated to matching the containers created above.
+The versions for docker images needs to be updated to match the containers created above.
 
 You may also update settings related memory, network, volume, environment variables etc.
 
 #### Prepare environment for Elastic Beanstalk
 
-A Beanstalk enviroment is an EC2 instance managed by Beanstalk.
-The easiest way to create a Beanstalk environemt for search is to clone and modify an existing one.
+A *Beanstalk environment* is an EC2 instance managed by Beanstalk.
+
+The easiest way to create a Beanstalk environment for search is to clone and modify an existing one.
 
 Cloning can be done through the AWS web console or `eb clone`.
 
