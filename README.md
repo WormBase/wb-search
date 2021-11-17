@@ -112,8 +112,9 @@ cd wb-search
 
 *It will take several minutes for the indexer environment to launch.*
 
-- You can confirm that the indexer is running by pinging the API.
---  http://wormbase-search-indexer.us-east-1.elasticbeanstalk.com/count
+- You can confirm that the indexer is running by pinging the API:
+
+  --  http://wormbase-search-indexer.us-east-1.elasticbeanstalk.com/count
 
 *Indexing requires 1-2 hours*
 
