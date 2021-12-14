@@ -273,6 +273,10 @@ Note:
 this will help locating the container image based on git history.
 - `[tag]` may be `latest` during development, but any container image intended for production must have a proper tag,
 with a matching git tag.
+  
+    eg 
+    git tag [tag] [commit hash]
+    git push origin [tag]
 
 For the Web API
 ```
