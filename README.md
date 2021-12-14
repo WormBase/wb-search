@@ -273,10 +273,11 @@ Note:
 this will help locating the container image based on git history.
 - `[tag]` may be `latest` during development, but any container image intended for production must have a proper tag,
 with a matching git tag.
-  
-    eg 
+  ```
+    eg:
     git tag [tag] [commit hash]
     git push origin [tag]
+    ```
 
 For the Web API
 ```
@@ -304,23 +305,23 @@ Cloning can be done through the AWS web console or via `eb clone`.
 
 Check the new environment is created:
 
-    `$ eb list`
+    $ eb list
 
 Switch to the newly created environment:
 
-    `$ eb use [environment_name]`
+    $ eb use [environment_name]
 
 Subsequent `eb` commands such as `eb deploy` and `eb setenv` will operate on the new environment.
 
 Set the environment variables for the Beanstalk environment:
 
-    `$ make eb-setenv`
+    $ eb setenv VAR=WHATEVER_THE_VALUE_IS
 
 #### Deploy and monitor
 
 Deploy containers to the Beanstalk environemnt:     
 
-     `$ eb deploy` 
+     $ eb deploy 
        
      _Note: the web API will attempt to restore the latest index of a particular release. This will take a few minutes before the web API finishes restarting._
 
