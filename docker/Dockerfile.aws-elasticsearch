@@ -7,6 +7,8 @@ RUN yes | bin/elasticsearch-plugin install repository-s3
 
 USER elasticsearch
 
+ENV LOG4J_FORMAT_MSG_NO_LOOKUPS=true
+
 ADD ./docker/elasticsearch-config/elasticsearch.yml /usr/share/elasticsearch/config
 ADD ./docker/elasticsearch-config/logging.yml /usr/share/elasticsearch/config
 ADD ./docker/es-entrypoint.sh /usr/share/elasticsearch/custom-docker-entrypoint.sh
