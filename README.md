@@ -50,6 +50,9 @@ You will need to set the following environment variables, and keep them up to da
 
 - **WB_DB_URI** (required)
 
+Set it via
+- export WB_DB_URI="datomic:ddb://us-east-1/WS284/wormbase"
+
 Optional environment variables for local/Non-AWS development environments only)
 - AWS_ACCESS_KEY_ID
 - AWS_SECRET_ACCESS_KEY
