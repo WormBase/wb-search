@@ -122,7 +122,7 @@ cd wb-search
 *Indexing requires 1-2 hours*
 
 - Confirm that the indexer has succeeded by checking for the presence of the snapshot in the console and/or by getting the instance log for the snapshot creation.
-- Once you have confirmed that indexer succeeded manually shut down the beanstalk instance in the console.
+- Once you have confirmed that indexer succeeded manually shut down the wormbase-search Elastoc Beanstalk environment in the console.
 
 ### Deploy Web API
 
