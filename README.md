@@ -2,8 +2,8 @@ WormBase Search Service
 ====================================================
 
 **This repository is intended for WormBase developers**
-who would like to build and deploy services that power the search functionality
-on the WormBase webiste.
+who would like to build and deploy services that drive the search functionality
+on the WormBase website.
 
 Architecture overview
 ---------------------------------------------------
@@ -12,12 +12,12 @@ The search service stack consists of:
 - A search database (or index) along with the data
 - A Web API
 
-WormBase search database is currently re-build for each release.
+WormBase search database is currently built (and discarded) for each release.
 The final product is a the search service stack deployed on AWS Elastic Beanstalk,
 as a multi-container setup.
 
-This process involves multiple steps along with multiple tools and configurations,
-which are hosted in this repository.
+This process involves multiple steps along with multiple tools and configurations
+all of which are hosted in this repository.
 
 
 Setting up
@@ -336,7 +336,7 @@ You can moniter the health and metrics of the Beanstalk environment on AWS web c
 
 ## License
 
-Copyright © 2021 WormBase
+Copyright © 2022 The WormBase Consortium
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
