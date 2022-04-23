@@ -72,12 +72,12 @@ The permissions being granted include:
 Production environment
 ---------------------------------------------------
 
-Production environment runs docker containers in Elastic Beanstalk environment on AWS.
+The production environment runs docker containers in the Elastic Beanstalk environment on AWS.
 
-We maintain two production environment,
+We maintain two production environments, somewhat confusingly called `index` and `default`
 
-- one for the on-demand indexing process, that runs once per WB release, and
-- the other for the long-running Web API, that runs of a Elasticsearch snapshot.
+- `index` for the on-demand indexing process; runs once per release
+- `default` for the log-rinning Web API running off an ElasticSearch snapshot
 
 ### Preparation for deployment
 
@@ -86,6 +86,8 @@ We maintain two production environment,
 Build and upload containers (if and only if source code has changed) and verify Dockerrun.aws.json is updated to use the right tag for the containers.
 
 (_Note: Building containers isn't necessary for every WS release, if the source code hasn't changed._)
+
+See below for more in-depth discussion of the container construction.
 
 ```
 LEVEL=[major|minor|patch|rc|beta|alpha] make release
