@@ -77,7 +77,7 @@ The production environment runs docker containers in the Elastic Beanstalk envir
 We maintain two production environments, somewhat confusingly called `index` and `default`
 
 - `index` for the on-demand indexing process; runs once per release
-- `default` for the log-rinning Web API running off an ElasticSearch snapshot
+- `default` for the log-running Web API running off an ElasticSearch snapshot
 
 ### Preparation for deployment
 
