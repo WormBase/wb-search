@@ -138,8 +138,11 @@ It may be necessary to `eb-init` to switch your environment from `search-indexer
 
 To make a production-like environment locally, `(cd eb/default/ && make eb-local-run)`.
 
-**Troubleshooot tip:**
+**Troubleshooting**
 - If `ERROR: InvalidProfileError - The config profile (eb-cli) could not be found` occurs while running on the development server instance, running `eb init` in the appropriate directory, ie. `eb/indexer/` or `eb/default`, seems to fix that. Remember that instance profile rather than user profile is used on the development server instance.
+
+- It *may* be necessary to clear out old EB environments prior to launching the Web search API because of constraints on the number of available EIPs.  Minimally, once the indexer is complete, you can terminate that environment.
+
 
 ### Deploy Hotfix
 
