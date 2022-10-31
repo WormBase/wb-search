@@ -54,15 +54,17 @@
            repository-name "s3_repository"]
        (do
          (es-connect)
-         (connect-snapshot-repository repository-name)
-         (if (has-index index-id)
-           (println (format "Elasticsearch index %s is found locally. No attempt will be made to restore snapshots." index-id))
-           (if snapshot
-             (let [snapshot-id (if (= "latest" snapshot)
-                                 (get-lateset-snapshot-id repository-name release-id)
-                                 snapshot)]
-               (restore-snapshot index-id repository-name snapshot-id)
-               (println (format "Elasticsearch is restored from snapshot %s" snapshot-id)))))))))
+;         (connect-snapshot-repository repository-name)
+         (if (has-index index-id) println "Index should be set"
+;           (println (format "Elasticsearch index %s is found locally. No attempt will be made to restore snapshots." index-id))
+;           (if snapshot
+;             (let [snapshot-id (if (= "latest" snapshot)
+;                                 (get-lateset-snapshot-id repository-name release-id)
+;                                 snapshot)]
+;               (restore-snapshot index-id repository-name snapshot-id)
+;               (println (format "Elasticsearch is restored from snapshot %s" snapshot-id))))
+           )
+         ))))
 
 (defn -main
   "I don't do a whole lot ... yet."
