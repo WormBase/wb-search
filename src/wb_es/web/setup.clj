@@ -17,9 +17,9 @@
 (defn has-index
   [index-id]
   (try
-    (http/get (format "%s/%s" es-base-url index-id))
+    (http/get (format "%s/%s" es-base-url "wbsearch"))
     (catch Exception e
-      (println (format "Index %s is not found locally." index-id)))))
+      (println (format "Index %s is not found locally." "wbsearch")))))
 
 (defn es-connect
   []
