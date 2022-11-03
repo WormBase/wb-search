@@ -50,7 +50,7 @@
   "run setup"
   ([] (run release-id restore-from-snapshot))
   ([release-id snapshot]
-     (let [index-id release-id
+     (let [index-id "wbsearch"
            repository-name "s3_repository"]
        (do
          (es-connect)
