@@ -14,7 +14,8 @@
             [wb-es.env :refer [es-base-url release-id]]
             [wb-es.mappings.core :refer [create-index]]
             [wb-es.web.setup :refer [es-connect]]
-            [wb-es.snapshot.core :refer [connect-snapshot-repository save-snapshot get-next-snapshot-id]]))
+            ; [wb-es.snapshot.core :refer [connect-snapshot-repository save-snapshot get-next-snapshot-id]]
+            ))
 
 (defn format-bulk
   "returns a new line delimited JSON based on
@@ -389,7 +390,7 @@
       (let [db (d/db datomic-conn)]
         (do
           (schedule-jobs-all db)
-          (connect-snapshot-repository repository-name)
+          ; (connect-snapshot-repository repository-name)
           (scheduler-put! (with-meta {} {:action "snapshot"
                                          :index index-id
                                          :repository repository-name}))

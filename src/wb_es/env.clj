@@ -10,5 +10,5 @@
   (->> (re-find #"WS\d+" datomic-uri)
        (clojure.string/lower-case)))
 
-(def restore-from-snapshot
-  (env :restore-from-snapshot))  ; options: latest, snapshot_id, nil
+;(def restore-from-snapshot
+;  (env :restore-from-snapshot))  ; options: latest, snapshot_id, nil
