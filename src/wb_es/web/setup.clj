@@ -2,7 +2,7 @@
   (:gen-class)
   (:require [clj-http.client :as http]
             [cheshire.core :as json]
-            [wb-es.env :refer [es-base-url release-id restore-from-snapshot]]
+            [wb-es.env :refer [es-base-url release-id]]
             ; [wb-es.snapshot.core :refer [connect-snapshot-repository
             ;                              get-lateset-snapshot-id
             ;                              restore-snapshot]]
@@ -49,9 +49,8 @@
 (defn run
   "run setup"
   ; ([] (run release-id restore-from-snapshot))
-  ([release-id snapshot]
-     (let [index-id release-id
-           repository-name "s3_repository"]
+  ([release-id]
+     (let [index-id release-id]
        (do
          (es-connect)
 ;         (connect-snapshot-repository repository-name)
