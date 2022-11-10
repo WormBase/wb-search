@@ -48,7 +48,7 @@
 
 (defn run
   "run setup"
-  ; ([] (run release-id restore-from-snapshot))
+  ([] (run release-id))
   ([release-id]
      (let [index-id release-id]
        (do
