@@ -3,9 +3,6 @@
   (:require [clj-http.client :as http]
             [cheshire.core :as json]
             [wb-es.env :refer [es-base-url release-id]]
-            ; [wb-es.snapshot.core :refer [connect-snapshot-repository
-            ;                              get-lateset-snapshot-id
-            ;                              restore-snapshot]]
             ))
 
 
@@ -53,15 +50,7 @@
      (let [index-id release-id]
        (do
          (es-connect)
-;         (connect-snapshot-repository repository-name)
          (if (has-index index-id) println "Index should be set"
-;           (println (format "Elasticsearch index %s is found locally. No attempt will be made to restore snapshots." index-id))
-;           (if snapshot
-;             (let [snapshot-id (if (= "latest" snapshot)
-;                                 (get-lateset-snapshot-id repository-name release-id)
-;                                 snapshot)]
-;               (restore-snapshot index-id repository-name snapshot-id)
-;               (println (format "Elasticsearch is restored from snapshot %s" snapshot-id))))
            )
          ))))
 
