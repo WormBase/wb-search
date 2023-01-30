@@ -14,7 +14,8 @@
             [wb-es.env :refer [es-base-url release-id]]
             [wb-es.mappings.core :refer [create-index]]
             [wb-es.web.setup :refer [es-connect]]
-            [wb-es.snapshot.core :refer [connect-snapshot-repository save-snapshot get-next-snapshot-id]]))
+            ; [wb-es.snapshot.core :refer [connect-snapshot-repository save-snapshot get-next-snapshot-id]]
+            ))
 
 (defn format-bulk
   "returns a new line delimited JSON based on
@@ -343,12 +344,12 @@
                 (case (:action job-meta)
                   "snapshot" (let [index-id (:index job-meta)
                                    repository-name (:repository job-meta)
-                                   snapshot-id (get-next-snapshot-id repository-name release-id)
+                                   snapshot-id "1"
                                    timeout 60000]
                                (debug (format "Snapshot paused for %s ms for jobs to finish..." timeout))
                                (Thread/sleep timeout) ; hack to allow other jobs to finish.
                                (debug "Snapshot resumed")
-                               (save-snapshot index-id repository-name snapshot-id)
+                               ; (save-snapshot index-id repository-name snapshot-id)
                                (debug "Snapshot created" job-meta))
                   (let [job-report (run-index-batch db release-id job)]
                     (do
@@ -389,7 +390,7 @@
       (let [db (d/db datomic-conn)]
         (do
           (schedule-jobs-all db)
-          (connect-snapshot-repository repository-name)
+          ; (connect-snapshot-repository repository-name)
           (scheduler-put! (with-meta {} {:action "snapshot"
                                          :index index-id
                                          :repository repository-name}))

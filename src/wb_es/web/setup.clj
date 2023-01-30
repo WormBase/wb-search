@@ -2,10 +2,7 @@
   (:gen-class)
   (:require [clj-http.client :as http]
             [cheshire.core :as json]
-            [wb-es.env :refer [es-base-url release-id restore-from-snapshot]]
-            [wb-es.snapshot.core :refer [connect-snapshot-repository
-                                         get-lateset-snapshot-id
-                                         restore-snapshot]]
+            [wb-es.env :refer [es-base-url release-id]]
             ))
 
 
@@ -48,21 +45,14 @@
 
 (defn run
   "run setup"
-  ([] (run release-id restore-from-snapshot))
-  ([release-id snapshot]
-     (let [index-id release-id
-           repository-name "s3_repository"]
+  ([] (run release-id))
+  ([release-id]
+     (let [index-id release-id]
        (do
          (es-connect)
-         (connect-snapshot-repository repository-name)
-         (if (has-index index-id)
-           (println (format "Elasticsearch index %s is found locally. No attempt will be made to restore snapshots." index-id))
-           (if snapshot
-             (let [snapshot-id (if (= "latest" snapshot)
-                                 (get-lateset-snapshot-id repository-name release-id)
-                                 snapshot)]
-               (restore-snapshot index-id repository-name snapshot-id)
-               (println (format "Elasticsearch is restored from snapshot %s" snapshot-id)))))))))
+         (if (has-index index-id) println "Index should be set"
+           )
+         ))))
 
 (defn -main
   "I don't do a whole lot ... yet."
