@@ -12,7 +12,9 @@
             [wb-es.env :refer [es-base-url release-id]]
             [wb-es.mappings.core :refer [create-index]]
             [wb-es.web.setup :refer [es-connect]]
-            [wb-es.snapshot.core :refer [connect-snapshot-repository save-snapshot get-next-snapshot-id]]))
+            ; [wb-es.snapshot.core :refer [connect-snapshot-repository save-snapshot get-next-snapshot-id]]
+            )
+  )
 
 (defn format-bulk
   "returns a new line delimited JSON based on
@@ -344,11 +346,11 @@
           (close! scheduler))
         )
 
-      (let [repository-name "s3_repository"]
-        (do
-          (connect-snapshot-repository repository-name)
-          (let [snapshot-id (get-next-snapshot-id repository-name release-id)]
-            (save-snapshot index-id repository-name snapshot-id))))
+      ; (let [repository-name "s3_repository"]
+      ;   (do
+      ;     (connect-snapshot-repository repository-name)
+      ;     (let [snapshot-id (get-next-snapshot-id repository-name release-id)]
+      ;       (save-snapshot index-id repository-name snapshot-id))))
       )))
 
 
