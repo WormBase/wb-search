@@ -30,15 +30,11 @@
                      :autocomplete {:type "text"
                                     :analyzer "autocomplete"
                                     :search_analyzer "standard"}
-
-                     ;; autocomplete analyzer will handle gene name like unc-22 as phase search,
-                     ;; seeems sufficient for now, no need for autocomplete_keyword analyzer
                      :autocomplete_keyword {:type "text"
                                             :analyzer "autocomplete_keyword"
                                             :search_analyzer "keyword_ignore_case"}
                      }
             }
-
 
     :other_unique_ids {:type "keyword"
                        :normalizer "lowercase_normalizer"
@@ -50,8 +46,6 @@
                    {:type "keyword"
                     :normalizer "lowercase_normalizer"}}}
 
-
-    ;; start of copy_to fields
     :keyword_all {:type "keyword"
                   :normalizer "lowercase_normalizer"}
     :id_all {:type "text"
@@ -73,8 +67,6 @@
                         :analyzer "english"}}
                       :store true}
     :other {:type "text"}
-    ;; end of copy to fields
-
 
     :description {:type "text"
                   :copy_to "description_all"}
@@ -83,9 +75,7 @@
     :remarks {:type "text"
               :copy_to "description_all"}
     :method {:type "text"
-             :copy_to "description_all"} ; for locatable
-
-
+             :copy_to "description_all"}
 
     :page_type {:type "keyword"
                 :copy_to "categories_all"
@@ -103,14 +93,12 @@
     :genotype {:type "text"
                :copy_to "other"}
 
-    ;; start of refs
     :allele (ref-mapping)
     :author (ref-mapping)
     :lab_representative (ref-mapping)
     :gene (ref-mapping)
     :phenotype (ref-mapping)
     :strain (ref-mapping)
-    ;; end of refs
     }})
 
 (def index-settings
@@ -157,26 +145,25 @@
 
                           "identifier" {:tokenizer "keyword"
                                         :filter ["lowercase" "unprefix_filter"]}}}}
-   :mappings {:_doc generic-mapping}})
+   :mappings generic-mapping})
 
 (defn create-index
   ([index & {:keys [default-index delete-existing]}]
-     (let [index-url (format "%s/%s " es-base-url index)
-           settings (if default-index
-                      (assoc-in index-settings [:aliases release-id] {})
-                      index-settings)]
-       (do
-         (if delete-existing
-           (try
-             (http/delete index-url)
-             (catch clojure.lang.ExceptionInfo e
-               (if-not (= (:status (ex-data e))
-                          404)
-                 (clojure.pprint/pprint (ex-data e))))))
+   (let [index-url (format "%s/%s" es-base-url index)
+         settings (if default-index
+                    (assoc-in index-settings [:aliases release-id] {})
+                    index-settings)]
+     (do
+       (when delete-existing
          (try
-           (http/put index-url {:headers {:content-type "application/json"}
-                                :body (json/generate-string settings)})
+           (http/delete index-url)
            (catch clojure.lang.ExceptionInfo e
-             (clojure.pprint/pprint (ex-data e))
-             (throw e))))
-       )))
+             (when-not (= (:status (ex-data e)) 404)
+               (clojure.pprint/pprint (ex-data e))))))
+       (try
+         (http/put index-url
+                   {:headers {:content-type "application/json"}
+                    :body (json/generate-string settings)})
+         (catch clojure.lang.ExceptionInfo e
+           (clojure.pprint/pprint (ex-data e))
+           (throw e)))))))

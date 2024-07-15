@@ -4,55 +4,54 @@
   :min-lein-version "2.7.0"
   :sign-releases false
   :dependencies
-  [[cheshire "5.7.0"]
-   [clj-http "2.3.0"]
-   [org.clojure/core.async "0.3.442"]
-   [org.clojure/tools.cli "0.3.5"]
-   [environ "1.1.0"]
-   [mount "0.1.11"]
-   [org.clojure/clojure "1.8.0"]
+  [[cheshire "5.10.0"]
+   [clj-http "3.12.3"]
+   [org.clojure/core.async "1.3.618"]
+   [org.clojure/tools.cli "1.0.206"]
+   [environ "1.2.0"]
+   [mount "0.1.16"]
+   [org.clojure/clojure "1.10.3"]
    [factual/durable-queue "0.1.5"]
-   [com.taoensso/timbre "4.10.0"]
+   [com.taoensso/timbre "5.1.2"]
 
-   ;; the following dependecies are only needed for web
-   [compojure "1.6.0"]
-   [ring/ring-defaults "0.3.0"]
-   [ring/ring-core "1.6.2"]
-   [ring/ring-json "0.4.0"]
+   ;; Update ElasticSearch client to 7.x
+   [org.elasticsearch.client/elasticsearch-rest-high-level-client "7.17.9"]
+
+   ;; the following dependencies are only needed for web
+   [compojure "1.6.2"]
+   [ring/ring-defaults "0.3.3"]
+   [ring/ring-core "1.9.5"]
+   [ring/ring-json "0.5.1"]
    ;; use jetty in tests
-   [ring/ring-jetty-adapter "1.6.3"]
+   [ring/ring-jetty-adapter "1.9.5"]]
 
-   ]
   :source-paths ["src"]
-  :plugins [[lein-environ "1.1.0"]
-            [lein-pprint "1.1.1"]]
+  :plugins [[lein-environ "1.2.0"]
+            [lein-pprint "1.3.2"]]
   :main ^:skip-aot wb-es.core
-  :resource-paths ["resources" "file:datomic-repository/datomic-pro"]
+;  :resource-paths ["resources" "file:datomic-repository/datomic-pro"]
   :target-path "target/%s"
   :javac-options ["-target" "1.8" "-source" "1.8"]
   :license "GPLv2"
-  :jvm-opts [;; same GC options as the transactor,
-             ;; should minimize long pauses.
-             "-XX:+UseG1GC" "-XX:MaxGCPauseMillis=50"
-             ;;"-Ddatomic.objectCacheMax=1000000000" ; when commented out, the default 50% RAM takes effect
+  :jvm-opts ["-XX:+UseG1GC" "-XX:MaxGCPauseMillis=50"
              "-Ddatomic.txTimeoutMsec=1000000"]
   :profiles
   {:datomic-free
    {:dependencies [[com.datomic/datomic-free "0.9.5561.56"
                     :exclusions [joda-time]]]}
    :datomic-pro
-   {:dependencies [[com.datomic/datomic-pro "0.9.5703"
+   {:dependencies [[com.datomic/datomic-pro "1.0.7180"
                     :exclusions [joda-time]]]}
    :ddb
    {:dependencies
-    [[com.amazonaws/aws-java-sdk-dynamodb "1.11.82"
+    [[com.amazonaws/aws-java-sdk-dynamodb "1.12.261"
       :exclusions [joda-time]]]}
    :search-engine
    {:docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/aws-elasticsearch"
              :dockerfile "docker/Dockerfile.aws-elasticsearch"}}
    :indexer [:datomic-pro :ddb
              {:main wb-es.bulk.core
-              :uberjar-name "wb-es-indexer-standalone.jar" ;this ubjer contains Datomic pro, hence must be kept private
+              :uberjar-name "wb-es-indexer-standalone.jar"
               :docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-indexer"
                        :dockerfile "docker/Dockerfile.indexer"}
               }]
@@ -62,8 +61,8 @@
                  :init wb-es.web.setup/run}
           :docker {:image-name "357210185381.dkr.ecr.us-east-1.amazonaws.com/wormbase/search-web-api"
                    :dockerfile "docker/Dockerfile.web"}}]
-   :web-dev {:dependencies [[ring/ring-devel "1.5.1"]]
-             :plugins [[lein-ring "0.12.5"]]}
+   :web-dev {:dependencies [[ring/ring-devel "1.9.5"]]
+             :plugins [[lein-ring "0.12.6"]]}
    :dev [:indexer
          :web
          :web-dev
@@ -77,13 +76,13 @@
           {:wb-db-uri "datomic:ddb://us-east-1/WS260/wormbase"
            :swagger-validator-url "http://localhost:8002"}
           :plugins
-          [[jonase/eastwood "0.2.4"
+          [[jonase/eastwood "1.2.4"
             :exclusions [org.clojure/clojure]]
-           [lein-ancient "0.6.8"]
-           [lein-bikeshed "0.3.0"]
-           [lein-ns-dep-graph "0.1.0-SNAPSHOT"]
-           [venantius/yagni "0.1.4"]
-           [com.jakemccrary/lein-test-refresh "0.17.0"]
+           [lein-ancient "0.7.0"]
+           [lein-bikeshed "0.5.2"]
+           [lein-ns-dep-graph "0.2.0-SNAPSHOT"]
+           [venantius/yagni "0.1.7"]
+           [com.jakemccrary/lein-test-refresh "0.25.0"]
            [io.sarnowski/lein-docker "1.1.0"]
            [lein-shell "0.5.0"]]}]
    :uberjar {:aot :all}
