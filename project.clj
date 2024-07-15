@@ -13,6 +13,9 @@
    [org.clojure/clojure "1.10.3"]
    [factual/durable-queue "0.1.5"]
    [com.taoensso/timbre "5.1.2"]
+   [com.fasterxml.jackson.core/jackson-core "2.12.3"]
+   [com.fasterxml.jackson.core/jackson-databind "2.12.3"]
+   [com.fasterxml.jackson.core/jackson-annotations "2.12.3"]
 
    ;; Update ElasticSearch client to 7.x
    [org.elasticsearch.client/elasticsearch-rest-high-level-client "7.17.9"]
@@ -40,7 +43,7 @@
    {:dependencies [[com.datomic/datomic-free "0.9.5561.56"
                     :exclusions [joda-time]]]}
    :datomic-pro
-   {:dependencies [[com.datomic/datomic-pro "1.0.7180"
+   {:dependencies [[com.datomic/datomic-pro "0.9.5703"
                     :exclusions [joda-time]]]}
    :ddb
    {:dependencies
